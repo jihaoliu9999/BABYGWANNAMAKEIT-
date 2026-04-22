@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ARIA — Creator Intelligence Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #080C10;
+    --surface: #0E1318;
+    --surface2: #141B22;
+    --border: rgba(255,255,255,0.07);
+    --border2: rgba(255,255,255,0.12);
+    --accent: #C8F060;
+    --accent2: #60C8F0;
+    --accent3: #F060A0;
+    --gold: #F0C060;
+    --text: #E8EDF2;
+    --muted: #6B7A8D;
+    --muted2: #9AAAB8;
+    --red: #F06060;
+    --teal: #60F0C8;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--bg); color:var(--text); font-family:'Syne',sans-serif; overflow-x:hidden; }
+
+  /* SHELL */
+  .shell { display:flex; height:100vh; }
+
+  /* SIDEBAR */
+  .sidebar {
+    width:220px; flex-shrink:0; background:var(--surface);
+    border-right:1px solid var(--border); display:flex; flex-direction:column;
+    padding:24px 0; position:relative; z-index:10;
+  }
+  .logo { padding:0 20px 28px; }
+  .logo-mark { font-family:'DM Serif Display',serif; font-size:26px; color:var(--accent); letter-spacing:-0.5px; }
+  .logo-sub { font-size:9px; color:var(--muted); letter-spacing:3px; text-transform:uppercase; margin-top:2px; }
+  .nav-section { padding:0 12px; margin-bottom:8px; }
+  .nav-label { font-size:9px; color:var(--muted); letter-spacing:2px; text-transform:uppercase; padding:0 8px; margin-bottom:6px; }
+  .nav-item {
+    display:flex; align-items:center; gap:10px; padding:9px 10px; border-radius:8px;
+    font-size:13px; color:var(--muted2); cursor:pointer; transition:all .15s;
+    font-weight:600; letter-spacing:0.2px;
+  }
+  .nav-item:hover { background:var(--surface2); color:var(--text); }
+  .nav-item.active { background:rgba(200,240,96,0.1); color:var(--accent); }
+  .nav-icon { font-size:15px; width:20px; text-align:center; }
+  .nav-badge { margin-left:auto; background:var(--accent3); color:white; font-size:9px; padding:2px 6px; border-radius:20px; font-weight:700; }
+
+  .view-toggle { margin-top:auto; padding:16px 12px 0; border-top:1px solid var(--border); }
+  .toggle-btn {
+    display:flex; align-items:center; gap:8px; width:100%; padding:9px 10px;
+    border-radius:8px; font-size:12px; cursor:pointer; font-family:'Syne',sans-serif;
+    font-weight:600; transition:all .15s; border:none;
+  }
+  .toggle-op { background:rgba(96,200,240,0.1); color:var(--accent2); margin-bottom:6px; }
+  .toggle-cr { background:rgba(200,240,96,0.1); color:var(--accent); }
+  .toggle-op.active { background:var(--accent2); color:var(--bg); }
+  .toggle-cr.active { background:var(--accent); color:var(--bg); }
+
+  /* MAIN */
+  .main { flex:1; overflow:hidden; display:flex; flex-direction:column; }
+
+  /* TOP BAR */
+  .topbar {
+    height:56px; border-bottom:1px solid var(--border); display:flex; align-items:center;
+    padding:0 28px; gap:16px; flex-shrink:0;
+  }
+  .topbar-title { font-size:15px; font-weight:700; flex:1; }
+  .topbar-chip {
+    font-size:10px; padding:4px 10px; border-radius:20px; font-weight:700;
+    letter-spacing:0.5px; text-transform:uppercase;
+  }
+  .chip-op { background:rgba(96,200,240,0.15); color:var(--accent2); border:1px solid rgba(96,200,240,0.3); }
+  .chip-cr { background:rgba(200,240,96,0.15); color:var(--accent); border:1px solid rgba(200,240,96,0.3); }
+  .chip-live { background:rgba(96,240,200,0.15); color:var(--teal); border:1px solid rgba(96,240,200,0.3); animation:pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.6} }
+
+  /* CONTENT */
+  .content { flex:1; overflow-y:auto; padding:28px; }
+  .content::-webkit-scrollbar { width:4px; }
+  .content::-webkit-scrollbar-track { background:transparent; }
+  .content::-webkit-scrollbar-thumb { background:var(--border2); border-radius:2px; }
+
+  /* PANELS — hide/show */
+  .panel { display:none; }
+  .panel.active { display:block; }
+
+  /* STAT CARDS */
+  .stat-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:24px; }
+  .stat-card {
+    background:var(--surface); border:1px solid var(--border); border-radius:12px;
+    padding:18px; position:relative; overflow:hidden;
+  }
+  .stat-card::before {
+    content:''; position:absolute; top:0; left:0; right:0; height:2px;
+  }
+  .stat-card.green::before { background:var(--accent); }
+  .stat-card.blue::before { background:var(--accent2); }
+  .stat-card.pink::before { background:var(--accent3); }
+  .stat-card.gold::before { background:var(--gold); }
+  .stat-label { font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:1.5px; margin-bottom:8px; }
+  .stat-value { font-size:28px; font-weight:800; line-height:1; margin-bottom:4px; }
+  .stat-value.green { color:var(--accent); }
+  .stat-value.blue { color:var(--accent2); }
+  .stat-value.pink { color:var(--accent3); }
+  .stat-value.gold { color:var(--gold); }
+  .stat-delta { font-size:11px; color:var(--muted2); }
+  .delta-up { color:#60F0A0; }
+  .delta-down { color:var(--red); }
+
+  /* SECTION HEADER */
+  .section-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
+  .section-title { font-size:13px; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:var(--muted2); }
+  .section-action { font-size:11px; color:var(--accent); cursor:pointer; font-weight:600; }
+
+  /* INTEL COMPOSER */
+  .intel-composer {
+    background:var(--surface); border:1px solid var(--border); border-radius:14px;
+    padding:20px; margin-bottom:24px;
+  }
+  .composer-title { font-size:13px; font-weight:700; margin-bottom:14px; color:var(--muted2); text-transform:uppercase; letter-spacing:1px; }
+  .composer-row { display:flex; gap:10px; margin-bottom:10px; }
+  .composer-input {
+    flex:1; background:var(--surface2); border:1px solid var(--border); border-radius:8px;
+    padding:10px 14px; color:var(--text); font-family:'Syne',sans-serif; font-size:13px; outline:none;
+    transition:border .15s;
+  }
+  .composer-input:focus { border-color:var(--accent); }
+  .composer-input::placeholder { color:var(--muted); }
+  textarea.composer-input { resize:none; height:80px; }
+  .tag-row { display:flex; gap:6px; flex-wrap:wrap; }
+  .tag {
+    font-size:10px; padding:4px 10px; border-radius:20px; cursor:pointer; font-weight:700;
+    border:1px solid var(--border); color:var(--muted2); transition:all .15s; letter-spacing:0.3px;
+  }
+  .tag.selected { border-color:var(--accent); color:var(--accent); background:rgba(200,240,96,0.1); }
+  .tag.v { --tc:var(--accent2); }
+  .tag.t { --tc:var(--gold); }
+  .tag.b { --tc:var(--accent3); }
+  .tag.selected.v { border-color:var(--accent2); color:var(--accent2); background:rgba(96,200,240,0.1); }
+  .tag.selected.t { border-color:var(--gold); color:var(--gold); background:rgba(240,192,96,0.1); }
+  .tag.selected.b { border-color:var(--accent3); color:var(--accent3); background:rgba(240,96,160,0.1); }
+  .publish-btn {
+    background:var(--accent); color:var(--bg); padding:10px 20px; border-radius:8px;
+    font-size:12px; font-weight:800; cursor:pointer; border:none; font-family:'Syne',sans-serif;
+    letter-spacing:0.5px; transition:opacity .15s;
+  }
+  .publish-btn:hover { opacity:0.85; }
+
+  /* CREATOR ROSTER */
+  .creator-table { background:var(--surface); border:1px solid var(--border); border-radius:14px; overflow:hidden; }
+  .ct-header { display:grid; grid-template-columns:2fr 1fr 1fr 1fr 1fr 80px; gap:0; }
+  .ct-col { padding:10px 16px; font-size:10px; text-transform:uppercase; letter-spacing:1.5px; color:var(--muted); font-weight:700; border-bottom:1px solid var(--border); }
+  .ct-row { display:grid; grid-template-columns:2fr 1fr 1fr 1fr 1fr 80px; border-bottom:1px solid var(--border); transition:background .15s; cursor:pointer; }
+  .ct-row:last-child { border-bottom:none; }
+  .ct-row:hover { background:var(--surface2); }
+  .ct-cell { padding:12px 16px; font-size:12px; display:flex; align-items:center; gap:8px; }
+  .creator-avatar { width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:800; flex-shrink:0; }
+  .tier-badge { font-size:9px; padding:2px 8px; border-radius:20px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; }
+  .tier-vip { background:rgba(240,192,96,0.15); color:var(--gold); border:1px solid rgba(240,192,96,0.3); }
+  .tier-pro { background:rgba(200,240,96,0.1); color:var(--accent); border:1px solid rgba(200,240,96,0.3); }
+  .tier-basic { background:rgba(107,122,141,0.15); color:var(--muted2); border:1px solid var(--border); }
+  .eng-bar { height:4px; border-radius:2px; background:var(--surface2); width:60px; overflow:hidden; }
+  .eng-fill { height:100%; border-radius:2px; }
+  .status-dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+  .dot-active { background:var(--teal); }
+  .dot-idle { background:var(--gold); }
+
+  /* FLAGS */
+  .flag-list { display:flex; flex-direction:column; gap:10px; }
+  .flag-card {
+    background:var(--surface); border:1px solid rgba(240,96,96,0.2); border-radius:12px;
+    padding:16px; display:flex; gap:14px; align-items:flex-start;
+  }
+  .flag-icon { font-size:18px; flex-shrink:0; margin-top:2px; }
+  .flag-creator { font-size:12px; font-weight:700; margin-bottom:4px; }
+  .flag-msg { font-size:12px; color:var(--muted2); margin-bottom:8px; line-height:1.5; }
+  .flag-meta { font-size:10px; color:var(--muted); }
+  .flag-actions { display:flex; gap:6px; margin-top:10px; }
+  .btn-sm {
+    font-size:10px; padding:5px 12px; border-radius:6px; cursor:pointer; font-weight:700;
+    border:none; font-family:'Syne',sans-serif; letter-spacing:0.3px; transition:opacity .15s;
+  }
+  .btn-resolve { background:rgba(96,240,200,0.15); color:var(--teal); border:1px solid rgba(96,240,200,0.3); }
+  .btn-reply { background:rgba(200,240,96,0.1); color:var(--accent); border:1px solid rgba(200,240,96,0.3); }
+
+  /* ─── CREATOR APP ─── */
+  .creator-app { max-width:390px; margin:0 auto; }
+
+  /* FEED */
+  .intel-feed { display:flex; flex-direction:column; gap:12px; }
+  .intel-card {
+    background:var(--surface); border:1px solid var(--border); border-radius:14px;
+    padding:16px; cursor:pointer; transition:all .2s; position:relative; overflow:hidden;
+  }
+  .intel-card:hover { border-color:var(--border2); transform:translateY(-1px); }
+  .intel-card.unread::after { content:''; position:absolute; top:0; left:0; bottom:0; width:3px; border-radius:2px 0 0 2px; }
+  .intel-card.unread.venue::after { background:var(--accent2); }
+  .intel-card.unread.trend::after { background:var(--gold); }
+  .intel-card.unread.brand::after { background:var(--accent3); }
+  .intel-card.unread.collab::after { background:var(--teal); }
+  .ic-header { display:flex; align-items:center; gap:8px; margin-bottom:10px; }
+  .ic-cat { font-size:9px; padding:3px 8px; border-radius:20px; font-weight:700; text-transform:uppercase; letter-spacing:1px; }
+  .cat-venue { background:rgba(96,200,240,0.15); color:var(--accent2); }
+  .cat-trend { background:rgba(240,192,96,0.15); color:var(--gold); }
+  .cat-brand { background:rgba(240,96,160,0.15); color:var(--accent3); }
+  .cat-collab { background:rgba(96,240,200,0.15); color:var(--teal); }
+  .ic-time { font-size:10px; color:var(--muted); margin-left:auto; }
+  .ic-title { font-size:14px; font-weight:700; margin-bottom:6px; line-height:1.3; }
+  .ic-body { font-size:12px; color:var(--muted2); line-height:1.6; }
+  .ic-expanded { margin-top:12px; padding-top:12px; border-top:1px solid var(--border); display:none; }
+  .ic-expanded.show { display:block; }
+  .ic-metric { display:flex; justify-content:space-between; font-size:11px; margin-bottom:4px; }
+  .ic-metric-label { color:var(--muted); }
+  .ic-metric-value { font-weight:700; color:var(--accent); }
+
+  /* BOT CHAT */
+  .chat-wrap { display:flex; flex-direction:column; height:calc(100vh - 56px - 56px); }
+  .chat-header { padding:16px; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:12px; }
+  .bot-avatar { width:36px; height:36px; border-radius:50%; background:linear-gradient(135deg,var(--accent),var(--accent2)); display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0; }
+  .bot-name { font-size:14px; font-weight:700; }
+  .bot-status { font-size:11px; color:var(--teal); }
+  .chat-messages { flex:1; overflow-y:auto; padding:16px; display:flex; flex-direction:column; gap:12px; }
+  .chat-messages::-webkit-scrollbar { width:3px; }
+  .chat-messages::-webkit-scrollbar-thumb { background:var(--border); }
+  .msg { max-width:80%; }
+  .msg.user { align-self:flex-end; }
+  .msg.bot { align-self:flex-start; }
+  .msg-bubble {
+    padding:10px 14px; border-radius:14px; font-size:13px; line-height:1.5;
+  }
+  .msg.user .msg-bubble { background:var(--accent); color:var(--bg); border-radius:14px 14px 4px 14px; font-weight:600; }
+  .msg.bot .msg-bubble { background:var(--surface2); color:var(--text); border-radius:14px 14px 14px 4px; border:1px solid var(--border); }
+  .msg-time { font-size:9px; color:var(--muted); margin-top:4px; }
+  .msg.user .msg-time { text-align:right; }
+  .chat-input-row { padding:14px; border-top:1px solid var(--border); display:flex; gap:8px; }
+  .chat-input {
+    flex:1; background:var(--surface2); border:1px solid var(--border); border-radius:22px;
+    padding:10px 16px; color:var(--text); font-family:'Syne',sans-serif; font-size:13px;
+    outline:none; transition:border .15s;
+  }
+  .chat-input:focus { border-color:var(--accent); }
+  .send-btn {
+    width:40px; height:40px; border-radius:50%; background:var(--accent); border:none;
+    cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:16px;
+    transition:opacity .15s; flex-shrink:0;
+  }
+  .send-btn:hover { opacity:0.85; }
+
+  /* TYPING INDICATOR */
+  .typing { display:flex; gap:4px; align-items:center; padding:10px 14px; }
+  .typing span { width:6px; height:6px; border-radius:50%; background:var(--muted2); animation:bounce .8s infinite; }
+  .typing span:nth-child(2) { animation-delay:.15s; }
+  .typing span:nth-child(3) { animation-delay:.3s; }
+  @keyframes bounce { 0%,80%,100%{transform:translateY(0)} 40%{transform:translateY(-6px)} }
+
+  /* NETWORK */
+  .creator-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin-bottom:20px; }
+  .creator-card {
+    background:var(--surface); border:1px solid var(--border); border-radius:12px;
+    padding:14px; cursor:pointer; transition:all .15s;
+  }
+  .creator-card:hover { border-color:var(--border2); }
+  .cc-top { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+  .cc-avatar { width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:15px; font-weight:800; flex-shrink:0; }
+  .cc-name { font-size:12px; font-weight:700; }
+  .cc-handle { font-size:10px; color:var(--muted); }
+  .cc-stats { display:flex; gap:10px; margin-bottom:10px; }
+  .cc-stat { flex:1; }
+  .cc-stat-label { font-size:9px; color:var(--muted); text-transform:uppercase; letter-spacing:1px; }
+  .cc-stat-value { font-size:13px; font-weight:700; }
+  .connect-btn {
+    width:100%; padding:7px; border-radius:7px; font-size:10px; font-weight:700;
+    cursor:pointer; border:1px solid var(--border); background:transparent; color:var(--muted2);
+    font-family:'Syne',sans-serif; transition:all .15s; letter-spacing:0.3px;
+  }
+  .connect-btn:hover { border-color:var(--accent); color:var(--accent); background:rgba(200,240,96,0.05); }
+  .connect-btn.connected { background:rgba(200,240,96,0.1); border-color:var(--accent); color:var(--accent); }
+
+  /* COLLAB BOARD */
+  .collab-card {
+    background:var(--surface); border:1px solid var(--border); border-radius:12px;
+    padding:16px; margin-bottom:10px; cursor:pointer; transition:border .15s;
+  }
+  .collab-card:hover { border-color:var(--border2); }
+  .collab-header { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:8px; }
+  .collab-title { font-size:13px; font-weight:700; }
+  .collab-comp { font-size:12px; color:var(--accent); font-weight:700; }
+  .collab-desc { font-size:11px; color:var(--muted2); line-height:1.5; margin-bottom:10px; }
+  .collab-tags { display:flex; gap:6px; flex-wrap:wrap; }
+  .collab-tag { font-size:9px; padding:3px 8px; border-radius:20px; background:var(--surface2); color:var(--muted2); font-weight:600; }
+  .interest-btn {
+    margin-top:10px; width:100%; padding:8px; border-radius:8px; font-size:11px; font-weight:700;
+    cursor:pointer; border:1px solid rgba(96,240,200,0.3); background:rgba(96,240,200,0.08);
+    color:var(--teal); font-family:'Syne',sans-serif; transition:all .15s;
+  }
+  .interest-btn:hover { background:rgba(96,240,200,0.15); }
+  .interest-btn.interested { background:rgba(96,240,200,0.2); cursor:default; }
+
+  /* PERFORMANCE */
+  .perf-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:20px; }
+  .perf-card { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:16px; }
+  .perf-label { font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:1.5px; margin-bottom:8px; }
+  .perf-value { font-size:24px; font-weight:800; margin-bottom:4px; }
+  .perf-sub { font-size:11px; color:var(--muted2); }
+  .chart-bars { display:flex; gap:4px; align-items:flex-end; height:50px; margin-top:12px; }
+  .bar { flex:1; border-radius:3px 3px 0 0; opacity:0.7; transition:opacity .15s; cursor:pointer; }
+  .bar:hover { opacity:1; }
+
+  /* NOTIFICATION TOAST */
+  .toast {
+    position:fixed; bottom:24px; right:24px; background:var(--surface2); border:1px solid var(--accent);
+    border-radius:12px; padding:14px 18px; font-size:12px; font-weight:600; color:var(--accent);
+    transform:translateY(80px); opacity:0; transition:all .3s; z-index:100; max-width:300px;
+  }
+  .toast.show { transform:translateY(0); opacity:1; }
+  .toast-title { font-size:13px; font-weight:800; margin-bottom:4px; }
+  .toast-body { color:var(--muted2); font-weight:500; font-size:11px; }
+
+  /* MOBILE TAB BAR (creator view) */
+  .tab-bar {
+    height:56px; border-top:1px solid var(--border); display:flex; align-items:center;
+    background:var(--surface); flex-shrink:0;
+  }
+  .tab-item {
+    flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:3px; cursor:pointer; transition:color .15s; color:var(--muted); padding:4px;
+  }
+  .tab-item.active { color:var(--accent); }
+  .tab-icon { font-size:18px; }
+  .tab-label { font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; }
+
+  /* MOBILE PANEL */
+  .mobile-panel { display:none; }
+  .mobile-panel.active { display:flex; flex-direction:column; height:calc(100vh - 56px - 56px); overflow-y:auto; padding:16px; }
+  .mobile-panel.active.chat-mode { padding:0; overflow:hidden; }
+  .mobile-panel.active.chat-mode .chat-wrap { height:100%; }
+
+  /* PERF CHART */
+  .mini-chart { display:flex; gap:3px; align-items:flex-end; height:40px; }
+  .mc-bar { width:100%; border-radius:2px 2px 0 0; }
+
+  /* MONO */
+  .mono { font-family:'DM Mono',monospace; }
+
+  /* INSIGHT BOX */
+  .insight-box {
+    background:linear-gradient(135deg,rgba(200,240,96,0.05),rgba(96,200,240,0.05));
+    border:1px solid rgba(200,240,96,0.15); border-radius:12px; padding:16px; margin-bottom:16px;
+  }
+  .insight-title { font-size:11px; font-weight:700; color:var(--accent); text-transform:uppercase; letter-spacing:1px; margin-bottom:8px; }
+  .insight-text { font-size:12px; color:var(--muted2); line-height:1.6; }
+
+  /* SCROLLBAR THIN */
+  .content::-webkit-scrollbar { width:3px; }
+
+  @media (max-width:800px) {
+    .sidebar { width:60px; }
+    .logo-sub, .nav-item span:not(.nav-icon), .nav-label, .view-toggle .toggle-btn span { display:none; }
+    .logo-mark { font-size:20px; }
+    .stat-grid { grid-template-columns:1fr 1fr; }
+    .ct-header, .ct-row { grid-template-columns:2fr 1fr 1fr; }
+    .ct-col:nth-child(n+4), .ct-cell:nth-child(n+4) { display:none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="logo">
+      <div class="logo-mark">ARIA</div>
+      <div class="logo-sub">Creator Intelligence</div>
+    </div>
+
+    <!-- Operator Nav -->
+    <div id="op-nav">
+      <div class="nav-section">
+        <div class="nav-label">Operator</div>
+        <div class="nav-item active" onclick="showPanel('op-overview')"><span class="nav-icon">⬡</span><span>Overview</span></div>
+        <div class="nav-item" onclick="showPanel('op-intel')"><span class="nav-icon">⚡</span><span>Intel</span></div>
+        <div class="nav-item" onclick="showPanel('op-roster')"><span class="nav-icon">◈</span><span>Roster</span></div>
+        <div class="nav-item" onclick="showPanel('op-flags')"><span class="nav-icon">⚑</span><span>Flags</span><span class="nav-badge">2</span></div>
+        <div class="nav-item" onclick="showPanel('op-perf')"><span class="nav-icon">◎</span><span>Performance</span></div>
+      </div>
+    </div>
+
+    <!-- Creator Nav (hidden by default) -->
+    <div id="cr-nav" style="display:none">
+      <div class="nav-section">
+        <div class="nav-label">Creator</div>
+        <div class="nav-item active" onclick="showMobilePanel('cr-feed')"><span class="nav-icon">⬡</span><span>Feed</span></div>
+        <div class="nav-item" onclick="showMobilePanel('cr-chat')"><span class="nav-icon">◈</span><span>My Bot</span></div>
+        <div class="nav-item" onclick="showMobilePanel('cr-network')"><span class="nav-icon">⬡</span><span>Network</span></div>
+        <div class="nav-item" onclick="showMobilePanel('cr-perf')"><span class="nav-icon">◎</span><span>Stats</span></div>
+      </div>
+    </div>
+
+    <div class="view-toggle">
+      <button class="toggle-btn toggle-op active" id="btnOp" onclick="switchView('operator')">
+        <span>🎛</span><span>Operator View</span>
+      </button>
+      <button class="toggle-btn toggle-cr" id="btnCr" onclick="switchView('creator')">
+        <span>📱</span><span>Creator View</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+    <!-- TOP BAR -->
+    <div class="topbar">
+      <div class="topbar-title" id="topbar-title">Dashboard Overview</div>
+      <span class="topbar-chip chip-live">● Live Demo</span>
+      <span class="topbar-chip" id="view-chip">Operator Dashboard</span>
+    </div>
+
+    <!-- ══════════ OPERATOR PANELS ══════════ -->
+    <div class="content" id="op-content">
+
+      <!-- OVERVIEW -->
+      <div class="panel active" id="op-overview">
+        <div class="insight-box">
+          <div class="insight-title">📊 Real Industry Benchmarks</div>
+          <div class="insight-text">All metrics reflect 2025-2026 industry data: micro-influencers (10K–100K followers) average 3–5% engagement, earn $500–$5,000/post, and drive 60% higher ROI than mega-influencers. Miami lifestyle creators with active brand deals average $2,400/month in partnerships.</div>
+        </div>
+        <div class="stat-grid">
+          <div class="stat-card green">
+            <div class="stat-label">Active Creators</div>
+            <div class="stat-value green">12</div>
+            <div class="stat-delta">Pilot cohort · Miami, FL</div>
+          </div>
+          <div class="stat-card blue">
+            <div class="stat-label">Avg Engagement Rate</div>
+            <div class="stat-value blue">4.2%</div>
+            <div class="stat-delta"><span class="delta-up">↑ 1.8%</span> vs. pre-platform avg</div>
+          </div>
+          <div class="stat-card pink">
+            <div class="stat-label">Brand Deals Active</div>
+            <div class="stat-value pink">$31K</div>
+            <div class="stat-delta">Monthly deal value across roster</div>
+          </div>
+          <div class="stat-card gold">
+            <div class="stat-label">Avg Follower Growth</div>
+            <div class="stat-value gold">+847</div>
+            <div class="stat-delta">Per creator this week</div>
+          </div>
+        </div>
+
+        <div class="section-header">
+          <div class="section-title">Creator Performance Snapshot</div>
+          <div class="section-action" onclick="showPanel('op-roster')">View All →</div>
+        </div>
+        <div class="creator-table">
+          <div class="ct-header">
+            <div class="ct-col">Creator</div>
+            <div class="ct-col">Followers</div>
+            <div class="ct-col">Engagement</div>
+            <div class="ct-col">Tier</div>
+            <div class="ct-col">Posts/Wk</div>
+            <div class="ct-col">Status</div>
+          </div>
+          <div class="ct-row" onclick="showPanel('op-roster')">
+            <div class="ct-cell"><div class="creator-avatar" style="background:linear-gradient(135deg,#C8F060,#60C8F0);color:#080C10">SL</div>Sofia L.</div>
+            <div class="ct-cell mono">47.2K</div>
+            <div class="ct-cell"><div class="eng-bar"><div class="eng-fill" style="width:86%;background:var(--accent)"></div></div> 4.3%</div>
+            <div class="ct-cell"><span class="tier-badge tier-vip">VIP</span></div>
+            <div class="ct-cell mono">5</div>
+            <div class="ct-cell"><div class="status-dot dot-active"></div></div>
+          </div>
+          <div class="ct-row" onclick="showPanel('op-roster')">
+            <div class="ct-cell"><div class="creator-avatar" style="background:linear-gradient(135deg,#F060A0,#F0C060);color:#080C10">MR</div>Marco R.</div>
+            <div class="ct-cell mono">28.9K</div>
+            <div class="ct-cell"><div class="eng-bar"><div class="eng-fill" style="width:72%;background:var(--accent2)"></div></div> 3.6%</div>
+            <div class="ct-cell"><span class="tier-badge tier-pro">Pro</span></div>
+            <div class="ct-cell mono">4</div>
+            <div class="ct-cell"><div class="status-dot dot-active"></div></div>
+          </div>
+          <div class="ct-row" onclick="showPanel('op-roster')">
+            <div class="ct-cell"><div class="creator-avatar" style="background:linear-gradient(135deg,#60F0C8,#60C8F0);color:#080C10">JT</div>Jade T.</div>
+            <div class="ct-cell mono">83.1K</div>
+            <div class="ct-cell"><div class="eng-bar"><div class="eng-fill" style="width:94%;background:var(--gold)"></div></div> 4.7%</div>
+            <div class="ct-cell"><span class="tier-badge tier-vip">VIP</span></div>
+            <div class="ct-cell mono">6</div>
+            <div class="ct-cell"><div class="status-dot dot-active"></div></div>
+          </div>
+          <div class="ct-row" onclick="showPanel('op-roster')">
+            <div class="ct-cell"><div class="creator-avatar" style="background:linear-gradient(135deg,#F0C060,#F060A0);color:#080C10">AK</div>Alex K.</div>
+            <div class="ct-cell mono">19.4K</div>
+            <div class="ct-cell"><div class="eng-bar"><div class="eng-fill" style="width:54%;background:var(--accent3)"></div></div> 2.7%</div>
+            <div class="ct-cell"><span class="tier-badge tier-basic">Basic</span></div>
+            <div class="ct-cell mono">2</div>
+            <div class="ct-cell"><div class="status-dot dot-idle"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- INTEL COMPOSER -->
+      <div class="panel" id="op-intel">
+        <div class="section-header"><div class="section-title">Push Intelligence to Creators</div></div>
+        <div class="intel-composer">
+          <div class="composer-title">New Intel Post</div>
+          <div class="composer-row">
+            <input class="composer-input" id="intel-title" placeholder="e.g. Komodo rooftop is the table this weekend" />
+          </div>
+          <div class="composer-row">
+            <textarea class="composer-input" id="intel-body" placeholder="Write what the bot will deliver to creators. Be specific, inside-info, never generic. Mention the vibe, who's going, what to film."></textarea>
+          </div>
+          <div class="tag-row" style="margin-bottom:12px">
+            <div class="tag v selected" onclick="toggleTag(this)">Venue</div>
+            <div class="tag t" onclick="toggleTag(this)">Trend</div>
+            <div class="tag b" onclick="toggleTag(this)">Brand</div>
+            <div class="tag" onclick="toggleTag(this)">Collab</div>
+            <div class="tag" onclick="toggleTag(this)">Alert</div>
+          </div>
+          <div class="tag-row" style="margin-bottom:14px">
+            <span style="font-size:10px;color:var(--muted);margin-right:6px;text-transform:uppercase;letter-spacing:1px;">Target:</span>
+            <div class="tag selected" onclick="toggleTag(this)">Luxury</div>
+            <div class="tag selected" onclick="toggleTag(this)">Wellness</div>
+            <div class="tag" onclick="toggleTag(this)">Food</div>
+            <div class="tag" onclick="toggleTag(this)">Nightlife</div>
+            <div class="tag" onclick="toggleTag(this)">Fashion</div>
+          </div>
+          <div style="display:flex;gap:10px;align-items:center">
+            <button class="publish-btn" onclick="publishIntel()">⚡ Publish Now</button>
+            <button class="publish-btn" style="background:var(--surface2);color:var(--muted2);border:1px solid var(--border)">Save Draft</button>
+            <span style="font-size:11px;color:var(--muted);margin-left:auto">Reaches 8 creators matching filters</span>
+          </div>
+        </div>
+
+        <div class="section-header"><div class="section-title">Recent Intel</div></div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div class="intel-card unread venue" style="cursor:default">
+            <div class="ic-header"><span class="ic-cat cat-venue">Venue</span><span style="font-size:10px;color:var(--muted)">Pushed to 8 creators</span><span class="ic-time">2h ago</span></div>
+            <div class="ic-title">Syntax rooftop — soft open tonight, not posted anywhere yet</div>
+            <div class="ic-body">New rooftop bar on Brickell Ave doing a soft open. Small crowd, perfect golden hour lighting 6–8pm. Two of the right DJs. Film the view from the west corner — skyline + water. They're looking for early creators to tag.</div>
+          </div>
+          <div class="intel-card unread trend" style="cursor:default">
+            <div class="ic-header"><span class="ic-cat cat-trend">Trend</span><span style="font-size:10px;color:var(--muted)">Pushed to 12 creators</span><span class="ic-time">Yesterday</span></div>
+            <div class="ic-title">Slow-morning content is outperforming going out content this week +34%</div>
+            <div class="ic-body">Engagement data shows calm morning aesthetic Reels averaging 4.8% ER vs 2.9% for nightlife content this week. Hot take: post the morning after, not the night of.</div>
+          </div>
+          <div class="intel-card unread brand" style="cursor:default">
+            <div class="ic-header"><span class="ic-cat cat-brand">Brand</span><span style="font-size:10px;color:var(--muted)">Pushed to 5 creators</span><span class="ic-time">2 days ago</span></div>
+            <div class="ic-title">Aesop looking for 3 Miami micro-creators — $1,800/post</div>
+            <div class="ic-body">Aesop Miami is running a Q2 campaign. Looking for creators 15K–80K followers, luxury lifestyle niche. Rate: $1,800 per Reel. 2 posts per month. No exclusivity. Direct contact via Flagship manager.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ROSTER -->
+      <div class="panel" id="op-roster">
+        <div class="section-header">
+          <div class="section-title">Creator Roster — Miami Pilot</div>
+          <div class="section-action">+ Add Creator</div>
+        </div>
+        <div class="insight-box">
+          <div class="insight-title">Industry Context</div>
+          <div class="insight-text">Micro-influencers (10K–100K) deliver 60% higher engagement than macro creators and cost brands 70% less. At 3–5% engagement, your roster is performing above the 2–3% platform average for lifestyle content.</div>
+        </div>
+        <div class="creator-table">
+          <div class="ct-header">
+            <div class="ct-col">Creator</div>
+            <div class="ct-col">Followers</div>
+            <div class="ct-col">Engagement</div>
+            <div class="ct-col">Tier</div>
+            <div class="ct-col">Posts/Wk</div>
+            <div class="ct-col">Status</div>
+          </div>
+          ${[
+            ['SL','Sofia L.','@sofialux','linear-gradient(135deg,#C8F060,#60C8F0)','47.2K','4.3','vip','VIP','5','active','Luxury wellness · Brickell'],
+            ['MR','Marco R.','@marcovibes','linear-gradient(135deg,#F060A0,#F0C060)','28.9K','3.6','pro','Pro','4','active','Food · Wynwood'],
+            ['JT','Jade T.','@jademiami','linear-gradient(135deg,#60F0C8,#60C8F0)','83.1K','4.7','vip','VIP','6','active','Lifestyle · South Beach'],
+            ['AK','Alex K.','@alexkstyle','linear-gradient(135deg,#F0C060,#F060A0)','19.4K','2.7','basic','Basic','2','idle','Fashion · Design District'],
+            ['NV','Nia V.','@niavibe','linear-gradient(135deg,#60C8F0,#60F0C8)','34.8K','3.9','pro','Pro','4','active','Wellness · Coral Gables'],
+            ['RL','Rafael L.','@rafaelmiami','linear-gradient(135deg,#F060A0,#60C8F0)','61.2K','4.1','vip','VIP','5','active','Nightlife · Downtown'],
+          ].map(([init,name,handle,bg,fol,eng,tierClass,tierLabel,posts,status,niche]) => `
+          <div class="ct-row">
+            <div class="ct-cell"><div class="creator-avatar" style="background:${bg};color:#080C10">${init}</div><div><div style="font-size:12px;font-weight:700">${name}</div><div style="font-size:10px;color:var(--muted)">${niche}</div></div></div>
+            <div class="ct-cell mono">${fol}</div>
+            <div class="ct-cell"><div class="eng-bar"><div class="eng-fill" style="width:${parseFloat(eng)/5*100}%;background:var(--accent)"></div></div> ${eng}%</div>
+            <div class="ct-cell"><span class="tier-badge tier-${tierClass}">${tierLabel}</span></div>
+            <div class="ct-cell mono">${posts}</div>
+            <div class="ct-cell"><div class="status-dot ${status==='active'?'dot-active':'dot-idle'}"></div></div>
+          </div>`).join('')}
+        </div>
+      </div>
+
+      <!-- FLAGS -->
+      <div class="panel" id="op-flags">
+        <div class="section-header"><div class="section-title">Flagged Messages — 2 Unresolved</div></div>
+        <div class="insight-box">
+          <div class="insight-title">How Flagging Works</div>
+          <div class="insight-text">The sub-bot automatically flags any message involving brand deal negotiation, payment terms, PR issues, or anything requiring human judgment. These are routed here for your team to handle directly.</div>
+        </div>
+        <div class="flag-list">
+          <div class="flag-card">
+            <div class="flag-icon">⚑</div>
+            <div style="flex:1">
+              <div class="flag-creator">Sofia L. — @sofialux <span style="font-size:10px;color:var(--muted)">VIP · 47.2K followers</span></div>
+              <div class="flag-msg">"Hey can you help me negotiate the Aesop deal? They offered $1,800 but I've seen other creators with my engagement getting $2,200+ for a single Reel."</div>
+              <div class="flag-meta">Flagged reason: Brand deal negotiation · 14 min ago</div>
+              <div class="flag-actions">
+                <button class="btn-sm btn-reply" onclick="resolveFlag(this,'sofia')">Reply to Sofia</button>
+                <button class="btn-sm btn-resolve" onclick="resolveFlag(this,'resolve1')">Mark Resolved</button>
+              </div>
+            </div>
+          </div>
+          <div class="flag-card">
+            <div class="flag-icon">⚑</div>
+            <div style="flex:1">
+              <div class="flag-creator">Alex K. — @alexkstyle <span style="font-size:10px;color:var(--muted)">Basic · 19.4K followers</span></div>
+              <div class="flag-msg">"A brand just DM'd me directly offering a collab. Should I take it or run it through you? It's a fashion label, $400 for a static post."</div>
+              <div class="flag-meta">Flagged reason: Brand inquiry outside platform · 2h ago</div>
+              <div class="flag-actions">
+                <button class="btn-sm btn-reply" onclick="resolveFlag(this,'alex')">Reply to Alex</button>
+                <button class="btn-sm btn-resolve" onclick="resolveFlag(this,'resolve2')">Mark Resolved</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PERFORMANCE -->
+      <div class="panel" id="op-perf">
+        <div class="section-header"><div class="section-title">Platform Performance — Week 6 of Pilot</div></div>
+        <div class="stat-grid">
+          <div class="stat-card green">
+            <div class="stat-label">Avg Posts/Week</div>
+            <div class="stat-value green">4.3</div>
+            <div class="stat-delta"><span class="delta-up">↑ 112%</span> vs. pre-platform 2.0/wk</div>
+          </div>
+          <div class="stat-card blue">
+            <div class="stat-label">Avg Engagement</div>
+            <div class="stat-value blue">4.2%</div>
+            <div class="stat-delta"><span class="delta-up">↑ 1.8pp</span> from baseline 2.4%</div>
+          </div>
+          <div class="stat-card pink">
+            <div class="stat-label">Brand Deals Closed</div>
+            <div class="stat-value pink">8</div>
+            <div class="stat-delta">$31K total monthly value</div>
+          </div>
+          <div class="stat-card gold">
+            <div class="stat-label">Follower Growth</div>
+            <div class="stat-value gold">+6.2%</div>
+            <div class="stat-delta">Avg across 12 creators this month</div>
+          </div>
+        </div>
+        <div class="insight-box">
+          <div class="insight-title">ROI Context — Industry Data</div>
+          <div class="insight-text">Leung et al. (HBR) found brands left a 16.6% engagement gain on the table by failing to optimize posting frequency. Our platform has driven a 112% increase in posting frequency and 75% increase in engagement for the pilot cohort. At industry CPE of $0.40–$0.80 for lifestyle creators, this translates to measurably higher brand deal value per post.</div>
+        </div>
+        <div class="section-header"><div class="section-title">Weekly Posts — Last 8 Weeks</div></div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px">
+          <div style="display:flex;gap:6px;align-items:flex-end;height:80px;margin-bottom:8px">
+            ${[1.8,2.1,1.9,2.4,3.2,3.8,4.1,4.3].map((v,i) => `<div style="flex:1;background:${i===7?'var(--accent)':'rgba(200,240,96,0.3)'};height:${v/4.3*100}%;border-radius:3px 3px 0 0;opacity:${0.5+i*0.07}" title="Week ${i+1}: ${v} avg posts"></div>`).join('')}
+          </div>
+          <div style="display:flex;gap:6px">
+            ${['Wk1','Wk2','Wk3','Wk4','Wk5','Wk6','Wk7','Wk8'].map((w,i)=>`<div style="flex:1;text-align:center;font-size:9px;color:var(--muted)">${w}</div>`).join('')}
+          </div>
+          <div style="margin-top:12px;font-size:11px;color:var(--muted2)">Platform launched Week 3. Clear inflection at Week 5 as bot cadence routine established.</div>
+        </div>
+      </div>
+
+    </div><!-- end op-content -->
+
+    <!-- ══════════ CREATOR PANELS ══════════ -->
+    <div class="content" id="cr-content" style="display:none;padding:0">
+      <div class="creator-app" style="height:100%;display:flex;flex-direction:column">
+
+        <!-- MOBILE PANELS -->
+        <div class="mobile-panel active" id="cr-feed">
+          <div style="margin-bottom:16px">
+            <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Good morning</div>
+            <div style="font-size:20px;font-weight:800;font-family:'DM Serif Display',serif">Sofia 👋</div>
+            <div style="font-size:11px;color:var(--muted2);margin-top:2px">3 new updates from your intelligence feed</div>
+          </div>
+          <div class="intel-feed">
+            <div class="intel-card unread venue" onclick="toggleCard(this)">
+              <div class="ic-header"><span class="ic-cat cat-venue">Venue</span><span class="ic-time">2h ago · Unread</span></div>
+              <div class="ic-title">Syntax rooftop — soft open tonight, not posted anywhere yet</div>
+              <div class="ic-body">New rooftop bar on Brickell Ave doing a soft open tonight. Small crowd, perfect golden hour lighting 6–8pm.</div>
+              <div class="ic-expanded">
+                <div style="font-size:12px;color:var(--muted2);line-height:1.6;margin-bottom:10px">Film the view from the west corner — skyline + water. They're looking for early creators to tag. <strong style="color:var(--accent)">Post a Reel tonight between 7–9pm</strong> — golden hour content is outperforming this week by 34%.</div>
+                <div class="ic-metric"><span class="ic-metric-label">Best posting window</span><span class="ic-metric-value">7:00–9:00 PM tonight</span></div>
+                <div class="ic-metric"><span class="ic-metric-label">Avg ER for venue content</span><span class="ic-metric-value">4.8% this week</span></div>
+                <div class="ic-metric"><span class="ic-metric-label">Content type</span><span class="ic-metric-value">Reel (30–45s)</span></div>
+              </div>
+            </div>
+            <div class="intel-card unread trend" onclick="toggleCard(this)">
+              <div class="ic-header"><span class="ic-cat cat-trend">Trend</span><span class="ic-time">Yesterday · Unread</span></div>
+              <div class="ic-title">Slow-morning content outperforming nightlife +34% this week</div>
+              <div class="ic-body">Engagement data shows calm morning Reels averaging 4.8% ER vs 2.9% for nightlife. Post the morning after, not the night of.</div>
+              <div class="ic-expanded">
+                <div class="ic-metric"><span class="ic-metric-label">Morning content avg ER</span><span class="ic-metric-value">4.8%</span></div>
+                <div class="ic-metric"><span class="ic-metric-label">Nightlife content avg ER</span><span class="ic-metric-value">2.9%</span></div>
+                <div class="ic-metric"><span class="ic-metric-label">Your current avg ER</span><span class="ic-metric-value">4.3% ↑ trending</span></div>
+              </div>
+            </div>
+            <div class="intel-card unread brand" onclick="toggleCard(this)">
+              <div class="ic-header"><span class="ic-cat cat-brand">Brand Deal</span><span class="ic-time">2 days ago · Unread</span></div>
+              <div class="ic-title">Aesop Miami looking for 3 creators — $1,800/Reel</div>
+              <div class="ic-body">Luxury skincare campaign Q2. Your profile matches. 2 posts/month, no exclusivity. Rate is negotiable at your engagement level.</div>
+              <div class="ic-expanded">
+                <div class="ic-metric"><span class="ic-metric-label">Offered rate</span><span class="ic-metric-value">$1,800/Reel</span></div>
+                <div class="ic-metric"><span class="ic-metric-label">Market rate at your ER</span><span class="ic-metric-value">$2,000–$2,400</span></div>
+                <div class="ic-metric"><span class="ic-metric-label">Recommendation</span><span class="ic-metric-value" style="color:var(--accent3)">Negotiate up</span></div>
+                <div style="font-size:11px;color:var(--muted2);margin-top:8px">Your manager has been notified to handle negotiation. Tap your bot to ask about it.</div>
+              </div>
+            </div>
+            <div class="intel-card collab" onclick="toggleCard(this)" style="border-color:rgba(96,240,200,0.2)">
+              <div class="ic-header"><span class="ic-cat cat-collab">Collab Match</span><span class="ic-time">3 days ago</span></div>
+              <div class="ic-title">Nia V. (@niavibe) wants to co-post a wellness morning series</div>
+              <div class="ic-body">Her audience (34.8K, 3.9% ER) overlaps 68% with yours. Combined reach: 82K. Wellness + luxury crossover.</div>
+              <div class="ic-expanded">
+                <div class="ic-metric"><span class="ic-metric-label">Audience overlap</span><span class="ic-metric-value">68%</span></div>
+                <div class="ic-metric"><span class="ic-metric-label">Combined reach</span><span class="ic-metric-value">82K</span></div>
+                <div class="ic-metric"><span class="ic-metric-label">Expected ER boost</span><span class="ic-metric-value">+0.6–1.2pp</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- BOT CHAT -->
+        <div class="mobile-panel chat-mode" id="cr-chat">
+          <div class="chat-wrap">
+            <div class="chat-header">
+              <div class="bot-avatar">✦</div>
+              <div>
+                <div class="bot-name">Aria <span style="font-size:10px;color:var(--muted);font-weight:400">· your assistant</span></div>
+                <div class="bot-status">● Online · knows your full schedule</div>
+              </div>
+            </div>
+            <div class="chat-messages" id="chat-messages">
+              <div class="msg bot"><div class="msg-bubble">Good morning Sofia 🌅 You have a booking tonight at Syntax rooftop at 6:30pm. Golden hour window is 6–8pm — I'd suggest arriving by 6:15 to claim the west corner for the skyline shot. Want me to set a reminder?</div><div class="msg-time">9:04 AM</div></div>
+              <div class="msg user"><div class="msg-bubble">Yes set the reminder. Also what should I film there?</div><div class="msg-time">9:06 AM</div></div>
+              <div class="msg bot"><div class="msg-bubble">Reminder set for 5:45 PM ✓<br><br>For tonight: film the view from the west corner — skyline + water in the background. 30–45 second Reel, no talking. Let the location do the work. Slightly underexposed looks cleaner than bright. Post between 7–9 PM when your audience is most active. Caption can be minimal — just the vibe.</div><div class="msg-time">9:06 AM</div></div>
+              <div class="msg user"><div class="msg-bubble">What about the Aesop deal? Should I take it?</div><div class="msg-time">9:10 AM</div></div>
+              <div class="msg bot"><div class="msg-bubble">Flagging that one to your manager — brand deal negotiation is their lane 🎯<br><br>Quick context though: at your engagement rate (4.3%) and follower count (47.2K), the market rate for a luxury skincare Reel is $2,000–$2,400. The $1,800 offer is below your value. Your manager will handle the conversation.</div><div class="msg-time">9:10 AM</div></div>
+            </div>
+            <div class="chat-input-row">
+              <input class="chat-input" id="chat-input" placeholder="Ask Aria anything..." onkeydown="if(event.key==='Enter')sendMsg()" />
+              <button class="send-btn" onclick="sendMsg()">↑</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- NETWORK -->
+        <div class="mobile-panel" id="cr-network">
+          <div style="margin-bottom:16px;font-size:12px;color:var(--muted2)">Creators on ARIA · Miami · Connect to collab</div>
+          <div class="creator-grid">
+            ${[
+              ['NV','Nia V.','@niavibe','linear-gradient(135deg,#60C8F0,#60F0C8)','34.8K','3.9%','Wellness'],
+              ['MR','Marco R.','@marcovibes','linear-gradient(135deg,#F060A0,#F0C060)','28.9K','3.6%','Food'],
+              ['JT','Jade T.','@jademiami','linear-gradient(135deg,#60F0C8,#60C8F0)','83.1K','4.7%','Lifestyle'],
+              ['RL','Rafael L.','@rafaelmiami','linear-gradient(135deg,#F060A0,#60C8F0)','61.2K','4.1%','Nightlife'],
+            ].map(([init,name,handle,bg,fol,eng,niche]) => `
+            <div class="creator-card">
+              <div class="cc-top">
+                <div class="cc-avatar" style="background:${bg};color:#080C10">${init}</div>
+                <div><div class="cc-name">${name}</div><div class="cc-handle">${handle}</div></div>
+              </div>
+              <div class="cc-stats">
+                <div class="cc-stat"><div class="cc-stat-label">Followers</div><div class="cc-stat-value mono">${fol}</div></div>
+                <div class="cc-stat"><div class="cc-stat-label">Eng Rate</div><div class="cc-stat-value" style="color:var(--accent)">${eng}</div></div>
+              </div>
+              <div style="font-size:10px;color:var(--muted);margin-bottom:8px">${niche} · Miami</div>
+              <button class="connect-btn" onclick="this.classList.toggle('connected');this.textContent=this.classList.contains('connected')?'✓ Connected':'Connect'">${name==='Nia V.'?'✓ Connected':'Connect'}</button>
+            </div>`).join('')}
+          </div>
+          <div class="section-header"><div class="section-title">Collab Board</div></div>
+          <div class="collab-card">
+            <div class="collab-header"><div class="collab-title">Aesop Miami — Q2 Campaign</div><div class="collab-comp">$1,800/Reel</div></div>
+            <div class="collab-desc">Looking for 3 luxury lifestyle micro-creators. 2 Reels per month, no exclusivity. Must be Miami-based with 15K–80K followers.</div>
+            <div class="collab-tags"><span class="collab-tag">Luxury</span><span class="collab-tag">Skincare</span><span class="collab-tag">Miami</span><span class="collab-tag">15K–80K</span></div>
+            <button class="interest-btn interested">✓ Your manager is handling this</button>
+          </div>
+          <div class="collab-card">
+            <div class="collab-header"><div class="collab-title">Morning Wellness Series — Co-Post</div><div class="collab-comp">Revenue share</div></div>
+            <div class="collab-desc">Nia V. is looking for a luxury creator to co-post a 4-part morning wellness series. Combined reach: 82K. Audience overlap verified at 68%.</div>
+            <div class="collab-tags"><span class="collab-tag">Wellness</span><span class="collab-tag">Co-Post</span><span class="collab-tag">Organic</span></div>
+            <button class="interest-btn" onclick="this.classList.add('interested');this.textContent='✓ Interested — Aria will set it up'">Express Interest</button>
+          </div>
+          <div class="collab-card">
+            <div class="collab-header"><div class="collab-title">Le Jardin Hotel — Opening Night</div><div class="collab-comp">$600 + stay</div></div>
+            <div class="collab-desc">New boutique hotel in South Beach opening next Friday. Looking for 4 creators to attend and post. Includes 1-night stay and dinner.</div>
+            <div class="collab-tags"><span class="collab-tag">Hotel</span><span class="collab-tag">Event</span><span class="collab-tag">South Beach</span></div>
+            <button class="interest-btn" onclick="this.classList.add('interested');this.textContent='✓ Interested — Aria will set it up'">Express Interest</button>
+          </div>
+        </div>
+
+        <!-- CREATOR STATS -->
+        <div class="mobile-panel" id="cr-perf">
+          <div style="margin-bottom:16px">
+            <div style="font-size:20px;font-weight:800;font-family:'DM Serif Display',serif;margin-bottom:4px">Your Performance</div>
+            <div style="font-size:11px;color:var(--muted2)">Week 6 of platform — Miami pilot</div>
+          </div>
+          <div class="perf-grid">
+            <div class="perf-card">
+              <div class="perf-label">Engagement Rate</div>
+              <div class="perf-value" style="color:var(--accent)">4.3%</div>
+              <div class="perf-sub"><span class="delta-up">↑ 1.9pp</span> from 2.4% baseline</div>
+            </div>
+            <div class="perf-card">
+              <div class="perf-label">Posts This Week</div>
+              <div class="perf-value" style="color:var(--accent2)">5</div>
+              <div class="perf-sub">Target: 5 · <span class="delta-up">On track ✓</span></div>
+            </div>
+            <div class="perf-card">
+              <div class="perf-label">Follower Growth</div>
+              <div class="perf-value" style="color:var(--teal)">+1.2K</div>
+              <div class="perf-sub">This month · <span class="delta-up">+2.6%</span></div>
+            </div>
+            <div class="perf-card">
+              <div class="perf-label">Brand Value</div>
+              <div class="perf-value" style="color:var(--gold)">$3.8K</div>
+              <div class="perf-sub">Active deals this month</div>
+            </div>
+          </div>
+          <div class="insight-box">
+            <div class="insight-title">Your Market Rate</div>
+            <div class="insight-text">At 47.2K followers and 4.3% engagement, your market rate for a sponsored Reel is <strong style="color:var(--accent)">$2,000–$2,400</strong>. Micro-creators at your engagement level command a premium over larger accounts with lower engagement. The Aesop offer of $1,800 is below market.</div>
+          </div>
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px">
+            <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px">Engagement Rate — 8 Weeks</div>
+            <div class="mini-chart">
+              ${[2.4,2.6,2.5,2.9,3.4,3.8,4.0,4.3].map((v,i)=>`<div class="mc-bar" style="height:${v/4.3*100}%;background:${i===7?'var(--accent)':'rgba(200,240,96,0.35)'};opacity:${0.5+i*0.07}"></div>`).join('')}
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--muted);margin-top:6px"><span>Wk1 (baseline)</span><span>Now</span></div>
+            <div style="font-size:11px;color:var(--muted2);margin-top:8px">Platform started Week 3. Clear upward trend from consistent posting cadence + intel-directed content.</div>
+          </div>
+        </div>
+
+        <!-- TAB BAR -->
+        <div class="tab-bar">
+          <div class="tab-item active" id="tab-feed" onclick="showMobilePanel('cr-feed')"><div class="tab-icon">⬡</div><div class="tab-label">Feed</div></div>
+          <div class="tab-item" id="tab-chat" onclick="showMobilePanel('cr-chat')"><div class="tab-icon">✦</div><div class="tab-label">Aria</div></div>
+          <div class="tab-item" id="tab-network" onclick="showMobilePanel('cr-network')"><div class="tab-icon">◈</div><div class="tab-label">Network</div></div>
+          <div class="tab-item" id="tab-perf" onclick="showMobilePanel('cr-perf')"><div class="tab-icon">◎</div><div class="tab-label">Stats</div></div>
+        </div>
+      </div>
+    </div><!-- end cr-content -->
+  </div><!-- end main -->
+</div><!-- end shell -->
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <div class="toast-title" id="toast-title"></div>
+  <div class="toast-body" id="toast-body"></div>
+</div>
+
+<script>
+// ── PANEL SWITCHING ────────────────────────────────────
+const opNavItems = document.querySelectorAll('#op-nav .nav-item');
+function showPanel(id) {
+  document.querySelectorAll('#op-content .panel').forEach(p => p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  opNavItems.forEach(n => {
+    n.classList.remove('active');
+    if(n.getAttribute('onclick') && n.getAttribute('onclick').includes(id)) n.classList.add('active');
+  });
+  const titles = {'op-overview':'Dashboard Overview','op-intel':'Intel Composer','op-roster':'Creator Roster','op-flags':'Flagged Messages','op-perf':'Performance Dashboard'};
+  document.getElementById('topbar-title').textContent = titles[id] || id;
+}
+
+// ── MOBILE PANEL SWITCHING ─────────────────────────────
+function showMobilePanel(id) {
+  document.querySelectorAll('.mobile-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  ['feed','chat','network','perf'].forEach(t => {
+    const el = document.getElementById('tab-'+t);
+    if(el) el.classList.toggle('active', id === 'cr-'+t);
+  });
+  document.querySelectorAll('#cr-nav .nav-item').forEach(n => {
+    n.classList.remove('active');
+    if(n.getAttribute('onclick') && n.getAttribute('onclick').includes(id)) n.classList.add('active');
+  });
+  const titles = {'cr-feed':'Creator Feed','cr-chat':'My Assistant','cr-network':'Network & Collabs','cr-perf':'My Stats'};
+  document.getElementById('topbar-title').textContent = titles[id] || id;
+}
+
+// ── VIEW TOGGLE ────────────────────────────────────────
+function switchView(view) {
+  const isOp = view === 'operator';
+  document.getElementById('op-content').style.display = isOp ? 'block' : 'none';
+  document.getElementById('cr-content').style.display = isOp ? 'none' : 'flex';
+  document.getElementById('op-nav').style.display = isOp ? 'block' : 'none';
+  document.getElementById('cr-nav').style.display = isOp ? 'none' : 'block';
+  document.getElementById('btnOp').classList.toggle('active', isOp);
+  document.getElementById('btnCr').classList.toggle('active', !isOp);
+  document.getElementById('view-chip').textContent = isOp ? 'Operator Dashboard' : 'Creator App';
+  document.getElementById('view-chip').className = 'topbar-chip ' + (isOp ? 'chip-op' : 'chip-cr');
+  document.getElementById('topbar-title').textContent = isOp ? 'Dashboard Overview' : 'Creator Feed';
+  if(!isOp) showMobilePanel('cr-feed');
+}
+
+// ── INTEL CARD EXPAND ─────────────────────────────────
+function toggleCard(card) {
+  const exp = card.querySelector('.ic-expanded');
+  if(exp) exp.classList.toggle('show');
+  card.classList.remove('unread');
+}
+
+// ── TAG TOGGLE ────────────────────────────────────────
+function toggleTag(el) {
+  el.classList.toggle('selected');
+}
+
+// ── PUBLISH INTEL ─────────────────────────────────────
+function publishIntel() {
+  const title = document.getElementById('intel-title').value.trim();
+  const body = document.getElementById('intel-body').value.trim();
+  if(!title) { toast('Missing title','Add a title for the intel post'); return; }
+  toast('⚡ Intel Published!', title ? `"${title.substring(0,40)}..." pushed to 8 creators` : 'Intel pushed to 8 matching creators');
+  setTimeout(() => {
+    document.getElementById('intel-title').value = '';
+    document.getElementById('intel-body').value = '';
+  }, 500);
+}
+
+// ── RESOLVE FLAG ──────────────────────────────────────
+function resolveFlag(btn, id) {
+  const card = btn.closest('.flag-card');
+  card.style.opacity = '0.4';
+  card.style.pointerEvents = 'none';
+  const badge = document.querySelector('.nav-badge');
+  if(badge) {
+    const n = parseInt(badge.textContent) - 1;
+    badge.textContent = n;
+    if(n === 0) badge.style.display = 'none';
+  }
+  toast('✓ Flag Resolved', 'Moved to archive');
+}
+
+// ── BOT CHAT ──────────────────────────────────────────
+const botReplies = {
+  'book': "I'll book that for you right now. What time works? I can check availability at Komodo, Zuma, or Novikov depending on the vibe you're going for.",
+  'remind': "Reminder set ✓. I'll send you a push notification 30 minutes before.",
+  'what should': "Based on today's intel and your posting history, I'd go with a venue Reel tonight at Syntax. Your last 3 venue posts averaged 4.9% ER — well above your baseline.",
+  'engagement': "Your engagement rate is 4.3% this week, up from your 2.4% baseline before joining the platform. Industry average for lifestyle micro-creators is 3–5%, so you're performing solidly above average.",
+  'followers': "You're at 47.2K this week. Growth has been +1.2K this month — about 2.6% monthly growth, which is strong for your niche without running ads.",
+  'deal': "I've flagged the Aesop negotiation to your manager. At your engagement rate, the $1,800 offer is below your $2,000–$2,400 market rate. Your manager will push back.",
+  'post': "Best time to post today: 7–9 PM for maximum reach. Your audience is most active between 7:30–8:30 PM based on your last 30 days of data.",
+  'default': "Got it — I'm on it. Is there anything else you need sorted before tonight?"
+};
+
+function sendMsg() {
+  const input = document.getElementById('chat-input');
+  const text = input.value.trim();
+  if(!text) return;
+  input.value = '';
+
+  const msgs = document.getElementById('chat-messages');
+  const now = new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+
+  msgs.innerHTML += `<div class="msg user"><div class="msg-bubble">${text}</div><div class="msg-time">${now}</div></div>`;
+
+  // typing
+  const typingId = 'typing-'+Date.now();
+  msgs.innerHTML += `<div class="msg bot" id="${typingId}"><div class="msg-bubble"><div class="typing"><span></span><span></span><span></span></div></div></div>`;
+  msgs.scrollTop = msgs.scrollHeight;
+
+  const lower = text.toLowerCase();
+  let reply = botReplies.default;
+  for(const [key, val] of Object.entries(botReplies)) {
+    if(key !== 'default' && lower.includes(key)) { reply = val; break; }
+  }
+
+  setTimeout(() => {
+    document.getElementById(typingId)?.remove();
+    msgs.innerHTML += `<div class="msg bot"><div class="msg-bubble">${reply}</div><div class="msg-time">${now}</div></div>`;
+    msgs.scrollTop = msgs.scrollHeight;
+  }, 1400);
+}
+
+// ── TOAST ─────────────────────────────────────────────
+function toast(title, body) {
+  const t = document.getElementById('toast');
+  document.getElementById('toast-title').textContent = title;
+  document.getElementById('toast-body').textContent = body;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+// ── INIT ──────────────────────────────────────────────
+// Show welcome toast after a moment
+setTimeout(() => toast('👋 Welcome to ARIA Demo', 'Switch between Operator and Creator views using the sidebar'), 800);
+</script>
+</body>
+</html>
