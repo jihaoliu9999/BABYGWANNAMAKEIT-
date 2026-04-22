@@ -1,0 +1,1147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>ARIA — Creator Intelligence Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#06080B;
+  --s1:#0C1018;
+  --s2:#121820;
+  --s3:#1A2230;
+  --border:rgba(255,255,255,0.06);
+  --border2:rgba(255,255,255,0.11);
+  --lime:#B8FF4E;
+  --cyan:#4EFFE0;
+  --pink:#FF4EB8;
+  --amber:#FFB84E;
+  --blue:#4E9FFF;
+  --red:#FF5C5C;
+  --txt:#ECF0F5;
+  --txt2:#8899AA;
+  --txt3:#4A5568;
+  --font:'Outfit',sans-serif;
+  --serif:'Playfair Display',serif;
+  --mono:'JetBrains Mono',monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;overflow:hidden;}
+body{background:var(--bg);color:var(--txt);font-family:var(--font);font-size:14px;}
+
+/* ── LAYOUT ── */
+.app{display:flex;height:100vh;overflow:hidden;}
+.sidebar{width:200px;flex-shrink:0;background:var(--s1);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;transition:width .2s;}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0;}
+.topbar{height:52px;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:12px;flex-shrink:0;background:var(--s1);}
+.content-area{flex:1;overflow:hidden;position:relative;}
+
+/* ── SIDEBAR ── */
+.logo{padding:20px 16px 16px;border-bottom:1px solid var(--border);}
+.logo-name{font-family:var(--serif);font-size:22px;color:var(--lime);font-style:italic;letter-spacing:-0.5px;}
+.logo-tag{font-size:9px;color:var(--txt3);letter-spacing:2.5px;text-transform:uppercase;margin-top:1px;}
+.nav{flex:1;padding:12px 8px;overflow-y:auto;}
+.nav-grp{margin-bottom:16px;}
+.nav-grp-label{font-size:9px;color:var(--txt3);text-transform:uppercase;letter-spacing:2px;padding:0 8px;margin-bottom:6px;}
+.ni{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;cursor:pointer;color:var(--txt2);font-size:12px;font-weight:600;transition:all .15s;position:relative;user-select:none;}
+.ni:hover{background:var(--s2);color:var(--txt);}
+.ni.on{color:var(--lime);background:rgba(184,255,78,.08);}
+.ni-ic{font-size:14px;width:18px;text-align:center;flex-shrink:0;}
+.ni-badge{margin-left:auto;background:var(--pink);color:#fff;font-size:9px;padding:1px 5px;border-radius:10px;font-weight:700;}
+.ni-dot{width:6px;height:6px;border-radius:50%;background:var(--cyan);margin-left:auto;animation:blink 2s infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+
+.sidebar-foot{padding:12px 8px;border-top:1px solid var(--border);}
+.view-btn{display:flex;align-items:center;gap:8px;width:100%;padding:8px 10px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;border:none;font-family:var(--font);letter-spacing:.3px;transition:all .2s;margin-bottom:6px;}
+.vb-op{background:rgba(78,159,255,.1);color:var(--blue);}
+.vb-cr{background:rgba(184,255,78,.1);color:var(--lime);}
+.vb-op.on{background:var(--blue);color:#06080B;}
+.vb-cr.on{background:var(--lime);color:#06080B;}
+
+/* ── TOPBAR ── */
+.tb-title{font-size:14px;font-weight:700;flex:1;}
+.chip{font-size:9px;padding:3px 9px;border-radius:20px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;border:1px solid;}
+.chip-op{color:var(--blue);border-color:rgba(78,159,255,.3);background:rgba(78,159,255,.08);}
+.chip-cr{color:var(--lime);border-color:rgba(184,255,78,.3);background:rgba(184,255,78,.08);}
+.chip-live{color:var(--cyan);border-color:rgba(78,255,224,.3);background:rgba(78,255,224,.08);animation:blink 2s infinite;}
+.tb-notif{width:32px;height:32px;border-radius:50%;background:var(--s2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;transition:border .15s;}
+.tb-notif:hover{border-color:var(--border2);}
+.notif-dot{position:absolute;top:6px;right:6px;width:7px;height:7px;border-radius:50%;background:var(--pink);border:2px solid var(--s1);}
+
+/* ── PANELS ── */
+.panel{display:none;height:100%;overflow-y:auto;padding:24px;}
+.panel.on{display:block;}
+.panel::-webkit-scrollbar{width:3px;}
+.panel::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+
+/* ── MOBILE PANEL (creator) ── */
+.cr-shell{height:100%;display:flex;flex-direction:column;background:var(--bg);}
+.cr-panels{flex:1;overflow:hidden;position:relative;}
+.cr-panel{display:none;height:100%;overflow-y:auto;padding:16px 16px 0;}
+.cr-panel.on{display:block;}
+.cr-panel::-webkit-scrollbar{width:2px;}
+.cr-panel::-webkit-scrollbar-thumb{background:var(--border);}
+.cr-panel.chat-p{padding:0;display:none;flex-direction:column;}
+.cr-panel.chat-p.on{display:flex;}
+
+/* ── TABBAR ── */
+.tabbar{height:60px;border-top:1px solid var(--border);display:flex;background:var(--s1);flex-shrink:0;}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;color:var(--txt3);transition:color .15s;user-select:none;}
+.tab.on{color:var(--lime);}
+.tab-ic{font-size:17px;}
+.tab-lb{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;}
+
+/* ── STAT CARDS ── */
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;}
+.sc{background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:16px;position:relative;overflow:hidden;}
+.sc::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;border-radius:2px 2px 0 0;}
+.sc.lime::after{background:var(--lime);}
+.sc.cyan::after{background:var(--cyan);}
+.sc.pink::after{background:var(--pink);}
+.sc.amber::after{background:var(--amber);}
+.sc-lbl{font-size:9px;color:var(--txt3);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px;}
+.sc-val{font-size:26px;font-weight:800;line-height:1;margin-bottom:3px;}
+.sc.lime .sc-val{color:var(--lime);}
+.sc.cyan .sc-val{color:var(--cyan);}
+.sc.pink .sc-val{color:var(--pink);}
+.sc.amber .sc-val{color:var(--amber);}
+.sc-sub{font-size:10px;color:var(--txt2);}
+.up{color:#5EE89A;}
+.dn{color:var(--red);}
+
+/* ── SECTION HDR ── */
+.sh{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.sh-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--txt2);}
+.sh-act{font-size:11px;color:var(--lime);cursor:pointer;font-weight:600;}
+
+/* ── INSIGHT BOX ── */
+.ib{background:linear-gradient(135deg,rgba(184,255,78,.04),rgba(78,255,224,.04));border:1px solid rgba(184,255,78,.12);border-radius:10px;padding:14px;margin-bottom:16px;}
+.ib-title{font-size:9px;font-weight:700;color:var(--lime);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px;}
+.ib-text{font-size:11px;color:var(--txt2);line-height:1.65;}
+
+/* ── TABLE ── */
+.tbl{background:var(--s1);border:1px solid var(--border);border-radius:12px;overflow:hidden;}
+.tbl-hd,.tbl-row{display:grid;}
+.tbl-hd{background:var(--s2);}
+.tbl-th{padding:8px 14px;font-size:9px;text-transform:uppercase;letter-spacing:1.5px;color:var(--txt3);font-weight:700;}
+.tbl-td{padding:11px 14px;font-size:12px;display:flex;align-items:center;gap:7px;}
+.tbl-row{border-top:1px solid var(--border);cursor:pointer;transition:background .15s;}
+.tbl-row:hover{background:var(--s2);}
+.av{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0;}
+.tier{font-size:8px;padding:2px 7px;border-radius:10px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;}
+.t-vip{background:rgba(255,184,78,.12);color:var(--amber);border:1px solid rgba(255,184,78,.25);}
+.t-pro{background:rgba(184,255,78,.1);color:var(--lime);border:1px solid rgba(184,255,78,.2);}
+.t-basic{background:rgba(74,85,104,.2);color:var(--txt2);border:1px solid var(--border);}
+.ebar{height:3px;border-radius:2px;background:var(--s3);width:50px;}
+.efill{height:100%;border-radius:2px;}
+.sdot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+.sdot.act{background:var(--cyan);}
+.sdot.idl{background:var(--amber);}
+
+/* ── COMPOSER ── */
+.composer{background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:18px;margin-bottom:20px;}
+.ci{width:100%;background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:9px 13px;color:var(--txt);font-family:var(--font);font-size:12px;outline:none;transition:border .15s;margin-bottom:8px;}
+.ci:focus{border-color:var(--lime);}
+.ci::placeholder{color:var(--txt3);}
+textarea.ci{resize:none;height:72px;}
+.tag-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;}
+.tg{font-size:9px;padding:3px 9px;border-radius:20px;cursor:pointer;font-weight:700;border:1px solid var(--border);color:var(--txt3);transition:all .15s;letter-spacing:.3px;user-select:none;}
+.tg.on{border-color:var(--lime);color:var(--lime);background:rgba(184,255,78,.08);}
+.tg.on.cy{border-color:var(--cyan);color:var(--cyan);background:rgba(78,255,224,.08);}
+.tg.on.pk{border-color:var(--pink);color:var(--pink);background:rgba(255,78,184,.08);}
+.btn{padding:9px 18px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;border:none;font-family:var(--font);letter-spacing:.3px;transition:opacity .15s;}
+.btn:hover{opacity:.85;}
+.btn-lime{background:var(--lime);color:#06080B;}
+.btn-ghost{background:var(--s2);color:var(--txt2);border:1px solid var(--border);}
+.btn-sm{padding:5px 11px;font-size:10px;border-radius:6px;}
+
+/* ── FLAGS ── */
+.flag-card{background:var(--s1);border:1px solid rgba(255,92,92,.2);border-radius:11px;padding:14px;margin-bottom:10px;display:flex;gap:12px;}
+.fc-body{flex:1;}
+.fc-creator{font-size:12px;font-weight:700;margin-bottom:4px;}
+.fc-msg{font-size:11px;color:var(--txt2);line-height:1.55;margin-bottom:7px;}
+.fc-meta{font-size:9px;color:var(--txt3);}
+.flag-acts{display:flex;gap:6px;margin-top:8px;}
+.btn-teal{background:rgba(78,255,224,.1);color:var(--cyan);border:1px solid rgba(78,255,224,.25);}
+.btn-pink{background:rgba(255,78,184,.1);color:var(--pink);border:1px solid rgba(255,78,184,.25);}
+
+/* ── INTEL CARD ── */
+.ic{background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:14px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;margin-bottom:10px;}
+.ic:hover{border-color:var(--border2);transform:translateY(-1px);}
+.ic.new::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;}
+.ic.new.vn::before{background:var(--cyan);}
+.ic.new.tr::before{background:var(--amber);}
+.ic.new.br::before{background:var(--pink);}
+.ic.new.cl::before{background:var(--cyan);}
+.ic-hd{display:flex;align-items:center;gap:7px;margin-bottom:8px;}
+.cat{font-size:8px;padding:2px 8px;border-radius:20px;font-weight:700;text-transform:uppercase;letter-spacing:1px;}
+.cat-vn{background:rgba(78,255,224,.12);color:var(--cyan);}
+.cat-tr{background:rgba(255,184,78,.12);color:var(--amber);}
+.cat-br{background:rgba(255,78,184,.12);color:var(--pink);}
+.cat-cl{background:rgba(78,255,224,.08);color:var(--cyan);}
+.ic-time{font-size:9px;color:var(--txt3);margin-left:auto;}
+.ic-title{font-size:13px;font-weight:700;margin-bottom:5px;line-height:1.3;}
+.ic-body{font-size:11px;color:var(--txt2);line-height:1.6;}
+.ic-exp{margin-top:10px;padding-top:10px;border-top:1px solid var(--border);display:none;}
+.ic-exp.on{display:block;}
+.ic-met{display:flex;justify-content:space-between;font-size:10px;margin-bottom:4px;}
+.ic-ml{color:var(--txt3);}
+.ic-mv{font-weight:700;color:var(--lime);}
+
+/* ── CREATOR CARDS ── */
+.cr-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
+.crcard{background:var(--s1);border:1px solid var(--border);border-radius:11px;padding:13px;transition:all .15s;cursor:pointer;}
+.crcard:hover{border-color:var(--border2);}
+.cc-top{display:flex;align-items:center;gap:9px;margin-bottom:9px;}
+.cc-av{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;flex-shrink:0;}
+.cc-n{font-size:12px;font-weight:700;}
+.cc-h{font-size:9px;color:var(--txt3);}
+.cc-stats{display:flex;gap:8px;margin-bottom:8px;}
+.cc-st{flex:1;}
+.cc-sl{font-size:8px;color:var(--txt3);text-transform:uppercase;letter-spacing:1px;}
+.cc-sv{font-size:12px;font-weight:700;}
+.conn-btn{width:100%;padding:6px;border-radius:6px;font-size:9px;font-weight:700;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--txt2);font-family:var(--font);transition:all .15s;letter-spacing:.3px;}
+.conn-btn:hover{border-color:var(--lime);color:var(--lime);background:rgba(184,255,78,.04);}
+.conn-btn.on{background:rgba(184,255,78,.1);border-color:var(--lime);color:var(--lime);}
+
+/* ── COLLAB ── */
+.col-card{background:var(--s1);border:1px solid var(--border);border-radius:11px;padding:14px;margin-bottom:10px;}
+.col-hd{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:6px;}
+.col-title{font-size:12px;font-weight:700;}
+.col-comp{font-size:11px;color:var(--lime);font-weight:700;}
+.col-desc{font-size:10px;color:var(--txt2);line-height:1.55;margin-bottom:8px;}
+.col-tags{display:flex;gap:5px;flex-wrap:wrap;}
+.ctag{font-size:8px;padding:2px 7px;border-radius:10px;background:var(--s2);color:var(--txt3);font-weight:600;}
+.int-btn{margin-top:9px;width:100%;padding:7px;border-radius:7px;font-size:10px;font-weight:700;cursor:pointer;border:1px solid rgba(78,255,224,.25);background:rgba(78,255,224,.06);color:var(--cyan);font-family:var(--font);transition:all .15s;}
+.int-btn:hover{background:rgba(78,255,224,.12);}
+.int-btn.on{background:rgba(78,255,224,.15);cursor:default;}
+
+/* ── CHAT ── */
+.chat-hd{padding:14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-shrink:0;}
+.bot-av{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--lime),var(--cyan));display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
+.bot-nm{font-size:13px;font-weight:700;}
+.bot-st{font-size:10px;color:var(--cyan);}
+.msgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;}
+.msgs::-webkit-scrollbar{width:2px;}
+.msgs::-webkit-scrollbar-thumb{background:var(--border);}
+.msg{max-width:82%;}
+.msg.u{align-self:flex-end;}
+.msg.b{align-self:flex-start;}
+.mb{padding:9px 13px;border-radius:12px;font-size:12px;line-height:1.55;}
+.msg.u .mb{background:var(--lime);color:#06080B;border-radius:12px 12px 3px 12px;font-weight:600;}
+.msg.b .mb{background:var(--s2);color:var(--txt);border-radius:12px 12px 12px 3px;border:1px solid var(--border);}
+.mt{font-size:8px;color:var(--txt3);margin-top:3px;}
+.msg.u .mt{text-align:right;}
+.chat-in-row{padding:12px;border-top:1px solid var(--border);display:flex;gap:8px;flex-shrink:0;}
+.chat-in{flex:1;background:var(--s2);border:1px solid var(--border);border-radius:20px;padding:9px 15px;color:var(--txt);font-family:var(--font);font-size:12px;outline:none;transition:border .15s;}
+.chat-in:focus{border-color:var(--lime);}
+.send{width:38px;height:38px;border-radius:50%;background:var(--lime);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px;transition:opacity .15s;flex-shrink:0;color:#06080B;font-weight:700;}
+.send:hover{opacity:.85;}
+.typing{display:flex;gap:3px;align-items:center;padding:9px 13px;}
+.typing span{width:5px;height:5px;border-radius:50%;background:var(--txt2);animation:bounce .8s infinite;}
+.typing span:nth-child(2){animation-delay:.15s;}
+.typing span:nth-child(3){animation-delay:.3s;}
+@keyframes bounce{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-5px)}}
+
+/* ── CALENDAR ── */
+.cal-wrap{padding:0 0 80px;}
+.cal-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.cal-month{font-family:var(--serif);font-size:20px;font-style:italic;}
+.cal-nav{display:flex;gap:6px;}
+.cal-arrow{width:28px;height:28px;border-radius:6px;background:var(--s1);border:1px solid var(--border);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px;transition:border .15s;color:var(--txt2);}
+.cal-arrow:hover{border-color:var(--border2);color:var(--txt);}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:16px;}
+.cal-dow{padding:6px 0;text-align:center;font-size:8px;color:var(--txt3);text-transform:uppercase;letter-spacing:1px;font-weight:700;}
+.cal-day{aspect-ratio:1;border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:5px;cursor:pointer;transition:all .15s;position:relative;font-size:11px;font-weight:600;color:var(--txt2);min-height:38px;}
+.cal-day:hover{background:var(--s2);}
+.cal-day.today{background:rgba(184,255,78,.1);color:var(--lime);border:1px solid rgba(184,255,78,.25);}
+.cal-day.other{color:var(--txt3);}
+.cal-day.has-event::after{content:'';position:absolute;bottom:4px;left:50%;transform:translateX(-50%);width:4px;height:4px;border-radius:50%;background:var(--lime);}
+.cal-day.has-booking::after{background:var(--cyan);}
+.cal-day.has-both::after{background:var(--pink);}
+.cal-day.selected{background:var(--s3);border:1px solid var(--border2);color:var(--txt);}
+.day-dots{display:flex;gap:2px;margin-top:2px;}
+.ddot{width:4px;height:4px;border-radius:50%;}
+
+/* ── AGENDA ── */
+.agenda-title{font-size:10px;color:var(--txt3);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:10px;font-weight:700;}
+.ev-card{background:var(--s1);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:8px;display:flex;gap:10px;cursor:pointer;transition:border .15s;}
+.ev-card:hover{border-color:var(--border2);}
+.ev-time-col{width:40px;flex-shrink:0;text-align:right;}
+.ev-time{font-size:10px;font-weight:700;color:var(--txt2);font-family:var(--mono);}
+.ev-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:3px;}
+.ev-title{font-size:12px;font-weight:700;margin-bottom:2px;}
+.ev-sub{font-size:10px;color:var(--txt2);}
+.ev-tag{display:inline-block;font-size:8px;padding:1px 6px;border-radius:10px;font-weight:700;margin-top:4px;}
+.ev-booking{background:rgba(78,255,224,.1);color:var(--cyan);}
+.ev-reminder{background:rgba(184,255,78,.1);color:var(--lime);}
+.ev-brand{background:rgba(255,78,184,.1);color:var(--pink);}
+.ev-collab{background:rgba(255,184,78,.1);color:var(--amber);}
+.add-ev-btn{width:100%;padding:10px;border-radius:10px;background:var(--s1);border:1px dashed var(--border);color:var(--txt3);font-family:var(--font);font-size:11px;font-weight:600;cursor:pointer;transition:all .15s;margin-bottom:10px;}
+.add-ev-btn:hover{border-color:var(--lime);color:var(--lime);}
+.cal-modal{position:fixed;inset:0;background:rgba(0,0,0,.7);display:flex;align-items:flex-end;justify-content:center;z-index:200;opacity:0;pointer-events:none;transition:opacity .2s;}
+.cal-modal.on{opacity:1;pointer-events:all;}
+.cal-modal-box{background:var(--s1);border:1px solid var(--border2);border-radius:16px 16px 0 0;padding:20px;width:100%;max-width:390px;transform:translateY(20px);transition:transform .2s;}
+.cal-modal.on .cal-modal-box{transform:translateY(0);}
+.cml-title{font-size:14px;font-weight:700;margin-bottom:14px;}
+.cml-close{float:right;cursor:pointer;color:var(--txt3);font-size:18px;line-height:1;}
+
+/* ── NOTIF ── */
+.notif-panel{position:absolute;top:52px;right:16px;width:300px;background:var(--s2);border:1px solid var(--border2);border-radius:12px;z-index:50;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,.5);opacity:0;pointer-events:none;transform:translateY(-8px);transition:all .2s;}
+.notif-panel.on{opacity:1;pointer-events:all;transform:translateY(0);}
+.notif-hd{padding:12px 14px;border-bottom:1px solid var(--border);font-size:11px;font-weight:700;color:var(--txt2);text-transform:uppercase;letter-spacing:1px;}
+.notif-list{max-height:300px;overflow-y:auto;}
+.notif-item{padding:10px 14px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .15s;display:flex;gap:10px;align-items:flex-start;}
+.notif-item:hover{background:var(--s3);}
+.notif-item:last-child{border:none;}
+.notif-ic{font-size:16px;flex-shrink:0;margin-top:1px;}
+.ni-title{font-size:11px;font-weight:700;margin-bottom:2px;}
+.ni-body{font-size:10px;color:var(--txt2);}
+.ni-time{font-size:9px;color:var(--txt3);margin-top:3px;}
+.notif-item.unread{background:rgba(184,255,78,.03);}
+
+/* ── PERF ── */
+.perf-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
+.pc{background:var(--s1);border:1px solid var(--border);border-radius:11px;padding:14px;}
+.pc-lbl{font-size:9px;color:var(--txt3);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:7px;}
+.pc-val{font-size:22px;font-weight:800;margin-bottom:3px;}
+.pc-sub{font-size:10px;color:var(--txt2);}
+.bar-chart{display:flex;gap:4px;align-items:flex-end;height:60px;}
+.bc-bar{flex:1;border-radius:2px 2px 0 0;transition:opacity .2s;cursor:pointer;}
+.bc-bar:hover{opacity:1!important;}
+.bc-labels{display:flex;gap:4px;margin-top:5px;}
+.bc-lb{flex:1;text-align:center;font-size:8px;color:var(--txt3);}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:20px;right:20px;background:var(--s2);border:1px solid var(--lime);border-radius:11px;padding:12px 16px;transform:translateY(60px);opacity:0;transition:all .3s;z-index:300;max-width:280px;pointer-events:none;}
+.toast.on{transform:translateY(0);opacity:1;}
+.toast-t{font-size:12px;font-weight:700;color:var(--lime);margin-bottom:3px;}
+.toast-b{font-size:10px;color:var(--txt2);}
+
+/* ── CHART MINI ── */
+.mini-bars{display:flex;gap:3px;align-items:flex-end;height:36px;}
+.mb-bar{flex:1;border-radius:2px 2px 0 0;}
+
+/* ── OPERATOR PERF CHART ── */
+.op-chart-wrap{background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:18px;margin-bottom:16px;}
+.op-chart-title{font-size:10px;color:var(--txt2);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:14px;font-weight:700;}
+
+/* ── PREVIEW OVERLAY ── */
+.preview-overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);display:flex;align-items:center;justify-content:center;z-index:400;opacity:0;pointer-events:none;transition:opacity .2s;}
+.preview-overlay.on{opacity:1;pointer-events:all;}
+.preview-phone{width:300px;background:var(--s1);border:1px solid var(--border2);border-radius:24px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.6);}
+.preview-status{height:28px;background:var(--s2);display:flex;align-items:center;justify-content:space-between;padding:0 16px;font-size:9px;color:var(--txt3);}
+.preview-content{padding:14px;}
+.preview-close{position:absolute;top:20px;right:20px;width:36px;height:36px;border-radius:50%;background:var(--s2);border:1px solid var(--border);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--txt2);transition:all .15s;}
+.preview-close:hover{border-color:var(--border2);color:var(--txt);}
+
+/* ── PROFILE ── */
+.prof-card{background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:18px;margin-bottom:14px;}
+.prof-top{display:flex;align-items:center;gap:14px;margin-bottom:16px;}
+.prof-av{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800;flex-shrink:0;}
+.prof-name{font-family:var(--serif);font-size:18px;font-style:italic;margin-bottom:2px;}
+.prof-handle{font-size:11px;color:var(--txt3);}
+.prof-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.ps{text-align:center;padding:10px;background:var(--s2);border-radius:8px;}
+.ps-v{font-size:16px;font-weight:800;}
+.ps-l{font-size:8px;color:var(--txt3);text-transform:uppercase;letter-spacing:1px;margin-top:2px;}
+.edit-btn{margin-top:12px;width:100%;padding:8px;border-radius:8px;background:transparent;border:1px solid var(--border);color:var(--txt2);font-family:var(--font);font-size:11px;font-weight:600;cursor:pointer;transition:all .15s;}
+.edit-btn:hover{border-color:var(--border2);color:var(--txt);}
+
+/* ── NOTIF SETTINGS ── */
+.notif-set{background:var(--s1);border:1px solid var(--border);border-radius:11px;overflow:hidden;margin-bottom:14px;}
+.ns-row{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid var(--border);}
+.ns-row:last-child{border:none;}
+.ns-label{font-size:12px;font-weight:600;}
+.ns-sub{font-size:10px;color:var(--txt3);margin-top:1px;}
+.toggle{width:36px;height:20px;border-radius:10px;background:var(--s3);position:relative;cursor:pointer;transition:background .2s;flex-shrink:0;}
+.toggle.on{background:var(--lime);}
+.toggle::after{content:'';position:absolute;top:3px;left:3px;width:14px;height:14px;border-radius:50%;background:#fff;transition:left .2s;}
+.toggle.on::after{left:19px;}
+
+/* ── ANIM ── */
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.panel.on,.cr-panel.on{animation:fadeIn .2s ease;}
+
+/* ── RESPONSIVE ── */
+@media(max-width:700px){
+  .sidebar{width:52px;}
+  .logo-tag,.ni span:not(.ni-ic),.nav-grp-label,.sidebar-foot span:not(:first-child){display:none;}
+  .logo-name{font-size:17px;}
+  .stat-row{grid-template-columns:1fr 1fr;}
+  .tbl-hd,.tbl-row{grid-template-columns:2fr 1fr 1fr!important;}
+  .tbl-th:nth-child(n+4),.tbl-td:nth-child(n+4){display:none;}
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+
+<!-- ════════════════ SIDEBAR ════════════════ -->
+<div class="sidebar">
+  <div class="logo">
+    <div class="logo-name">ARIA</div>
+    <div class="logo-tag">Creator Intelligence</div>
+  </div>
+  <div class="nav">
+    <!-- Op nav -->
+    <div id="op-nav">
+      <div class="nav-grp">
+        <div class="nav-grp-label">Operator</div>
+        <div class="ni on" onclick="opPanel('op-dash')"><span class="ni-ic">⬡</span><span>Overview</span></div>
+        <div class="ni" onclick="opPanel('op-intel')"><span class="ni-ic">⚡</span><span>Intel</span></div>
+        <div class="ni" onclick="opPanel('op-roster')"><span class="ni-ic">◈</span><span>Roster</span></div>
+        <div class="ni" onclick="opPanel('op-flags')"><span class="ni-ic">⚑</span><span>Flags</span><span class="ni-badge" id="flag-badge">2</span></div>
+        <div class="ni" onclick="opPanel('op-perf')"><span class="ni-ic">◎</span><span>Analytics</span></div>
+      </div>
+    </div>
+    <!-- Creator nav -->
+    <div id="cr-nav" style="display:none">
+      <div class="nav-grp">
+        <div class="nav-grp-label">Creator</div>
+        <div class="ni on" onclick="crPanel('cr-feed')"><span class="ni-ic">⬡</span><span>Feed</span></div>
+        <div class="ni" onclick="crPanel('cr-chat')"><span class="ni-ic">✦</span><span>Aria</span><span class="ni-dot"></span></div>
+        <div class="ni" onclick="crPanel('cr-cal')"><span class="ni-ic">◷</span><span>Calendar</span></div>
+        <div class="ni" onclick="crPanel('cr-net')"><span class="ni-ic">⬡</span><span>Network</span></div>
+        <div class="ni" onclick="crPanel('cr-perf')"><span class="ni-ic">◎</span><span>Stats</span></div>
+        <div class="ni" onclick="crPanel('cr-prof')"><span class="ni-ic">◉</span><span>Profile</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="sidebar-foot">
+    <button class="view-btn vb-op on" id="vb-op" onclick="switchView('op')"><span>🎛</span><span>Operator</span></button>
+    <button class="view-btn vb-cr" id="vb-cr" onclick="switchView('cr')"><span>📱</span><span>Creator</span></button>
+  </div>
+</div>
+
+<!-- ════════════════ MAIN ════════════════ -->
+<div class="main">
+  <div class="topbar">
+    <div class="tb-title" id="tb-title">Dashboard Overview</div>
+    <span class="chip chip-live">● Live</span>
+    <span class="chip" id="view-chip">Operator</span>
+    <div class="tb-notif" onclick="toggleNotif()" id="notif-btn">
+      🔔<div class="notif-dot" id="notif-dot"></div>
+    </div>
+  </div>
+
+  <!-- NOTIF PANEL -->
+  <div class="notif-panel" id="notif-panel">
+    <div class="notif-hd">Notifications</div>
+    <div class="notif-list">
+      <div class="notif-item unread"><div class="notif-ic">⚑</div><div><div class="ni-title">Sofia flagged a brand deal</div><div class="ni-body">Asking to negotiate Aesop above $1,800</div><div class="ni-time">14 min ago</div></div></div>
+      <div class="notif-item unread"><div class="notif-ic">⚡</div><div><div class="ni-title">Intel pushed to 8 creators</div><div class="ni-body">Syntax rooftop soft open — tonight</div><div class="ni-time">2 hours ago</div></div></div>
+      <div class="notif-item"><div class="notif-ic">📅</div><div><div class="ni-title">Booking confirmed</div><div class="ni-body">Jade T. — Komodo 8:30 PM Friday</div><div class="ni-time">5 hours ago</div></div></div>
+      <div class="notif-item"><div class="notif-ic">📈</div><div><div class="ni-title">Engagement milestone</div><div class="ni-body">Roster avg hit 4.2% — above industry avg</div><div class="ni-time">Yesterday</div></div></div>
+      <div class="notif-item"><div class="notif-ic">🤝</div><div><div class="ni-title">New collab match</div><div class="ni-body">Sofia + Nia — wellness series overlap 68%</div><div class="ni-time">2 days ago</div></div></div>
+    </div>
+  </div>
+
+  <div class="content-area">
+
+    <!-- ══ OPERATOR CONTENT ══ -->
+    <div id="op-content">
+
+      <!-- OVERVIEW -->
+      <div class="panel on" id="op-dash">
+        <div class="ib">
+          <div class="ib-title">📊 Real Industry Benchmarks — 2025-2026</div>
+          <div class="ib-text">Micro-influencers (10K–100K) average 3–5% engagement and earn $500–$5,000/post. Platform creators average 4.2% ER vs 2.4% baseline — a 75% improvement. Influencer marketing industry: $32.55B globally (2025).</div>
+        </div>
+        <div class="stat-row">
+          <div class="sc lime"><div class="sc-lbl">Active Creators</div><div class="sc-val">12</div><div class="sc-sub">Miami pilot cohort</div></div>
+          <div class="sc cyan"><div class="sc-lbl">Avg Engagement</div><div class="sc-val">4.2%</div><div class="sc-sub"><span class="up">↑ 1.8pp</span> vs pre-platform</div></div>
+          <div class="sc pink"><div class="sc-lbl">Monthly Deal Value</div><div class="sc-val">$31K</div><div class="sc-sub">Across active roster</div></div>
+          <div class="sc amber"><div class="sc-lbl">Avg Weekly Growth</div><div class="sc-val">+847</div><div class="sc-sub">Followers per creator</div></div>
+        </div>
+        <div class="sh"><div class="sh-title">Roster Snapshot</div><div class="sh-act" onclick="opPanel('op-roster')">View All →</div></div>
+        <div class="tbl" style="margin-bottom:20px">
+          <div class="tbl-hd" style="grid-template-columns:2fr 1fr 1fr 1fr 1fr 60px">
+            <div class="tbl-th">Creator</div><div class="tbl-th">Followers</div><div class="tbl-th">Engagement</div><div class="tbl-th">Tier</div><div class="tbl-th">Posts/wk</div><div class="tbl-th">Status</div>
+          </div>
+          ${[['SL','Sofia L.','Luxury wellness','linear-gradient(135deg,#B8FF4E,#4EFFE0)','47.2K','4.3','vip','VIP','5','act'],
+             ['JT','Jade T.','Lifestyle','linear-gradient(135deg,#4EFFE0,#4E9FFF)','83.1K','4.7','vip','VIP','6','act'],
+             ['MR','Marco R.','Food · Wynwood','linear-gradient(135deg,#FF4EB8,#FFB84E)','28.9K','3.6','pro','Pro','4','act'],
+             ['AK','Alex K.','Fashion','linear-gradient(135deg,#FFB84E,#FF4EB8)','19.4K','2.7','basic','Basic','2','idl']].map(([i,n,ni,bg,f,e,tc,tl,p,s])=>`
+          <div class="tbl-row" style="grid-template-columns:2fr 1fr 1fr 1fr 1fr 60px">
+            <div class="tbl-td"><div class="av" style="background:${bg};color:#06080B">${i}</div><div><div style="font-weight:700">${n}</div><div style="font-size:9px;color:var(--txt3)">${ni}</div></div></div>
+            <div class="tbl-td" style="font-family:var(--mono);font-size:11px">${f}</div>
+            <div class="tbl-td"><div class="ebar"><div class="efill" style="width:${parseFloat(e)/5*100}%;background:var(--lime)"></div></div> ${e}%</div>
+            <div class="tbl-td"><span class="tier t-${tc}">${tl}</span></div>
+            <div class="tbl-td" style="font-family:var(--mono);font-size:11px">${p}</div>
+            <div class="tbl-td"><div class="sdot ${s}"></div></div>
+          </div>`).join('')}
+        </div>
+        <div class="sh"><div class="sh-title">Recent Intel Activity</div><div class="sh-act" onclick="opPanel('op-intel')">View All →</div></div>
+        <div class="ic new vn" style="cursor:default">
+          <div class="ic-hd"><span class="cat cat-vn">Venue</span><span style="font-size:9px;color:var(--txt3)">Pushed to 8 creators</span><span class="ic-time">2h ago</span></div>
+          <div class="ic-title">Syntax rooftop — soft open tonight, not posted anywhere yet</div>
+          <div class="ic-body">New rooftop bar on Brickell Ave doing a soft open tonight. Perfect golden hour 6–8pm, small crowd.</div>
+        </div>
+      </div>
+
+      <!-- INTEL -->
+      <div class="panel" id="op-intel">
+        <div class="sh"><div class="sh-title">Push Intelligence to Creators</div></div>
+        <div class="composer">
+          <div style="font-size:10px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:12px">New Intel Post</div>
+          <input class="ci" id="it" placeholder="e.g. Komodo rooftop is the table this weekend — not posted anywhere yet">
+          <textarea class="ci" id="ib" placeholder="Write what the bot delivers to creators. Specific, insider, never generic. Mention the vibe, who's going, what to film, when to post."></textarea>
+          <div class="tag-row">
+            <div class="tg on" onclick="this.classList.toggle('on')">Venue</div>
+            <div class="tg on cy" onclick="this.classList.toggle('on');this.classList.toggle('cy')">Trend</div>
+            <div class="tg on pk" onclick="this.classList.toggle('on');this.classList.toggle('pk')">Brand</div>
+            <div class="tg" onclick="this.classList.toggle('on')">Collab</div>
+            <div class="tg" onclick="this.classList.toggle('on')">Alert</div>
+          </div>
+          <div style="font-size:9px;color:var(--txt3);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;margin-top:2px">Target niches</div>
+          <div class="tag-row" style="margin-bottom:14px">
+            <div class="tg on" onclick="this.classList.toggle('on')">Luxury</div>
+            <div class="tg on" onclick="this.classList.toggle('on')">Wellness</div>
+            <div class="tg" onclick="this.classList.toggle('on')">Food</div>
+            <div class="tg" onclick="this.classList.toggle('on')">Nightlife</div>
+            <div class="tg" onclick="this.classList.toggle('on')">Fashion</div>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+            <button class="btn btn-lime" onclick="publishIntel()">⚡ Publish Now</button>
+            <button class="btn btn-ghost" onclick="previewIntel()">👁 Preview as Creator</button>
+            <button class="btn btn-ghost">Save Draft</button>
+            <span style="font-size:10px;color:var(--txt3);margin-left:auto">Reaches 8 creators</span>
+          </div>
+        </div>
+        <div class="sh"><div class="sh-title">Recent Intel Library</div></div>
+        <div class="ic new vn" style="cursor:default">
+          <div class="ic-hd"><span class="cat cat-vn">Venue</span><span style="font-size:9px;color:var(--txt3)">8 creators · 7 read</span><span class="ic-time">2h ago</span></div>
+          <div class="ic-title">Syntax rooftop — soft open tonight, not posted anywhere yet</div>
+          <div class="ic-body">New rooftop bar on Brickell Ave doing a soft open. Small crowd, perfect golden hour 6–8pm. Film the view from west corner — skyline + water.</div>
+        </div>
+        <div class="ic new tr" style="cursor:default">
+          <div class="ic-hd"><span class="cat cat-tr">Trend</span><span style="font-size:9px;color:var(--txt3)">12 creators · 11 read</span><span class="ic-time">Yesterday</span></div>
+          <div class="ic-title">Slow-morning content outperforming nightlife content +34% this week</div>
+          <div class="ic-body">Engagement data: calm morning aesthetic Reels averaging 4.8% ER vs 2.9% for nightlife. Post the morning after, not the night of.</div>
+        </div>
+        <div class="ic new br" style="cursor:default">
+          <div class="ic-hd"><span class="cat cat-br">Brand</span><span style="font-size:9px;color:var(--txt3)">5 creators · 5 read</span><span class="ic-time">2 days ago</span></div>
+          <div class="ic-title">Aesop Miami looking for 3 micro-creators — $1,800/Reel</div>
+          <div class="ic-body">Q2 campaign. 15K–80K followers, luxury lifestyle niche. No exclusivity. 2 posts/month. Negotiable above $1,800 at 4%+ ER.</div>
+        </div>
+      </div>
+
+      <!-- ROSTER -->
+      <div class="panel" id="op-roster">
+        <div class="sh"><div class="sh-title">Creator Roster — Miami Pilot</div><div class="sh-act">+ Add Creator</div></div>
+        <div class="ib"><div class="ib-title">Industry Context</div><div class="ib-text">Micro-influencers deliver 60% higher engagement than macro creators and cost brands 70% less. Your roster is performing at 4.2% avg ER vs the 2–3% platform average for lifestyle content. At this engagement level, creators are eligible for $1,800–$4,500 per Reel from luxury brands.</div></div>
+        <div class="tbl">
+          <div class="tbl-hd" style="grid-template-columns:2.5fr 1fr 1fr 1fr 1fr 80px">
+            <div class="tbl-th">Creator</div><div class="tbl-th">Followers</div><div class="tbl-th">Engagement</div><div class="tbl-th">Tier</div><div class="tbl-th">Posts/wk</div><div class="tbl-th">Status</div>
+          </div>
+          ${[['SL','Sofia L.','@sofialux','Luxury wellness · Brickell','linear-gradient(135deg,#B8FF4E,#4EFFE0)','47.2K','4.3','vip','VIP','5','act'],
+             ['JT','Jade T.','@jademiami','Lifestyle · South Beach','linear-gradient(135deg,#4EFFE0,#4E9FFF)','83.1K','4.7','vip','VIP','6','act'],
+             ['MR','Marco R.','@marcovibes','Food · Wynwood','linear-gradient(135deg,#FF4EB8,#FFB84E)','28.9K','3.6','pro','Pro','4','act'],
+             ['NV','Nia V.','@niavibe','Wellness · Coral Gables','linear-gradient(135deg,#4E9FFF,#4EFFE0)','34.8K','3.9','pro','Pro','4','act'],
+             ['RL','Rafael L.','@rafaelmiami','Nightlife · Downtown','linear-gradient(135deg,#FF4EB8,#4E9FFF)','61.2K','4.1','vip','VIP','5','act'],
+             ['AK','Alex K.','@alexkstyle','Fashion · Design District','linear-gradient(135deg,#FFB84E,#FF4EB8)','19.4K','2.7','basic','Basic','2','idl'],
+             ['KL','Kai L.','@kailoves','Beauty · Brickell','linear-gradient(135deg,#FF4EB8,#B8FF4E)','42.1K','3.8','pro','Pro','4','act']].map(([i,n,h,ni,bg,f,e,tc,tl,p,s])=>`
+          <div class="tbl-row" style="grid-template-columns:2.5fr 1fr 1fr 1fr 1fr 80px">
+            <div class="tbl-td"><div class="av" style="background:${bg};color:#06080B">${i}</div><div><div style="font-weight:700;font-size:12px">${n}</div><div style="font-size:9px;color:var(--txt3)">${ni}</div></div></div>
+            <div class="tbl-td" style="font-family:var(--mono);font-size:11px">${f}</div>
+            <div class="tbl-td"><div class="ebar"><div class="efill" style="width:${parseFloat(e)/5*100}%;background:var(--lime)"></div></div><span style="font-size:11px;font-family:var(--mono)"> ${e}%</span></div>
+            <div class="tbl-td"><span class="tier t-${tc}">${tl}</span></div>
+            <div class="tbl-td" style="font-family:var(--mono);font-size:11px">${p}</div>
+            <div class="tbl-td"><div class="sdot ${s}"></div></div>
+          </div>`).join('')}
+        </div>
+      </div>
+
+      <!-- FLAGS -->
+      <div class="panel" id="op-flags">
+        <div class="sh"><div class="sh-title">Flagged Messages — 2 Unresolved</div></div>
+        <div class="ib"><div class="ib-title">Auto-Flagging</div><div class="ib-text">The sub-bot automatically routes brand deal negotiation, payment terms, PR issues, and low-confidence responses to this queue. Your team handles them directly — creators hear back via the platform.</div></div>
+        <div class="flag-card">
+          <div style="font-size:20px">⚑</div>
+          <div class="fc-body">
+            <div class="fc-creator">Sofia L. — @sofialux <span style="font-size:9px;color:var(--txt3)">VIP · 47.2K followers · 4.3% ER</span></div>
+            <div class="fc-msg">"Hey can you help me negotiate the Aesop deal? They offered $1,800 but I've seen other creators with my engagement getting $2,200+ for a single Reel."</div>
+            <div class="fc-meta">⚑ Brand deal negotiation · 14 min ago</div>
+            <div class="flag-acts">
+              <button class="btn btn-sm btn-pink" onclick="resolveFlag(this)">Reply to Sofia</button>
+              <button class="btn btn-sm btn-teal" onclick="resolveFlag(this)">Mark Resolved</button>
+            </div>
+          </div>
+        </div>
+        <div class="flag-card">
+          <div style="font-size:20px">⚑</div>
+          <div class="fc-body">
+            <div class="fc-creator">Alex K. — @alexkstyle <span style="font-size:9px;color:var(--txt3)">Basic · 19.4K followers · 2.7% ER</span></div>
+            <div class="fc-msg">"A brand just DM'd me directly offering a collab. Should I take it or run it through you? It's a fashion label, $400 for a static post."</div>
+            <div class="fc-meta">⚑ Brand inquiry outside platform · 2h ago</div>
+            <div class="flag-acts">
+              <button class="btn btn-sm btn-pink" onclick="resolveFlag(this)">Reply to Alex</button>
+              <button class="btn btn-sm btn-teal" onclick="resolveFlag(this)">Mark Resolved</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ANALYTICS -->
+      <div class="panel" id="op-perf">
+        <div class="sh"><div class="sh-title">Platform Analytics — Week 6 of Pilot</div></div>
+        <div class="stat-row">
+          <div class="sc lime"><div class="sc-lbl">Avg Posts/Week</div><div class="sc-val">4.3</div><div class="sc-sub"><span class="up">↑ 115%</span> vs 2.0 baseline</div></div>
+          <div class="sc cyan"><div class="sc-lbl">Avg Engagement</div><div class="sc-val">4.2%</div><div class="sc-sub"><span class="up">↑ 1.8pp</span> from 2.4%</div></div>
+          <div class="sc pink"><div class="sc-lbl">Deals Closed</div><div class="sc-val">8</div><div class="sc-sub">$31K monthly value</div></div>
+          <div class="sc amber"><div class="sc-lbl">Follower Growth</div><div class="sc-val">+6.2%</div><div class="sc-sub">Avg across 12 creators</div></div>
+        </div>
+        <div class="ib"><div class="ib-title">ROI Context</div><div class="ib-text">Leung et al. (HBR): brands left 16.6% engagement gain on table by failing to optimize posting frequency. Platform drove 115% frequency increase + 75% engagement lift. At $0.40–$0.80 CPE for lifestyle creators, this translates to measurably higher brand deal value per post.</div></div>
+        <div class="op-chart-wrap">
+          <div class="op-chart-title">Weekly Average Posts — 8-Week Pilot</div>
+          <div class="bar-chart" id="op-bar-chart">
+            ${[1.8,2.1,1.9,2.4,3.2,3.8,4.1,4.3].map((v,i)=>`<div class="bc-bar" style="height:${v/4.3*100}%;background:${i===7?'var(--lime)':'rgba(184,255,78,0.3)'};opacity:${0.45+i*0.07}" title="Week ${i+1}: ${v} avg posts/creator"></div>`).join('')}
+          </div>
+          <div class="bc-labels">${['Wk1','Wk2','Wk3','Wk4','Wk5','Wk6','Wk7','Wk8'].map(w=>`<div class="bc-lb">${w}</div>`).join('')}</div>
+          <div style="font-size:10px;color:var(--txt3);margin-top:8px">Platform launched Week 3. Clear inflection at Week 5 as bot cadence routine established.</div>
+        </div>
+        <div class="op-chart-wrap">
+          <div class="op-chart-title">Avg Engagement Rate — 8-Week Pilot</div>
+          <div class="bar-chart">
+            ${[2.4,2.6,2.5,2.9,3.4,3.8,4.0,4.2].map((v,i)=>`<div class="bc-bar" style="height:${v/4.2*100}%;background:${i===7?'var(--cyan)':'rgba(78,255,224,0.25)'};opacity:${0.45+i*0.07}" title="Week ${i+1}: ${v}% avg ER"></div>`).join('')}
+          </div>
+          <div class="bc-labels">${['Wk1','Wk2','Wk3','Wk4','Wk5','Wk6','Wk7','Wk8'].map(w=>`<div class="bc-lb">${w}</div>`).join('')}</div>
+        </div>
+      </div>
+
+    </div><!-- end op-content -->
+
+    <!-- ══ CREATOR CONTENT ══ -->
+    <div id="cr-content" style="display:none;height:100%">
+      <div class="cr-shell">
+        <div class="cr-panels">
+
+          <!-- FEED -->
+          <div class="cr-panel on" id="cr-feed">
+            <div style="margin-bottom:14px">
+              <div style="font-size:10px;color:var(--txt3);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:3px">Good morning</div>
+              <div style="font-family:var(--serif);font-size:22px;font-style:italic">Sofia 👋</div>
+              <div style="font-size:11px;color:var(--txt2);margin-top:2px">3 new updates from your intelligence feed</div>
+            </div>
+            <div class="ic new vn" onclick="expandCard(this)">
+              <div class="ic-hd"><span class="cat cat-vn">Venue</span><span class="ic-time">2h ago · Unread</span></div>
+              <div class="ic-title">Syntax rooftop — soft open tonight, not posted anywhere yet</div>
+              <div class="ic-body">New rooftop bar on Brickell Ave doing a soft open tonight. Small crowd, perfect golden hour 6–8pm.</div>
+              <div class="ic-exp">
+                <div style="font-size:11px;color:var(--txt2);line-height:1.6;margin-bottom:10px">Film the view from the west corner — skyline + water. They're looking for early creators to tag. <strong style="color:var(--lime)">Post a Reel tonight between 7–9pm</strong> — golden hour content outperforming this week by 34%.</div>
+                <div class="ic-met"><span class="ic-ml">Best posting window</span><span class="ic-mv">7:00–9:00 PM tonight</span></div>
+                <div class="ic-met"><span class="ic-ml">Avg ER for venue content</span><span class="ic-mv">4.8% this week</span></div>
+                <div class="ic-met"><span class="ic-ml">Recommended format</span><span class="ic-mv">Reel · 30–45s</span></div>
+                <button class="btn btn-lime btn-sm" style="margin-top:8px;width:100%" onclick="event.stopPropagation();crPanel('cr-cal');showToast('📅 Added to Calendar','Syntax rooftop tonight 6:30 PM — reminder set for 5:45 PM')">Add to Calendar</button>
+              </div>
+            </div>
+            <div class="ic new tr" onclick="expandCard(this)">
+              <div class="ic-hd"><span class="cat cat-tr">Trend</span><span class="ic-time">Yesterday · Unread</span></div>
+              <div class="ic-title">Slow-morning content outperforming nightlife +34% this week</div>
+              <div class="ic-body">Engagement data shows calm morning Reels averaging 4.8% ER vs 2.9% for nightlife. Post the morning after, not the night of.</div>
+              <div class="ic-exp">
+                <div class="ic-met"><span class="ic-ml">Morning content avg ER</span><span class="ic-mv">4.8%</span></div>
+                <div class="ic-met"><span class="ic-ml">Nightlife content avg ER</span><span class="ic-mv">2.9%</span></div>
+                <div class="ic-met"><span class="ic-ml">Your current avg ER</span><span class="ic-mv">4.3% ↑ trending</span></div>
+              </div>
+            </div>
+            <div class="ic new br" onclick="expandCard(this)">
+              <div class="ic-hd"><span class="cat cat-br">Brand Deal</span><span class="ic-time">2 days ago · Unread</span></div>
+              <div class="ic-title">Aesop Miami looking for 3 creators — $1,800/Reel</div>
+              <div class="ic-body">Luxury skincare campaign Q2. Your profile matches. 2 posts/month, no exclusivity. Rate is negotiable at your engagement level.</div>
+              <div class="ic-exp">
+                <div class="ic-met"><span class="ic-ml">Offered rate</span><span class="ic-mv">$1,800/Reel</span></div>
+                <div class="ic-met"><span class="ic-ml">Your market rate</span><span class="ic-mv" style="color:var(--cyan)">$2,000–$2,400</span></div>
+                <div class="ic-met"><span class="ic-ml">Recommendation</span><span class="ic-mv" style="color:var(--pink)">Negotiate up ↑</span></div>
+                <div style="font-size:10px;color:var(--txt2);margin-top:8px">Your manager has been notified to handle negotiation. Tap Aria to ask about it.</div>
+              </div>
+            </div>
+            <div class="ic" onclick="expandCard(this)" style="border-color:rgba(78,255,224,.15)">
+              <div class="ic-hd"><span class="cat cat-vn">Collab Match</span><span class="ic-time">3 days ago</span></div>
+              <div class="ic-title">Nia V. wants to co-post a wellness morning series</div>
+              <div class="ic-body">Her audience (34.8K, 3.9% ER) overlaps 68% with yours. Combined reach 82K. Wellness + luxury crossover.</div>
+              <div class="ic-exp">
+                <div class="ic-met"><span class="ic-ml">Audience overlap</span><span class="ic-mv">68%</span></div>
+                <div class="ic-met"><span class="ic-ml">Combined reach</span><span class="ic-mv">82K</span></div>
+                <div class="ic-met"><span class="ic-ml">Expected ER boost</span><span class="ic-mv">+0.6–1.2pp</span></div>
+              </div>
+            </div>
+            <div style="height:20px"></div>
+          </div>
+
+          <!-- CHAT -->
+          <div class="cr-panel chat-p" id="cr-chat">
+            <div class="chat-hd">
+              <div class="bot-av">✦</div>
+              <div>
+                <div class="bot-nm">Aria <span style="font-size:9px;color:var(--txt3);font-weight:400">· your assistant</span></div>
+                <div class="bot-st">● Online · knows your full schedule</div>
+              </div>
+            </div>
+            <div class="msgs" id="msgs">
+              <div class="msg b"><div class="mb">Good morning Sofia 🌅 You have a booking tonight at Syntax rooftop at 6:30pm. Golden hour window is 6–8pm — I'd suggest arriving by 6:15 to claim the west corner for the skyline shot. Want me to set a reminder?</div><div class="mt">9:04 AM</div></div>
+              <div class="msg u"><div class="mb">Yes set the reminder. Also what should I film there?</div><div class="mt">9:06 AM</div></div>
+              <div class="msg b"><div class="mb">Reminder set for 5:45 PM ✓<br><br>For tonight: film the view from the west corner — skyline + water in the background. 30–45 second Reel, no talking. Let the location do the work. Slightly underexposed looks cleaner than bright. Post between 7–9 PM.</div><div class="mt">9:06 AM</div></div>
+              <div class="msg u"><div class="mb">What about the Aesop deal?</div><div class="mt">9:10 AM</div></div>
+              <div class="msg b"><div class="mb">Flagging that to your manager — brand deal negotiation is their lane 🎯<br><br>Context: at your engagement rate (4.3%) and 47.2K followers, your market rate for a luxury skincare Reel is <strong>$2,000–$2,400</strong>. The $1,800 offer is below your value. Your manager will push back.</div><div class="mt">9:10 AM</div></div>
+            </div>
+            <div class="chat-in-row">
+              <input class="chat-in" id="chat-in" placeholder="Ask Aria anything…" onkeydown="if(event.key==='Enter')sendMsg()">
+              <button class="send" onclick="sendMsg()">↑</button>
+            </div>
+          </div>
+
+          <!-- CALENDAR -->
+          <div class="cr-panel" id="cr-cal">
+            <div class="cal-wrap">
+              <div class="cal-hd">
+                <div class="cal-month" id="cal-month-label">April 2026</div>
+                <div class="cal-nav">
+                  <div class="cal-arrow" onclick="changeMonth(-1)">‹</div>
+                  <div class="cal-arrow" onclick="changeMonth(1)">›</div>
+                </div>
+              </div>
+              <div class="cal-grid" id="cal-grid"></div>
+              <button class="add-ev-btn" onclick="openCalModal()">+ Ask Aria to book something</button>
+              <div class="agenda-title" id="agenda-label">Events for April 21</div>
+              <div id="agenda-list"></div>
+            </div>
+          </div>
+
+          <!-- NETWORK -->
+          <div class="cr-panel" id="cr-net">
+            <div style="font-size:11px;color:var(--txt2);margin-bottom:12px">Creators on ARIA · Miami · Connect to collaborate</div>
+            <div class="cr-grid">
+              ${[['NV','Nia V.','@niavibe','linear-gradient(135deg,#4E9FFF,#4EFFE0)','34.8K','3.9%','Wellness',true],
+                 ['MR','Marco R.','@marcovibes','linear-gradient(135deg,#FF4EB8,#FFB84E)','28.9K','3.6%','Food',false],
+                 ['JT','Jade T.','@jademiami','linear-gradient(135deg,#4EFFE0,#4E9FFF)','83.1K','4.7%','Lifestyle',false],
+                 ['RL','Rafael L.','@rafaelmiami','linear-gradient(135deg,#FF4EB8,#4E9FFF)','61.2K','4.1%','Nightlife',false]].map(([i,n,h,bg,f,e,ni,conn])=>`
+              <div class="crcard">
+                <div class="cc-top">
+                  <div class="cc-av" style="background:${bg};color:#06080B">${i}</div>
+                  <div><div class="cc-n">${n}</div><div class="cc-h">${h}</div></div>
+                </div>
+                <div class="cc-stats">
+                  <div class="cc-st"><div class="cc-sl">Followers</div><div class="cc-sv" style="font-family:var(--mono);font-size:11px">${f}</div></div>
+                  <div class="cc-st"><div class="cc-sl">Eng Rate</div><div class="cc-sv" style="color:var(--lime)">${e}</div></div>
+                </div>
+                <div style="font-size:9px;color:var(--txt3);margin-bottom:7px">${ni} · Miami</div>
+                <button class="conn-btn${conn?' on':''}" onclick="this.classList.toggle('on');this.textContent=this.classList.contains('on')?'✓ Connected':'Connect'">${conn?'✓ Connected':'Connect'}</button>
+              </div>`).join('')}
+            </div>
+            <div class="sh"><div class="sh-title">Collab Board</div></div>
+            <div class="col-card">
+              <div class="col-hd"><div class="col-title">Aesop Miami — Q2 Campaign</div><div class="col-comp">$1,800/Reel</div></div>
+              <div class="col-desc">Luxury skincare campaign. 15K–80K followers, lifestyle niche. 2 Reels/month, no exclusivity. Miami-based required.</div>
+              <div class="col-tags"><span class="ctag">Luxury</span><span class="ctag">Skincare</span><span class="ctag">Miami</span><span class="ctag">15K–80K</span></div>
+              <button class="int-btn on">✓ Your manager is handling this</button>
+            </div>
+            <div class="col-card">
+              <div class="col-hd"><div class="col-title">Morning Wellness Series — Co-Post with Nia V.</div><div class="col-comp">Revenue share</div></div>
+              <div class="col-desc">4-part morning wellness series. Combined reach 82K, audience overlap 68%. Organic content, no brand brief.</div>
+              <div class="col-tags"><span class="ctag">Wellness</span><span class="ctag">Co-Post</span><span class="ctag">Organic</span></div>
+              <button class="int-btn" onclick="this.classList.add('on');this.textContent='✓ Interested — Aria will set it up';showToast('🤝 Interest Sent','Aria will coordinate with Nia V. for the wellness series')">Express Interest</button>
+            </div>
+            <div class="col-card">
+              <div class="col-hd"><div class="col-title">Le Jardin Hotel — Opening Night</div><div class="col-comp">$600 + 1-night stay</div></div>
+              <div class="col-desc">New boutique hotel South Beach opening next Friday. 4 creator slots. Includes dinner, 1-night stay, and rooftop access.</div>
+              <div class="col-tags"><span class="ctag">Hotel</span><span class="ctag">Event</span><span class="ctag">South Beach</span></div>
+              <button class="int-btn" onclick="this.classList.add('on');this.textContent='✓ Interested — Aria will set it up';showToast('🏨 Interest Sent','Aria will book Le Jardin opening night for you')">Express Interest</button>
+            </div>
+            <div style="height:20px"></div>
+          </div>
+
+          <!-- STATS -->
+          <div class="cr-panel" id="cr-perf">
+            <div style="margin-bottom:14px">
+              <div style="font-family:var(--serif);font-size:20px;font-style:italic;margin-bottom:3px">Your Performance</div>
+              <div style="font-size:10px;color:var(--txt2)">Week 6 of pilot · Miami</div>
+            </div>
+            <div class="perf-grid">
+              <div class="pc"><div class="pc-lbl">Engagement Rate</div><div class="pc-val" style="color:var(--lime)">4.3%</div><div class="pc-sub"><span class="up">↑ 1.9pp</span> from 2.4% baseline</div></div>
+              <div class="pc"><div class="pc-lbl">Posts This Week</div><div class="pc-val" style="color:var(--cyan)">5</div><div class="pc-sub">Target 5 · <span class="up">On track ✓</span></div></div>
+              <div class="pc"><div class="pc-lbl">Follower Growth</div><div class="pc-val" style="color:var(--amber)">+1.2K</div><div class="pc-sub">This month · <span class="up">+2.6%</span></div></div>
+              <div class="pc"><div class="pc-lbl">Brand Value</div><div class="pc-val" style="color:var(--pink)">$3.8K</div><div class="pc-sub">Active deals this month</div></div>
+            </div>
+            <div class="ib"><div class="ib-title">Your Market Rate</div><div class="ib-text">At 47.2K followers and 4.3% engagement, your sponsored Reel rate is <strong style="color:var(--lime)">$2,000–$2,400</strong>. The Aesop offer of $1,800 is below market. Your manager is negotiating up.</div></div>
+            <div style="background:var(--s1);border:1px solid var(--border);border-radius:11px;padding:14px;margin-bottom:12px">
+              <div style="font-size:9px;color:var(--txt3);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:10px;font-weight:700">Engagement Rate — 8 Weeks</div>
+              <div class="mini-bars">
+                ${[2.4,2.6,2.5,2.9,3.4,3.8,4.0,4.3].map((v,i)=>`<div class="mb-bar" style="height:${v/4.3*100}%;background:${i===7?'var(--lime)':'rgba(184,255,78,.3)'};opacity:${0.45+i*0.07}"></div>`).join('')}
+              </div>
+              <div style="display:flex;justify-content:space-between;font-size:8px;color:var(--txt3);margin-top:5px"><span>Wk1 (baseline 2.4%)</span><span>Now 4.3%</span></div>
+            </div>
+            <div style="height:20px"></div>
+          </div>
+
+          <!-- PROFILE -->
+          <div class="cr-panel" id="cr-prof">
+            <div class="prof-card">
+              <div class="prof-top">
+                <div class="prof-av" style="background:linear-gradient(135deg,var(--lime),var(--cyan));color:#06080B">SL</div>
+                <div>
+                  <div class="prof-name">Sofia L.</div>
+                  <div class="prof-handle">@sofialux · Luxury Wellness · Miami</div>
+                </div>
+              </div>
+              <div class="prof-stats">
+                <div class="ps"><div class="ps-v" style="color:var(--lime)">47.2K</div><div class="ps-l">Followers</div></div>
+                <div class="ps"><div class="ps-v" style="color:var(--cyan)">4.3%</div><div class="ps-l">Eng Rate</div></div>
+                <div class="ps"><div class="ps-v" style="color:var(--pink)">VIP</div><div class="ps-l">Tier</div></div>
+              </div>
+              <button class="edit-btn">Edit Profile</button>
+            </div>
+            <div class="sh"><div class="sh-title">Notification Settings</div></div>
+            <div class="notif-set">
+              <div class="ns-row"><div><div class="ns-label">Daily Intel Push</div><div class="ns-sub">Morning updates from your intelligence feed</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+              <div class="ns-row"><div><div class="ns-label">Posting Reminders</div><div class="ns-sub">Nudge when you go 3+ days without posting</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+              <div class="ns-row"><div><div class="ns-label">Booking Reminders</div><div class="ns-sub">2 hours before confirmed bookings</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+              <div class="ns-row"><div><div class="ns-label">SMS Alerts</div><div class="ns-sub">Critical updates via text (VIP only)</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+              <div class="ns-row"><div><div class="ns-label">Collab Matches</div><div class="ns-sub">When a new creator matches your niche</div></div><div class="toggle" onclick="this.classList.toggle('on')"></div></div>
+              <div class="ns-row"><div><div class="ns-label">Weekly Digest</div><div class="ns-sub">Monday performance summary</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+            </div>
+            <div class="sh"><div class="sh-title">Sub-Bot Settings</div></div>
+            <div class="prof-card">
+              <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+                <div class="bot-av" style="width:40px;height:40px;font-size:16px">✦</div>
+                <div><div style="font-size:13px;font-weight:700">Aria</div><div style="font-size:10px;color:var(--txt3)">Your personal assistant · Always on</div></div>
+              </div>
+              <input class="ci" value="Aria" placeholder="Bot name" style="margin-bottom:6px">
+              <button class="btn btn-ghost btn-sm">Save Changes</button>
+            </div>
+            <div style="height:20px"></div>
+          </div>
+
+        </div><!-- end cr-panels -->
+
+        <!-- TAB BAR -->
+        <div class="tabbar">
+          <div class="tab on" id="tab-feed" onclick="crPanel('cr-feed')"><div class="tab-ic">⬡</div><div class="tab-lb">Feed</div></div>
+          <div class="tab" id="tab-chat" onclick="crPanel('cr-chat')"><div class="tab-ic">✦</div><div class="tab-lb">Aria</div></div>
+          <div class="tab" id="tab-cal" onclick="crPanel('cr-cal')"><div class="tab-ic">◷</div><div class="tab-lb">Calendar</div></div>
+          <div class="tab" id="tab-net" onclick="crPanel('cr-net')"><div class="tab-ic">◈</div><div class="tab-lb">Network</div></div>
+          <div class="tab" id="tab-perf" onclick="crPanel('cr-perf')"><div class="tab-ic">◎</div><div class="tab-lb">Stats</div></div>
+          <div class="tab" id="tab-prof" onclick="crPanel('cr-prof')"><div class="tab-ic">◉</div><div class="tab-lb">Profile</div></div>
+        </div>
+      </div>
+    </div><!-- end cr-content -->
+
+  </div><!-- end content-area -->
+</div><!-- end main -->
+</div><!-- end app -->
+
+<!-- CALENDAR MODAL -->
+<div class="cal-modal" id="cal-modal" onclick="if(event.target===this)closeCalModal()">
+  <div class="cal-modal-box">
+    <div class="cml-title">Book Something <span class="cml-close" onclick="closeCalModal()">×</span></div>
+    <input class="ci" id="book-what" placeholder="What do you want to book? e.g. dinner at Komodo Friday 8pm">
+    <div style="display:flex;gap:8px;margin-top:4px">
+      <button class="btn btn-lime" style="flex:1" onclick="submitBooking()">Ask Aria to Book It</button>
+      <button class="btn btn-ghost" onclick="closeCalModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- INTEL PREVIEW OVERLAY -->
+<div class="preview-overlay" id="preview-overlay" onclick="if(event.target===this)closePreview()">
+  <div class="preview-phone">
+    <div class="preview-status"><span>9:41</span><span>▲▲▲ WiFi 100%</span></div>
+    <div class="preview-content">
+      <div style="font-size:9px;color:var(--txt3);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:3px">From ARIA · Just now</div>
+      <div id="preview-card-content"></div>
+    </div>
+  </div>
+  <div class="preview-close" onclick="closePreview()">×</div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"><div class="toast-t" id="toast-t"></div><div class="toast-b" id="toast-b"></div></div>
+
+<script>
+// ════════════════ STATE ════════════════
+let currentView = 'op';
+let calDate = new Date(2026, 3, 1); // April 2026
+let selectedDay = 21;
+const TODAY = 21;
+
+// Calendar events data
+const calEvents = {
+  21:[
+    {time:'6:30 PM',title:'Syntax Rooftop — Soft Open',sub:'Brickell Ave · Golden hour shoot',type:'booking',color:'var(--cyan)'},
+    {time:'8:00 PM',title:'Post Reel reminder',sub:'Best window: 7–9 PM tonight',type:'reminder',color:'var(--lime)'},
+  ],
+  23:[
+    {time:'12:30 PM',title:'Aesop brand call',sub:'Manager handling negotiation',type:'brand',color:'var(--pink)'},
+    {time:'3:00 PM',title:'Post reminder — 3 days since last post',sub:'Aria nudge · consistency reminder',type:'reminder',color:'var(--lime)'},
+  ],
+  25:[
+    {time:'7:00 PM',title:'Le Jardin Hotel Opening Night',sub:'South Beach · $600 + stay',type:'booking',color:'var(--cyan)'},
+  ],
+  26:[
+    {time:'9:00 AM',title:'Co-post with Nia V. — Morning Series',sub:'Wellness collab · 4-part series starts',type:'collab',color:'var(--amber)'},
+    {time:'8:00 PM',title:'Weekly digest from Aria',sub:'Performance summary + upcoming intel',type:'reminder',color:'var(--lime)'},
+  ],
+  28:[
+    {time:'8:00 PM',title:'Komodo dinner booking',sub:'Brickell · Table for 4',type:'booking',color:'var(--cyan)'},
+  ],
+  30:[
+    {time:'All day',title:'Monthly brand deal deadline',sub:'2 Aesop posts due this month',type:'brand',color:'var(--pink)'},
+  ]
+};
+
+// ════════════════ VIEW SWITCH ════════════════
+function switchView(v) {
+  currentView = v;
+  const isOp = v === 'op';
+  document.getElementById('op-content').style.display = isOp ? 'block' : 'none';
+  document.getElementById('cr-content').style.display = isOp ? 'none' : 'block';
+  document.getElementById('op-nav').style.display = isOp ? 'block' : 'none';
+  document.getElementById('cr-nav').style.display = isOp ? 'none' : 'block';
+  document.getElementById('vb-op').classList.toggle('on', isOp);
+  document.getElementById('vb-cr').classList.toggle('on', !isOp);
+  document.getElementById('view-chip').textContent = isOp ? 'Operator' : 'Creator App';
+  document.getElementById('view-chip').className = 'chip ' + (isOp ? 'chip-op' : 'chip-cr');
+  if(!isOp) { crPanel('cr-feed'); renderCal(); }
+  else opPanel('op-dash');
+}
+
+// ════════════════ OP PANELS ════════════════
+function opPanel(id) {
+  document.querySelectorAll('#op-content .panel').forEach(p=>p.classList.remove('on'));
+  document.getElementById(id)?.classList.add('on');
+  document.querySelectorAll('#op-nav .ni').forEach(n=>{
+    n.classList.remove('on');
+    if(n.getAttribute('onclick')?.includes(id)) n.classList.add('on');
+  });
+  const titles = {'op-dash':'Dashboard Overview','op-intel':'Intel Composer','op-roster':'Creator Roster','op-flags':'Flagged Messages','op-perf':'Platform Analytics'};
+  document.getElementById('tb-title').textContent = titles[id]||id;
+}
+
+// ════════════════ CR PANELS ════════════════
+function crPanel(id) {
+  document.querySelectorAll('.cr-panel').forEach(p=>p.classList.remove('on'));
+  document.getElementById(id)?.classList.add('on');
+  ['feed','chat','cal','net','perf','prof'].forEach(t=>{
+    document.getElementById('tab-'+t)?.classList.toggle('on', id==='cr-'+t);
+  });
+  document.querySelectorAll('#cr-nav .ni').forEach(n=>{
+    n.classList.remove('on');
+    if(n.getAttribute('onclick')?.includes(id)) n.classList.add('on');
+  });
+  const titles = {'cr-feed':'My Feed','cr-chat':'Aria — My Assistant','cr-cal':'My Calendar','cr-net':'Network & Collabs','cr-perf':'My Stats','cr-prof':'My Profile'};
+  document.getElementById('tb-title').textContent = titles[id]||id;
+  if(id==='cr-cal') renderCal();
+}
+
+// ════════════════ CALENDAR ════════════════
+function renderCal() {
+  const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  document.getElementById('cal-month-label').textContent = months[calDate.getMonth()]+' '+calDate.getFullYear();
+
+  const grid = document.getElementById('cal-grid');
+  grid.innerHTML = '';
+
+  // Day headers
+  ['S','M','T','W','T','F','S'].forEach(d=>{
+    const el = document.createElement('div');
+    el.className='cal-dow'; el.textContent=d; grid.appendChild(el);
+  });
+
+  const firstDay = new Date(calDate.getFullYear(), calDate.getMonth(), 1).getDay();
+  const daysInMonth = new Date(calDate.getFullYear(), calDate.getMonth()+1, 0).getDate();
+  const prevDays = new Date(calDate.getFullYear(), calDate.getMonth(), 0).getDate();
+
+  // Prev month blanks
+  for(let i=firstDay-1;i>=0;i--){
+    const el=document.createElement('div');
+    el.className='cal-day other';
+    el.textContent=prevDays-i;
+    grid.appendChild(el);
+  }
+
+  // Current month days
+  for(let d=1;d<=daysInMonth;d++){
+    const el=document.createElement('div');
+    const isApril2026 = calDate.getMonth()===3 && calDate.getFullYear()===2026;
+    const hasEv = isApril2026 && calEvents[d];
+    const isToday = isApril2026 && d===TODAY;
+    const isSel = d===selectedDay;
+    el.className='cal-day'+(isToday?' today':'')+(isSel&&!isToday?' selected':'')+(hasEv?' has-booking':'');
+    el.innerHTML=`<span>${d}</span>`;
+    if(hasEv){
+      const types = calEvents[d].map(e=>e.type);
+      const dots = document.createElement('div');
+      dots.className='day-dots';
+      types.slice(0,3).forEach(t=>{
+        const dot=document.createElement('div');
+        dot.className='ddot';
+        dot.style.background=t==='booking'?'var(--cyan)':t==='brand'?'var(--pink)':t==='collab'?'var(--amber)':'var(--lime)';
+        dots.appendChild(dot);
+      });
+      el.appendChild(dots);
+    }
+    el.onclick=()=>selectDay(d);
+    grid.appendChild(el);
+  }
+
+  renderAgenda(selectedDay);
+}
+
+function selectDay(d) {
+  selectedDay=d;
+  renderCal();
+}
+
+function renderAgenda(d) {
+  const months=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const isApril = calDate.getMonth()===3 && calDate.getFullYear()===2026;
+  const label = months[calDate.getMonth()]+' '+d+', '+calDate.getFullYear();
+  document.getElementById('agenda-label').textContent='Events for '+label;
+
+  const list = document.getElementById('agenda-list');
+  const evs = (isApril && calEvents[d]) || [];
+  if(!evs.length){
+    list.innerHTML=`<div style="font-size:11px;color:var(--txt3);padding:12px 0;text-align:center">No events — ask Aria to book something</div>`;
+    return;
+  }
+  list.innerHTML=evs.map(ev=>`
+  <div class="ev-card">
+    <div class="ev-time-col"><div class="ev-time">${ev.time.split(' ')[0]}<br><span style="font-size:8px;color:var(--txt3)">${ev.time.split(' ')[1]||''}</span></div></div>
+    <div style="width:2px;flex-shrink:0;background:${ev.color};border-radius:2px;align-self:stretch;margin:2px 0"></div>
+    <div style="flex:1">
+      <div class="ev-title">${ev.title}</div>
+      <div class="ev-sub">${ev.sub}</div>
+      <span class="ev-tag ev-${ev.type}">${ev.type}</span>
+    </div>
+  </div>`).join('');
+}
+
+function changeMonth(dir) {
+  calDate.setMonth(calDate.getMonth()+dir);
+  selectedDay=1;
+  renderCal();
+}
+
+function openCalModal() { document.getElementById('cal-modal').classList.add('on'); document.getElementById('book-what').focus(); }
+function closeCalModal() { document.getElementById('cal-modal').classList.remove('on'); }
+
+function submitBooking() {
+  const val = document.getElementById('book-what').value.trim();
+  if(!val) return;
+  closeCalModal();
+  document.getElementById('book-what').value='';
+  showToast('📅 Aria is on it!', val.length>50?val.substring(0,50)+'…':val);
+  // Add to events
+  if(!calEvents[28]) calEvents[28]=[];
+  calEvents[28].push({time:'8:00 PM',title:val,sub:'Booked by Aria',type:'booking',color:'var(--cyan)'});
+  setTimeout(()=>renderCal(),300);
+}
+
+// ════════════════ INTEL ════════════════
+function publishIntel() {
+  const t = document.getElementById('it').value.trim();
+  if(!t){showToast('Missing title','Add a title for the intel post');return;}
+  showToast('⚡ Intel Published!',`"${t.substring(0,45)}${t.length>45?'…':''}" pushed to 8 creators`);
+  setTimeout(()=>{document.getElementById('it').value='';document.getElementById('ib').value='';},400);
+}
+
+function previewIntel() {
+  const t = document.getElementById('it').value.trim()||'Syntax rooftop — soft open tonight, not posted anywhere yet';
+  const b = document.getElementById('ib').value.trim()||'New rooftop bar on Brickell Ave doing a soft open tonight. Small crowd, perfect golden hour 6–8pm. Film the view from the west corner — skyline + water. Post between 7–9 PM.';
+  document.getElementById('preview-card-content').innerHTML=`
+    <div class="ic new vn" style="cursor:default;margin:0">
+      <div class="ic-hd"><span class="cat cat-vn">Venue</span><span class="ic-time">Just now</span></div>
+      <div class="ic-title">${t}</div>
+      <div class="ic-body">${b}</div>
+    </div>`;
+  document.getElementById('preview-overlay').classList.add('on');
+}
+function closePreview(){document.getElementById('preview-overlay').classList.remove('on');}
+
+// ════════════════ FLAGS ════════════════
+function resolveFlag(btn) {
+  const card = btn.closest('.flag-card');
+  card.style.transition='all .3s';
+  card.style.opacity='0.35';
+  card.style.pointerEvents='none';
+  const badge = document.getElementById('flag-badge');
+  const n = parseInt(badge?.textContent||'1')-1;
+  if(badge){badge.textContent=n;if(n<=0)badge.style.display='none';}
+  showToast('✓ Resolved','Flag moved to archive');
+}
+
+// ════════════════ EXPAND CARD ════════════════
+function expandCard(card){
+  const exp = card.querySelector('.ic-exp');
+  if(exp) exp.classList.toggle('on');
+  card.classList.remove('new');
+}
+
+// ════════════════ CHAT ════════════════
+const replies = {
+  'book':()=>`I'll book that right now. What date and time? I can check availability at Komodo, Zuma, or Novikov. Once confirmed it'll appear on your calendar automatically.`,
+  'remind':()=>`Reminder set ✓. You'll get a push notification 30 minutes before. Want me to also send an SMS?`,
+  'calendar':()=>`Your calendar this week: Tonight 6:30 PM Syntax rooftop, Wednesday brand call with Aesop manager, Friday Le Jardin hotel opening. Posting reminders are set around each. Want me to add or change anything?`,
+  'what should':()=>`Based on today's intel and your history: tonight's Syntax rooftop is your best shot — venue content is 4.8% ER this week. Film the west corner skyline at golden hour, 30–45s no talking. Post 7–9 PM.`,
+  'engagement':()=>`Your engagement rate is 4.3% this week, up from your 2.4% baseline before joining. Industry average for lifestyle micro-creators is 3–5% — you're performing solidly above average.`,
+  'follower':()=>`You're at 47.2K this week. Growth has been +1.2K this month — about 2.6% monthly growth, strong for your niche without running ads.`,
+  'deal':()=>`I've flagged the Aesop negotiation to your manager. At your engagement rate, the $1,800 offer is below your $2,000–$2,400 market rate. Your manager will push back. `,
+  'post':()=>`Best time to post today: 7–9 PM for maximum reach. Your audience is most active 7:30–8:30 PM based on the last 30 days.`,
+  'rate':()=>`At 47.2K followers and 4.3% engagement, your market rate for a sponsored luxury Reel is $2,000–$2,400. Static posts: $800–$1,200. Stories: 40% less than Reels.`,
+  'nia':()=>`The wellness series collab with Nia V. looks strong — 68% audience overlap and combined 82K reach. I can coordinate the scheduling with her. Want me to set up a time for you both?`,
+  'default':()=>`Got it — on it. Is there anything else you need sorted before tonight?`
+};
+
+function sendMsg(){
+  const inp=document.getElementById('chat-in');
+  const txt=inp.value.trim(); if(!txt) return;
+  inp.value='';
+  const msgs=document.getElementById('msgs');
+  const now=new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+  msgs.innerHTML+=`<div class="msg u"><div class="mb">${txt}</div><div class="mt">${now}</div></div>`;
+  const tid='t'+Date.now();
+  msgs.innerHTML+=`<div class="msg b" id="${tid}"><div class="mb"><div class="typing"><span></span><span></span><span></span></div></div></div>`;
+  msgs.scrollTop=msgs.scrollHeight;
+  const lower=txt.toLowerCase();
+  let reply=replies.default();
+  for(const [k,fn] of Object.entries(replies)){
+    if(k!=='default'&&lower.includes(k)){reply=fn();break;}
+  }
+  setTimeout(()=>{
+    document.getElementById(tid)?.remove();
+    msgs.innerHTML+=`<div class="msg b"><div class="mb">${reply}</div><div class="mt">${now}</div></div>`;
+    msgs.scrollTop=msgs.scrollHeight;
+  },1300);
+}
+
+// ════════════════ NOTIF ════════════════
+function toggleNotif(){
+  const p=document.getElementById('notif-panel');
+  p.classList.toggle('on');
+  if(p.classList.contains('on')) document.getElementById('notif-dot').style.display='none';
+}
+document.addEventListener('click',e=>{
+  if(!e.target.closest('#notif-panel')&&!e.target.closest('#notif-btn'))
+    document.getElementById('notif-panel')?.classList.remove('on');
+});
+
+// ════════════════ TOAST ════════════════
+let toastTimer;
+function showToast(t,b){
+  clearTimeout(toastTimer);
+  document.getElementById('toast-t').textContent=t;
+  document.getElementById('toast-b').textContent=b;
+  const el=document.getElementById('toast');
+  el.classList.add('on');
+  toastTimer=setTimeout(()=>el.classList.remove('on'),3500);
+}
+
+// ════════════════ INIT ════════════════
+renderCal();
+setTimeout(()=>showToast('👋 Welcome to ARIA','Switch between Operator and Creator views below'),700);
+</script>
+</body>
+</html>
