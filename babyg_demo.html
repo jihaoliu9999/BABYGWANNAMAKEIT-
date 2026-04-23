@@ -1,0 +1,1572 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<title>babyg — the missing system between your lifestyle and your results</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@1,400;1,500;1,600;1,700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#06080B;
+  --s1:#0C1018;
+  --s2:#121820;
+  --s3:#1A2230;
+  --lime:#B8FF4E;
+  --cyan:#4EFFE0;
+  --pink:#FF4EB8;
+  --amber:#FFB84E;
+  --blue:#4E9FFF;
+  --red:#FF5C5C;
+  --txt:#ECF0F5;
+  --txt2:#8899AA;
+  --txt3:#4A5568;
+  --line:rgba(255,255,255,.06);
+  --line2:rgba(255,255,255,.10);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--txt);font-family:'Outfit',system-ui,sans-serif;font-weight:400;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+button{font-family:inherit;color:inherit;background:none;border:none;cursor:pointer}
+input,textarea,select{font-family:inherit;color:inherit}
+a{color:inherit;text-decoration:none}
+::selection{background:var(--lime);color:#000}
+.mono{font-family:'JetBrains Mono',monospace}
+.italic{font-family:'Playfair Display',serif;font-style:italic;font-weight:500;letter-spacing:-.01em}
+:focus-visible{outline:2px solid var(--lime);outline-offset:2px;border-radius:4px}
+
+/* Layout */
+.app{display:grid;grid-template-columns:240px 1fr;min-height:100vh}
+.sidebar{background:var(--s1);border-right:1px solid var(--line);padding:24px 16px;position:sticky;top:0;height:100vh;display:flex;flex-direction:column;gap:6px;z-index:50}
+.logo{font-family:'Playfair Display',serif;font-style:italic;font-weight:600;font-size:32px;color:var(--lime);padding:0 8px 18px;letter-spacing:-.02em;line-height:1}
+.logo small{display:block;font-family:'Outfit',sans-serif;font-style:normal;font-weight:400;font-size:10px;color:var(--txt3);letter-spacing:.18em;text-transform:uppercase;margin-top:8px;letter-spacing:.2em}
+.nav-section{margin-top:6px;font-size:10px;color:var(--txt3);letter-spacing:.2em;text-transform:uppercase;padding:14px 8px 6px;font-weight:600}
+.nav-item{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:10px;color:var(--txt2);font-size:14px;font-weight:500;cursor:pointer;transition:.15s;position:relative}
+.nav-item:hover{background:var(--s2);color:var(--txt)}
+.nav-item.active{background:var(--s3);color:var(--txt)}
+.nav-item .ico{width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;color:inherit}
+.nav-item .badge{margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:10px;background:var(--pink);color:#000;padding:2px 6px;border-radius:8px;font-weight:600}
+.view-switch{margin-top:auto;background:var(--s2);border:1px solid var(--line);border-radius:14px;padding:6px;display:flex;gap:4px}
+.view-btn{flex:1;padding:10px 8px;border-radius:10px;font-size:12px;font-weight:600;color:var(--txt2);text-align:center;letter-spacing:.04em}
+.view-btn.active.op{background:var(--blue);color:#000}
+.view-btn.active.cr{background:var(--lime);color:#000}
+.user-chip{margin-top:10px;display:flex;align-items:center;gap:10px;padding:10px;background:var(--s2);border-radius:12px;border:1px solid var(--line)}
+.user-avatar{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--lime));font-weight:700;font-size:12px;display:flex;align-items:center;justify-content:center;color:#000}
+.user-meta{display:flex;flex-direction:column}
+.user-meta .n{font-size:13px;font-weight:600}
+.user-meta .r{font-size:10px;color:var(--txt3);letter-spacing:.1em;text-transform:uppercase}
+
+.main{min-width:0;display:flex;flex-direction:column}
+.topbar{display:flex;align-items:center;gap:14px;padding:18px 28px;border-bottom:1px solid var(--line);background:rgba(6,8,11,.85);backdrop-filter:blur(12px);position:sticky;top:0;z-index:40}
+.title{font-size:22px;font-weight:700;letter-spacing:-.02em}
+.subtitle{font-size:12px;color:var(--txt2);margin-top:2px}
+.title-wrap{display:flex;flex-direction:column}
+.spacer{flex:1}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:999px;font-size:11px;font-weight:600;letter-spacing:.04em}
+.chip.live{background:rgba(78,255,224,.1);color:var(--cyan);border:1px solid rgba(78,255,224,.25)}
+.chip.live .dot{width:6px;height:6px;border-radius:50%;background:var(--cyan);animation:pulse 1.4s infinite}
+.chip.view-chip{background:var(--s2);color:var(--txt2);border:1px solid var(--line)}
+.chip.view-chip.op{color:var(--blue);border-color:rgba(78,159,255,.3);background:rgba(78,159,255,.08)}
+.chip.view-chip.cr{color:var(--lime);border-color:rgba(184,255,78,.3);background:rgba(184,255,78,.08)}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.45;transform:scale(.9)}}
+.bell{position:relative;width:38px;height:38px;border-radius:10px;background:var(--s2);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;color:var(--txt2)}
+.bell:hover{color:var(--txt);background:var(--s3)}
+.bell .dot{position:absolute;top:8px;right:9px;width:7px;height:7px;border-radius:50%;background:var(--pink);border:2px solid var(--s2)}
+.bell.no-dot .dot{display:none}
+
+.content{padding:28px;max-width:1280px;margin:0 auto;width:100%;flex:1}
+
+/* Panels */
+.panel{display:none;animation:fadeIn .3s ease}
+.panel.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+/* Insight box */
+.insight{background:linear-gradient(135deg,rgba(78,159,255,.08),rgba(184,255,78,.04));border:1px solid var(--line2);border-left:3px solid var(--blue);padding:16px 18px;border-radius:12px;margin-bottom:24px;display:flex;gap:14px}
+.insight.lime{border-left-color:var(--lime);background:linear-gradient(135deg,rgba(184,255,78,.08),rgba(78,255,224,.04))}
+.insight.amber{border-left-color:var(--amber);background:linear-gradient(135deg,rgba(255,184,78,.08),rgba(255,78,184,.03))}
+.insight .ico{flex-shrink:0;width:28px;height:28px;border-radius:8px;background:var(--s3);display:flex;align-items:center;justify-content:center;color:var(--blue);font-size:14px}
+.insight.lime .ico{color:var(--lime)}
+.insight.amber .ico{color:var(--amber)}
+.insight .body{font-size:13px;line-height:1.55;color:var(--txt2)}
+.insight .body strong{color:var(--txt);font-weight:600}
+
+/* Stat cards */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:28px}
+.stat-card{background:var(--s1);border:1px solid var(--line);border-radius:14px;padding:18px;position:relative;overflow:hidden}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--lime)}
+.stat-card.cyan::before{background:var(--cyan)}
+.stat-card.pink::before{background:var(--pink)}
+.stat-card.amber::before{background:var(--amber)}
+.stat-label{font-size:11px;color:var(--txt3);letter-spacing:.14em;text-transform:uppercase;font-weight:600;margin-bottom:10px}
+.stat-value{font-family:'JetBrains Mono',monospace;font-size:30px;font-weight:600;letter-spacing:-.02em;line-height:1}
+.stat-delta{font-size:12px;color:var(--lime);margin-top:8px;font-weight:500}
+.stat-delta.flat{color:var(--txt3)}
+
+/* Cards */
+.card{background:var(--s1);border:1px solid var(--line);border-radius:14px;padding:20px;margin-bottom:18px}
+.card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.card-title{font-size:14px;font-weight:600;letter-spacing:-.01em}
+.card-sub{font-size:11px;color:var(--txt3);text-transform:uppercase;letter-spacing:.14em;font-weight:600}
+.link{color:var(--blue);font-size:12px;font-weight:600;cursor:pointer}
+.link:hover{text-decoration:underline}
+
+/* Tables */
+.table{width:100%;border-collapse:collapse;font-size:13px}
+.table th{font-size:10px;color:var(--txt3);letter-spacing:.14em;text-transform:uppercase;text-align:left;padding:10px 12px;font-weight:600;border-bottom:1px solid var(--line)}
+.table td{padding:14px 12px;border-bottom:1px solid var(--line)}
+.table tr:last-child td{border-bottom:0}
+.table tr:hover td{background:var(--s2)}
+.creator-cell{display:flex;align-items:center;gap:12px}
+.avatar{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;color:#000;flex-shrink:0}
+.av-1{background:linear-gradient(135deg,#FF4EB8,#FFB84E)}
+.av-2{background:linear-gradient(135deg,#4EFFE0,#4E9FFF)}
+.av-3{background:linear-gradient(135deg,#B8FF4E,#FFB84E)}
+.av-4{background:linear-gradient(135deg,#FF4EB8,#4E9FFF)}
+.av-5{background:linear-gradient(135deg,#FFB84E,#FF5C5C)}
+.av-6{background:linear-gradient(135deg,#B8FF4E,#4EFFE0)}
+.av-7{background:linear-gradient(135deg,#4E9FFF,#FF4EB8)}
+.cr-name{font-size:14px;font-weight:600;line-height:1.2}
+.cr-meta{font-size:11px;color:var(--txt3);margin-top:2px}
+.bar-cell{display:flex;align-items:center;gap:10px}
+.bar{width:80px;height:5px;background:var(--s3);border-radius:99px;overflow:hidden}
+.bar-fill{height:100%;background:var(--lime);border-radius:99px}
+.tier{display:inline-block;font-size:10px;font-weight:700;padding:3px 8px;border-radius:999px;letter-spacing:.08em;text-transform:uppercase}
+.tier.vip{background:rgba(255,184,78,.12);color:var(--amber);border:1px solid rgba(255,184,78,.25)}
+.tier.pro{background:rgba(184,255,78,.12);color:var(--lime);border:1px solid rgba(184,255,78,.25)}
+.tier.basic{background:rgba(136,153,170,.12);color:var(--txt2);border:1px solid rgba(136,153,170,.2)}
+.status-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--cyan);box-shadow:0 0 0 3px rgba(78,255,224,.15)}
+.status-dot.idle{background:var(--txt3);box-shadow:0 0 0 3px rgba(74,85,104,.15)}
+
+/* Forms */
+.form-row{margin-bottom:14px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.form-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.label{display:block;font-size:11px;color:var(--txt2);font-weight:600;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}
+.input,.textarea,.select{width:100%;background:var(--s2);border:1px solid var(--line);border-radius:10px;padding:11px 14px;color:var(--txt);font-size:14px;font-family:inherit;transition:.15s}
+.input:focus,.textarea:focus,.select:focus{outline:none;border-color:var(--lime);background:var(--s3)}
+.textarea{resize:vertical;min-height:96px;line-height:1.5}
+.pill-row{display:flex;flex-wrap:wrap;gap:8px}
+.pill{padding:7px 14px;background:var(--s2);border:1px solid var(--line);border-radius:999px;font-size:12px;font-weight:500;color:var(--txt2);cursor:pointer;transition:.15s;user-select:none}
+.pill:hover{border-color:var(--line2);color:var(--txt)}
+.pill.on{background:var(--lime);color:#000;border-color:var(--lime);font-weight:600}
+.pill.on.cyan{background:var(--cyan);border-color:var(--cyan)}
+.pill.on.pink{background:var(--pink);border-color:var(--pink)}
+.pill.on.amber{background:var(--amber);border-color:var(--amber)}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:11px 18px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;transition:.15s;border:1px solid transparent}
+.btn.primary{background:var(--lime);color:#000}
+.btn.primary:hover{background:#cdff7a;transform:translateY(-1px)}
+.btn.ghost{background:var(--s2);color:var(--txt);border-color:var(--line2)}
+.btn.ghost:hover{background:var(--s3)}
+.btn.cyan{background:var(--cyan);color:#000}
+.btn.pink{background:var(--pink);color:#000}
+.btn.pink:hover{background:#ff7ac9}
+.btn-row{display:flex;gap:10px;align-items:center;margin-top:8px}
+.btn-row .reach{margin-left:auto;font-size:12px;color:var(--txt2)}
+.btn-row .reach b{color:var(--lime);font-family:'JetBrains Mono',monospace}
+
+/* Intel library */
+.intel-row{display:flex;align-items:center;gap:14px;padding:14px;border-radius:12px;background:var(--s2);margin-bottom:8px;border:1px solid transparent}
+.intel-row:hover{border-color:var(--line2)}
+.intel-cat{flex-shrink:0;font-size:10px;font-weight:700;padding:4px 8px;border-radius:6px;text-transform:uppercase;letter-spacing:.08em}
+.cat-venue{background:rgba(78,255,224,.12);color:var(--cyan)}
+.cat-trend{background:rgba(255,184,78,.12);color:var(--amber)}
+.cat-brand{background:rgba(255,78,184,.12);color:var(--pink)}
+.cat-collab{background:rgba(78,255,224,.12);color:var(--cyan)}
+.cat-alert{background:rgba(255,92,92,.12);color:var(--red)}
+.intel-body{flex:1;min-width:0}
+.intel-title{font-size:13px;font-weight:600;margin-bottom:3px}
+.intel-meta{font-size:11px;color:var(--txt3)}
+.intel-stat{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--txt2);text-align:right}
+.intel-stat b{color:var(--txt);font-weight:600}
+.decay{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;border-radius:6px}
+.decay.active{background:rgba(184,255,78,.12);color:var(--lime)}
+.decay.exp{background:rgba(255,184,78,.12);color:var(--amber)}
+.decay.arch{background:rgba(136,153,170,.1);color:var(--txt3)}
+
+/* Recent activity */
+.activity-item{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
+.activity-item:last-child{border-bottom:0}
+.activity-icon{width:32px;height:32px;border-radius:8px;background:var(--s3);display:flex;align-items:center;justify-content:center}
+.activity-text{flex:1;font-size:13px}
+.activity-text small{display:block;color:var(--txt3);font-size:11px;margin-top:2px}
+.activity-time{font-size:11px;color:var(--txt3);font-family:'JetBrains Mono',monospace}
+
+/* Flags */
+.tabs{display:flex;gap:6px;margin-bottom:18px;background:var(--s2);padding:4px;border-radius:10px;width:fit-content;border:1px solid var(--line)}
+.tab{padding:8px 16px;font-size:12px;font-weight:600;color:var(--txt2);border-radius:7px;cursor:pointer}
+.tab.active{background:var(--s3);color:var(--txt)}
+.tab .count{margin-left:6px;font-family:'JetBrains Mono',monospace;font-size:10px;background:var(--s3);padding:1px 6px;border-radius:99px;color:var(--txt2)}
+.tab.active .count{background:var(--pink);color:#000}
+.flag-card{background:var(--s1);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:14px;transition:.3s}
+.flag-card.resolved{opacity:0;transform:scale(.96);pointer-events:none}
+.flag-head{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.flag-cat{font-size:10px;font-weight:700;padding:3px 8px;border-radius:6px;letter-spacing:.08em;text-transform:uppercase;background:rgba(255,184,78,.12);color:var(--amber)}
+.flag-cat.urgent{background:rgba(255,92,92,.12);color:var(--red)}
+.flag-time{margin-left:auto;font-size:11px;color:var(--txt3);font-family:'JetBrains Mono',monospace}
+.flag-msg{font-size:14px;line-height:1.55;color:var(--txt);background:var(--s2);padding:14px;border-radius:10px;border-left:3px solid var(--amber);margin-bottom:14px}
+.flag-msg.urgent{border-left-color:var(--red)}
+.flag-actions{display:flex;gap:8px;align-items:center}
+.flag-actions .age{margin-left:auto;font-size:11px;color:var(--txt3)}
+
+/* Charts */
+.chart-card{background:var(--s1);border:1px solid var(--line);border-radius:14px;padding:22px;margin-bottom:18px}
+.chart-head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:18px}
+.chart-title{font-size:14px;font-weight:600}
+.chart-sub{font-size:11px;color:var(--txt3);text-transform:uppercase;letter-spacing:.14em;font-weight:600;margin-top:4px}
+.chart{display:flex;align-items:flex-end;gap:14px;height:180px;position:relative;padding-bottom:30px;border-bottom:1px dashed var(--line)}
+.chart-launch{position:absolute;top:0;bottom:30px;border-left:1px dashed rgba(184,255,78,.4);font-size:9px;color:var(--lime);font-weight:600;padding-left:6px;display:flex;align-items:flex-start;letter-spacing:.1em;text-transform:uppercase}
+.bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:8px;height:100%;justify-content:flex-end;position:relative}
+.bar-bar{width:100%;max-width:36px;background:rgba(184,255,78,.3);border-radius:6px 6px 0 0;height:0;transition:height 1s cubic-bezier(.2,.8,.2,1);position:relative}
+.bar-bar.cyan{background:rgba(78,255,224,.3)}
+.bar-bar.cur{background:var(--lime)}
+.bar-bar.cur.cyan{background:var(--cyan)}
+.bar-val{position:absolute;top:-22px;left:50%;transform:translateX(-50%);font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--txt2);font-weight:600;opacity:0;transition:opacity .3s .9s}
+.bar-bar.shown .bar-val{opacity:1}
+.bar-lbl{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--txt3);position:absolute;bottom:-22px;letter-spacing:.04em}
+
+/* Filter row */
+.filter-row{display:flex;gap:10px;align-items:center;margin-bottom:18px;flex-wrap:wrap}
+.toggle{position:relative;display:inline-flex;align-items:center;gap:8px;cursor:pointer;font-size:12px;color:var(--txt2)}
+.toggle input{display:none}
+.switch{width:32px;height:18px;background:var(--s3);border-radius:99px;position:relative;transition:.2s;border:1px solid var(--line)}
+.switch::after{content:'';position:absolute;top:2px;left:2px;width:12px;height:12px;background:var(--txt2);border-radius:50%;transition:.2s}
+.toggle input:checked + .switch{background:var(--lime);border-color:var(--lime)}
+.toggle input:checked + .switch::after{background:#000;left:16px}
+
+/* Notification panel */
+.notif-panel{position:absolute;top:calc(100% + 8px);right:28px;width:340px;background:var(--s1);border:1px solid var(--line2);border-radius:14px;box-shadow:0 20px 60px rgba(0,0,0,.6);z-index:60;display:none;overflow:hidden}
+.notif-panel.open{display:block}
+.notif-head{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border-bottom:1px solid var(--line)}
+.notif-head .t{font-size:13px;font-weight:600}
+.notif-head .a{font-size:11px;color:var(--blue);cursor:pointer}
+.notif-item{display:flex;gap:12px;padding:14px 16px;border-bottom:1px solid var(--line);transition:.15s}
+.notif-item:last-child{border-bottom:0}
+.notif-item.unread{background:rgba(184,255,78,.04)}
+.notif-item:hover{background:var(--s2)}
+.notif-ico{width:30px;height:30px;border-radius:8px;background:var(--s2);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.notif-body{flex:1;font-size:13px;line-height:1.4}
+.notif-body small{display:block;color:var(--txt3);font-size:11px;margin-top:3px}
+
+/* Intel preview overlay */
+.overlay{position:fixed;inset:0;background:rgba(6,8,11,.85);backdrop-filter:blur(6px);z-index:100;display:none;align-items:center;justify-content:center;padding:20px}
+.overlay.open{display:flex}
+.phone-frame{width:300px;background:#000;border-radius:36px;padding:14px;border:6px solid #1a1a1a;box-shadow:0 30px 80px rgba(0,0,0,.6),0 0 0 2px rgba(255,255,255,.04);position:relative}
+.phone-screen{background:var(--bg);border-radius:24px;overflow:hidden;min-height:560px}
+.phone-status{display:flex;justify-content:space-between;align-items:center;padding:12px 18px 8px;font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--txt2)}
+.phone-content{padding:14px}
+.overlay-close{position:absolute;top:-44px;right:0;width:36px;height:36px;border-radius:50%;background:var(--s2);border:1px solid var(--line2);color:var(--txt);display:flex;align-items:center;justify-content:center;font-size:18px}
+
+/* Toast */
+.toast-wrap{position:fixed;bottom:24px;right:24px;z-index:200;display:flex;flex-direction:column;gap:10px;pointer-events:none}
+.toast{background:var(--s1);border:1px solid var(--line2);border-left:3px solid var(--lime);padding:14px 18px;border-radius:10px;min-width:260px;box-shadow:0 10px 40px rgba(0,0,0,.5);animation:toastIn .25s ease;pointer-events:auto}
+.toast .t{font-size:13px;font-weight:600;color:var(--lime);margin-bottom:3px}
+.toast .b{font-size:12px;color:var(--txt2);line-height:1.4}
+@keyframes toastIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:none}}
+
+/* Creator phone view */
+.creator-shell{max-width:390px;margin:0 auto;background:var(--bg);min-height:calc(100vh - 100px);position:relative;border-radius:28px;border:1px solid var(--line);overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.5)}
+.cr-status{display:flex;justify-content:space-between;align-items:center;padding:14px 22px 8px;font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--txt2)}
+.cr-content{padding:0 18px 90px;min-height:560px}
+.cr-tabbar{position:sticky;bottom:0;left:0;right:0;background:rgba(12,16,24,.95);backdrop-filter:blur(20px);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(6,1fr);padding:8px 4px 12px}
+.cr-tab{display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 4px;color:var(--txt3);font-size:9px;letter-spacing:.04em;border-radius:8px;cursor:pointer}
+.cr-tab svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.8}
+.cr-tab.active{color:var(--lime)}
+.cr-tab .live{position:absolute;top:6px;width:5px;height:5px;background:var(--cyan);border-radius:50%;margin-left:18px}
+
+.cr-panel{display:none;animation:fadeIn .2s ease}
+.cr-panel.active{display:block}
+
+.cr-header{padding:18px 4px 14px}
+.cr-greet{font-size:11px;text-transform:uppercase;letter-spacing:.2em;color:var(--txt3);font-weight:600}
+.cr-name-big{font-family:'Playfair Display',serif;font-style:italic;font-size:34px;font-weight:500;margin-top:4px;letter-spacing:-.02em}
+.cr-sub{font-size:13px;color:var(--txt2);margin-top:6px}
+.cr-sub b{color:var(--lime);font-weight:600}
+
+/* Intel cards (creator) */
+.feed-card{background:var(--s1);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px;border-left:3px solid var(--cyan);cursor:pointer;transition:.2s;position:relative}
+.feed-card.unread::before{content:'';position:absolute;top:14px;right:14px;width:7px;height:7px;border-radius:50%;background:var(--lime);box-shadow:0 0 0 3px rgba(184,255,78,.2)}
+.feed-card.trend{border-left-color:var(--amber)}
+.feed-card.brand{border-left-color:var(--pink)}
+.feed-card.collab{border-left-color:var(--cyan)}
+.feed-cat{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--cyan);margin-bottom:6px}
+.feed-card.trend .feed-cat{color:var(--amber)}
+.feed-card.brand .feed-cat{color:var(--pink)}
+.feed-card.collab .feed-cat{color:var(--cyan)}
+.feed-title{font-size:14px;font-weight:600;line-height:1.35;padding-right:18px}
+.feed-time{font-size:11px;color:var(--txt3);margin-top:6px;font-family:'JetBrains Mono',monospace}
+.feed-expand{display:none;margin-top:14px;padding-top:14px;border-top:1px solid var(--line);font-size:13px;line-height:1.6;color:var(--txt2)}
+.feed-card.open .feed-expand{display:block}
+.feed-meta-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0;background:var(--s2);padding:12px;border-radius:10px}
+.feed-meta-grid .k{font-size:10px;color:var(--txt3);text-transform:uppercase;letter-spacing:.1em;font-weight:600}
+.feed-meta-grid .v{font-family:'JetBrains Mono',monospace;font-size:14px;color:var(--txt);font-weight:600;margin-top:2px}
+.feed-fb{display:flex;gap:6px;margin-top:12px}
+.fb-btn{flex:1;padding:8px;background:var(--s2);border:1px solid var(--line);border-radius:8px;font-size:11px;font-weight:600;color:var(--txt2);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px}
+.fb-btn:hover{color:var(--txt);border-color:var(--line2)}
+.fb-btn.on{background:var(--lime);color:#000;border-color:var(--lime)}
+.fb-btn.on.bad{background:var(--red);color:#fff;border-color:var(--red)}
+.fb-btn.on.act{background:var(--cyan);color:#000;border-color:var(--cyan)}
+
+/* Aria chat */
+.chat-head{display:flex;align-items:center;gap:12px;padding:14px 4px 18px;border-bottom:1px solid var(--line);margin-bottom:14px}
+.chat-avatar{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--lime),var(--cyan));display:flex;align-items:center;justify-content:center;color:#000;font-size:20px;font-weight:700;position:relative}
+.chat-avatar::after{content:'';position:absolute;bottom:0;right:0;width:11px;height:11px;border-radius:50%;background:var(--cyan);border:2px solid var(--bg)}
+.chat-meta .n{font-family:'Playfair Display',serif;font-style:italic;font-size:20px;font-weight:500}
+.chat-meta .s{font-size:11px;color:var(--txt3);text-transform:uppercase;letter-spacing:.12em;font-weight:600}
+.chat-status{font-size:11px;color:var(--cyan);margin-top:3px;display:flex;align-items:center;gap:5px}
+.chat-status .d{width:5px;height:5px;background:var(--cyan);border-radius:50%}
+.chat-msgs{max-height:520px;overflow-y:auto;padding:4px;display:flex;flex-direction:column;gap:14px}
+.chat-msgs::-webkit-scrollbar{width:0}
+.msg{max-width:80%;padding:10px 14px;border-radius:14px;font-size:13.5px;line-height:1.5}
+.msg.bot{background:var(--s2);color:var(--txt);border-top-left-radius:4px;align-self:flex-start}
+.msg.user{background:var(--lime);color:#000;border-top-right-radius:4px;align-self:flex-end;font-weight:500}
+.typing{display:flex;gap:4px;padding:14px;background:var(--s2);border-radius:14px;border-top-left-radius:4px;align-self:flex-start;width:fit-content}
+.typing span{width:7px;height:7px;background:var(--txt3);border-radius:50%;animation:bounce 1.2s infinite}
+.typing span:nth-child(2){animation-delay:.15s}
+.typing span:nth-child(3){animation-delay:.3s}
+@keyframes bounce{0%,60%,100%{transform:translateY(0);opacity:.4}30%{transform:translateY(-6px);opacity:1}}
+.chat-input-wrap{display:flex;gap:8px;margin-top:14px;padding-top:14px;border-top:1px solid var(--line)}
+.chat-input{flex:1;background:var(--s2);border:1px solid var(--line);border-radius:14px;padding:11px 14px;color:var(--txt);font-size:13.5px}
+.chat-input:focus{outline:none;border-color:var(--lime)}
+.chat-send{width:42px;height:42px;border-radius:14px;background:var(--lime);color:#000;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700}
+
+/* Calendar */
+.cal-head{display:flex;justify-content:space-between;align-items:center;padding:14px 4px 18px}
+.cal-month{font-family:'Playfair Display',serif;font-style:italic;font-size:24px;font-weight:500}
+.cal-nav{display:flex;gap:6px}
+.cal-arrow{width:32px;height:32px;border-radius:8px;background:var(--s2);border:1px solid var(--line);color:var(--txt);display:flex;align-items:center;justify-content:center}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:18px}
+.cal-dh{font-size:10px;font-weight:700;color:var(--txt3);text-align:center;letter-spacing:.1em;padding:6px 0}
+.cal-day{aspect-ratio:1;background:var(--s2);border:1px solid var(--line);border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:5px;cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--txt2);position:relative;transition:.15s}
+.cal-day:hover{background:var(--s3);color:var(--txt)}
+.cal-day.empty{visibility:hidden}
+.cal-day.today{border-color:var(--lime);color:var(--lime);background:rgba(184,255,78,.06)}
+.cal-day.sel{background:var(--lime);color:#000;border-color:var(--lime);font-weight:700}
+.cal-dots{display:flex;gap:2px;margin-top:auto;padding-bottom:2px}
+.cal-dot{width:5px;height:5px;border-radius:50%;background:var(--cyan)}
+.cal-dot.pink{background:var(--pink)}
+.cal-dot.amber{background:var(--amber)}
+.cal-dot.lime{background:var(--lime)}
+.agenda-head{font-size:12px;text-transform:uppercase;letter-spacing:.14em;color:var(--txt3);font-weight:600;margin-bottom:12px}
+.agenda-item{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
+.agenda-item:last-child{border-bottom:0}
+.agenda-time{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--txt2);width:60px;flex-shrink:0;padding-top:2px}
+.agenda-bar{width:3px;border-radius:2px;background:var(--cyan);flex-shrink:0}
+.agenda-bar.pink{background:var(--pink)}
+.agenda-bar.amber{background:var(--amber)}
+.agenda-bar.lime{background:var(--lime)}
+.agenda-body{flex:1}
+.agenda-title{font-size:13px;font-weight:600}
+.agenda-sub{font-size:11px;color:var(--txt3);margin-top:2px}
+.agenda-tag{display:inline-block;font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:2px 7px;border-radius:6px;margin-top:6px}
+.agenda-tag.cyan{background:rgba(78,255,224,.1);color:var(--cyan)}
+.agenda-tag.pink{background:rgba(255,78,184,.1);color:var(--pink)}
+.agenda-tag.amber{background:rgba(255,184,78,.1);color:var(--amber)}
+.agenda-tag.lime{background:rgba(184,255,78,.1);color:var(--lime)}
+.book-btn{margin-top:18px;width:100%;padding:14px;background:var(--s2);border:1px dashed var(--line2);border-radius:14px;color:var(--lime);font-size:13px;font-weight:600;cursor:pointer}
+.book-btn:hover{background:var(--s3)}
+
+/* Bottom sheet */
+.sheet-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);z-index:90;display:none;align-items:flex-end;justify-content:center}
+.sheet-overlay.open{display:flex}
+.sheet{background:var(--s1);border:1px solid var(--line);border-bottom:0;border-radius:24px 24px 0 0;padding:22px;width:100%;max-width:390px;animation:sheetIn .25s ease}
+@keyframes sheetIn{from{transform:translateY(100%)}to{transform:none}}
+.sheet h3{margin:0 0 16px;font-family:'Playfair Display',serif;font-style:italic;font-size:22px;font-weight:500}
+
+/* Network */
+.net-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:24px}
+.net-card{background:var(--s1);border:1px solid var(--line);border-radius:14px;padding:14px;text-align:center}
+.net-avatar{width:56px;height:56px;border-radius:50%;margin:0 auto 10px;display:flex;align-items:center;justify-content:center;color:#000;font-weight:700;font-size:18px}
+.net-name{font-size:14px;font-weight:600}
+.net-handle{font-size:11px;color:var(--txt3);margin-top:2px}
+.net-stats{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--txt2);margin-top:8px;display:flex;justify-content:center;gap:8px}
+.net-stats b{color:var(--lime)}
+.net-niche{font-size:10px;color:var(--txt3);text-transform:uppercase;letter-spacing:.1em;margin-top:4px;font-weight:600}
+.net-connect{margin-top:10px;width:100%;padding:8px;background:var(--s2);border:1px solid var(--line2);border-radius:8px;font-size:11px;font-weight:600;color:var(--txt)}
+.net-connect.connected{background:rgba(184,255,78,.1);color:var(--lime);border-color:rgba(184,255,78,.3)}
+
+.collab-card{background:var(--s1);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:10px}
+.collab-head{display:flex;justify-content:space-between;align-items:start;gap:8px;margin-bottom:8px}
+.collab-title{font-size:13px;font-weight:600;flex:1}
+.collab-rate{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--lime);font-weight:600}
+.collab-sub{font-size:11px;color:var(--txt3);margin-bottom:10px}
+.collab-btn{width:100%;padding:8px;background:var(--s2);border:1px solid var(--line2);border-radius:8px;font-size:11px;font-weight:600;color:var(--txt)}
+.collab-btn.on,.collab-btn.handled{background:rgba(184,255,78,.1);color:var(--lime);border-color:rgba(184,255,78,.3)}
+
+/* Stats panel (creator) */
+.cr-stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.cr-stat{background:var(--s1);border:1px solid var(--line);border-radius:14px;padding:16px;border-top:2px solid var(--lime)}
+.cr-stat.cyan{border-top-color:var(--cyan)}
+.cr-stat.pink{border-top-color:var(--pink)}
+.cr-stat.amber{border-top-color:var(--amber)}
+.cr-stat .l{font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--txt3);font-weight:600;margin-bottom:8px}
+.cr-stat .v{font-family:'JetBrains Mono',monospace;font-size:24px;font-weight:600;letter-spacing:-.02em}
+.cr-stat .d{font-size:11px;color:var(--lime);margin-top:6px;font-weight:500}
+
+/* Profile */
+.prof-card{background:var(--s1);border:1px solid var(--line);border-radius:14px;padding:22px;text-align:center;margin-bottom:14px}
+.prof-avatar{width:80px;height:80px;border-radius:50%;margin:0 auto 14px;background:linear-gradient(135deg,#FF4EB8,#FFB84E);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:28px;color:#000}
+.prof-name{font-family:'Playfair Display',serif;font-style:italic;font-size:24px;font-weight:500}
+.prof-handle{font-size:12px;color:var(--txt3);margin-top:4px;font-family:'JetBrains Mono',monospace}
+.prof-niche{font-size:11px;text-transform:uppercase;letter-spacing:.14em;color:var(--lime);font-weight:600;margin-top:8px}
+.prof-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:18px;padding-top:18px;border-top:1px solid var(--line)}
+.prof-stat .v{font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:600}
+.prof-stat .l{font-size:9px;text-transform:uppercase;letter-spacing:.12em;color:var(--txt3);font-weight:600;margin-top:4px}
+.prof-edit{margin-top:14px;width:100%;padding:10px;background:var(--s2);border:1px solid var(--line);border-radius:10px;font-size:12px;font-weight:600;color:var(--txt)}
+
+.settings-card{background:var(--s1);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:14px}
+.settings-h{font-size:11px;text-transform:uppercase;letter-spacing:.14em;color:var(--txt3);font-weight:600;margin-bottom:12px}
+.setting-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--line);font-size:13px}
+.setting-row:last-child{border-bottom:0}
+.setting-row small{color:var(--txt3);display:block;font-size:11px;margin-top:2px}
+
+/* Mini chart */
+.mini-chart{display:flex;align-items:flex-end;gap:6px;height:80px;margin-top:14px;padding-bottom:18px;border-bottom:1px dashed var(--line)}
+.mini-bar-col{flex:1;display:flex;flex-direction:column;align-items:center;height:100%;justify-content:flex-end;position:relative}
+.mini-bar{width:100%;background:rgba(184,255,78,.3);border-radius:3px 3px 0 0;height:0;transition:height 1s cubic-bezier(.2,.8,.2,1)}
+.mini-bar.cur{background:var(--lime)}
+.mini-lbl{position:absolute;bottom:-16px;font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--txt3)}
+
+/* Mobile */
+@media (max-width:768px){
+  .app{grid-template-columns:64px 1fr}
+  .logo{font-size:0;padding:0 0 18px;text-align:center}
+  .logo::before{content:'b';font-family:'Playfair Display',serif;font-style:italic;font-size:32px;color:var(--lime)}
+  .logo small{display:none}
+  .nav-section{display:none}
+  .nav-item{justify-content:center;padding:10px;font-size:0}
+  .nav-item .badge{display:none}
+  .view-switch{flex-direction:column;padding:4px}
+  .view-btn{font-size:0;padding:8px}
+  .view-btn::before{font-size:10px}
+  .view-btn.op-btn::before{content:'OP'}
+  .view-btn.cr-btn::before{content:'CR'}
+  .user-chip{justify-content:center}
+  .user-meta{display:none}
+  .stats-grid{grid-template-columns:repeat(2,1fr)}
+  .form-grid,.form-grid-3{grid-template-columns:1fr}
+  .content{padding:18px}
+  .topbar{padding:14px 18px}
+  .title{font-size:18px}
+  .notif-panel{right:18px;width:calc(100vw - 36px);max-width:340px}
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="logo">babyg<small>Miami · Pilot W6</small></div>
+
+    <!-- Operator nav -->
+    <div id="op-nav">
+      <div class="nav-section">Operator</div>
+      <div class="nav-item active" data-op="dashboard"><span class="ico">▦</span>Dashboard</div>
+      <div class="nav-item" data-op="composer"><span class="ico">✦</span>Intel Composer</div>
+      <div class="nav-item" data-op="roster"><span class="ico">○</span>Creator Roster</div>
+      <div class="nav-item" data-op="flags"><span class="ico">⚑</span>Flagged Messages<span class="badge" id="flag-badge">2</span></div>
+      <div class="nav-item" data-op="analytics"><span class="ico">▥</span>Analytics</div>
+    </div>
+
+    <!-- Creator nav (hidden by default) -->
+    <div id="cr-nav" style="display:none">
+      <div class="nav-section">Sofia · @sofialux</div>
+      <div class="nav-item active" data-cr="feed"><span class="ico">⌂</span>Feed</div>
+      <div class="nav-item" data-cr="aria"><span class="ico">✦</span>Aria</div>
+      <div class="nav-item" data-cr="calendar"><span class="ico">◷</span>Calendar</div>
+      <div class="nav-item" data-cr="network"><span class="ico">◫</span>Network</div>
+      <div class="nav-item" data-cr="stats"><span class="ico">▤</span>Stats</div>
+      <div class="nav-item" data-cr="profile"><span class="ico">◉</span>Profile</div>
+    </div>
+
+    <div class="view-switch">
+      <button class="view-btn op-btn op active" id="vw-op">Operator</button>
+      <button class="view-btn cr-btn cr" id="vw-cr">Creator</button>
+    </div>
+
+    <div class="user-chip" id="user-chip">
+      <div class="user-avatar" id="user-av">M</div>
+      <div class="user-meta">
+        <span class="n" id="user-n">Maya · babyg</span>
+        <span class="r" id="user-r">Operator</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="main">
+    <div class="topbar">
+      <div class="title-wrap">
+        <div class="title" id="page-title">Dashboard</div>
+        <div class="subtitle" id="page-sub">Pilot week 6 · Miami cohort · 12 active creators</div>
+      </div>
+      <div class="spacer"></div>
+      <span class="chip live"><span class="dot"></span>Live Demo</span>
+      <span class="chip view-chip op" id="view-chip">Operator View</span>
+      <button class="bell" id="bell" aria-label="Notifications">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <span class="dot" id="bell-dot"></span>
+      </button>
+      <div class="notif-panel" id="notif-panel">
+        <div class="notif-head">
+          <span class="t">Notifications</span>
+          <span class="a" id="mark-read">Mark all as read</span>
+        </div>
+        <div class="notif-item unread"><div class="notif-ico">⚑</div><div class="notif-body">Sofia flagged a brand deal for review<small>14 min ago · @sofialux</small></div></div>
+        <div class="notif-item unread"><div class="notif-ico">⚡</div><div class="notif-body">Intel pushed to 8 creators<small>2 hours ago · Syntax soft open</small></div></div>
+        <div class="notif-item"><div class="notif-ico">📅</div><div class="notif-body">Jade T. booking confirmed at Komodo<small>5 hours ago</small></div></div>
+        <div class="notif-item"><div class="notif-ico">📈</div><div class="notif-body">Roster average engagement hit 4.2%<small>Yesterday</small></div></div>
+        <div class="notif-item"><div class="notif-ico">🤝</div><div class="notif-body">New collab match: Sofia + Nia V.<small>2 days ago</small></div></div>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- ===================== OPERATOR PANELS ===================== -->
+      <div id="op-view">
+
+      <!-- Dashboard -->
+      <section class="panel active" data-panel="op-dashboard">
+        <div class="insight">
+          <div class="ico">i</div>
+          <div class="body">Micro-influencers (10K–100K followers) average <strong>3–5% engagement</strong>; lifestyle vertical sits at <strong>2–3%</strong>. Your roster is at <strong>4.2%</strong> — a 75% lift over the 2.4% baseline. Posting cadence is up <strong>115%</strong> (2.0 → 4.3 posts/wk).</div>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-card"><div class="stat-label">Active Creators</div><div class="stat-value">12</div><div class="stat-delta">+3 onboarded this month</div></div>
+          <div class="stat-card cyan"><div class="stat-label">Avg Engagement</div><div class="stat-value">4.2<span style="font-size:18px;color:var(--txt2)">%</span></div><div class="stat-delta">+1.8pp from baseline</div></div>
+          <div class="stat-card pink"><div class="stat-label">Monthly Deal Value</div><div class="stat-value">$31<span style="font-size:18px;color:var(--txt2)">K</span></div><div class="stat-delta">8 deals closed in pilot</div></div>
+          <div class="stat-card amber"><div class="stat-label">Avg Weekly Growth</div><div class="stat-value">+847</div><div class="stat-delta">followers per creator</div></div>
+        </div>
+
+        <div class="card">
+          <div class="card-head">
+            <div><div class="card-title">Roster Snapshot</div><div class="card-sub" style="margin-top:4px">Top 4 by engagement</div></div>
+            <span class="link" data-goto="roster">View all →</span>
+          </div>
+          <table class="table">
+            <thead><tr><th>Creator</th><th>Followers</th><th>Engagement</th><th>Tier</th><th>Posts/wk</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr><td><div class="creator-cell"><div class="avatar av-2">JT</div><div><div class="cr-name">Jade T.</div><div class="cr-meta">Lifestyle · South Beach</div></div></div></td><td class="mono">83.1K</td><td><div class="bar-cell"><div class="bar"><div class="bar-fill" style="width:94%"></div></div><span class="mono" style="font-size:12px">4.7%</span></div></td><td><span class="tier vip">VIP</span></td><td class="mono">5.2</td><td><span class="status-dot"></span></td></tr>
+              <tr><td><div class="creator-cell"><div class="avatar av-1">SL</div><div><div class="cr-name">Sofia L.</div><div class="cr-meta">Luxury Wellness · Brickell</div></div></div></td><td class="mono">47.2K</td><td><div class="bar-cell"><div class="bar"><div class="bar-fill" style="width:86%"></div></div><span class="mono" style="font-size:12px">4.3%</span></div></td><td><span class="tier vip">VIP</span></td><td class="mono">4.8</td><td><span class="status-dot"></span></td></tr>
+              <tr><td><div class="creator-cell"><div class="avatar av-5">RL</div><div><div class="cr-name">Rafael L.</div><div class="cr-meta">Nightlife · Downtown</div></div></div></td><td class="mono">61.2K</td><td><div class="bar-cell"><div class="bar"><div class="bar-fill" style="width:82%"></div></div><span class="mono" style="font-size:12px">4.1%</span></div></td><td><span class="tier vip">VIP</span></td><td class="mono">4.4</td><td><span class="status-dot"></span></td></tr>
+              <tr><td><div class="creator-cell"><div class="avatar av-4">NV</div><div><div class="cr-name">Nia V.</div><div class="cr-meta">Wellness · Coral Gables</div></div></div></td><td class="mono">34.8K</td><td><div class="bar-cell"><div class="bar"><div class="bar-fill" style="width:78%"></div></div><span class="mono" style="font-size:12px">3.9%</span></div></td><td><span class="tier pro">Pro</span></td><td class="mono">4.0</td><td><span class="status-dot idle"></span></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="card">
+          <div class="card-head">
+            <div><div class="card-title">Recent Intel</div><div class="card-sub" style="margin-top:4px">Pushed to creator feeds</div></div>
+            <span class="link" data-goto="composer">Push new →</span>
+          </div>
+          <div class="activity-item">
+            <div class="activity-icon" style="color:var(--cyan)">⚡</div>
+            <div class="activity-text"><b>Syntax rooftop — soft open tonight</b><small>Pushed to 8 VIP/Pro creators · Luxury, Lifestyle, Nightlife niches</small></div>
+            <span class="activity-time">14m ago</span>
+          </div>
+          <div class="activity-item">
+            <div class="activity-icon" style="color:var(--amber)">📈</div>
+            <div class="activity-text"><b>Slow-morning content outperforming nightlife +34%</b><small>Pushed to all 12 creators · Trend intel</small></div>
+            <span class="activity-time">2h ago</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Composer -->
+      <section class="panel" data-panel="op-composer">
+        <div class="insight lime">
+          <div class="ico">✦</div>
+          <div class="body">Intel is the product. Push <strong>specific, sourced, time-bounded</strong> intelligence — venue openings, brand briefs, trend shifts. Generic posting tips kill trust. Last week's intel-to-action conversion: <strong>34%</strong>.</div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><div><div class="card-title">Push Intelligence to Creators</div><div class="card-sub" style="margin-top:4px">Drafts publish to the bot feed instantly</div></div></div>
+
+          <div class="form-row"><label class="label">Title</label><input class="input" id="cmp-title" placeholder="Syntax rooftop — soft open tonight, not posted anywhere yet" /></div>
+          <div class="form-row"><label class="label">Body — what the bot delivers</label><textarea class="textarea" id="cmp-body" placeholder="West corner has the skyline + water at golden hour. Small crowd, right people. Film a Reel 6–8 PM. No talking. Post between 7–9 PM."></textarea></div>
+
+          <div class="form-row">
+            <label class="label">Category</label>
+            <div class="pill-row" id="cmp-cats">
+              <span class="pill on cyan" data-cat="venue">Venue</span>
+              <span class="pill" data-cat="trend">Trend</span>
+              <span class="pill" data-cat="brand">Brand</span>
+              <span class="pill" data-cat="collab">Collab</span>
+              <span class="pill" data-cat="alert">Alert</span>
+            </div>
+          </div>
+
+          <div class="form-grid-3">
+            <div class="form-row"><label class="label">Source</label><input class="input" value="Maya · in-person walkthrough" /></div>
+            <div class="form-row"><label class="label">Confidence</label><select class="select"><option>High</option><option>Medium</option><option>Low</option></select></div>
+            <div class="form-row"><label class="label">Valid Until</label><input class="input" value="Tonight · 10 PM ET" /></div>
+          </div>
+
+          <div class="form-row">
+            <label class="label">Target niches</label>
+            <div class="pill-row" id="cmp-niches">
+              <span class="pill on" data-n="luxury">Luxury</span>
+              <span class="pill" data-n="wellness">Wellness</span>
+              <span class="pill" data-n="food">Food</span>
+              <span class="pill on" data-n="nightlife">Nightlife</span>
+              <span class="pill" data-n="fashion">Fashion</span>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <label class="label">Target tiers</label>
+            <div class="pill-row" id="cmp-tiers">
+              <span class="pill" data-t="basic">Basic</span>
+              <span class="pill on" data-t="pro">Pro</span>
+              <span class="pill on amber" data-t="vip">VIP</span>
+            </div>
+          </div>
+
+          <div class="btn-row">
+            <button class="btn primary" id="publish-btn">Publish Now</button>
+            <button class="btn ghost" id="preview-btn">Preview as Creator</button>
+            <button class="btn ghost">Save Draft</button>
+            <span class="reach">Reaches <b id="reach-count">8</b> creators</span>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><div><div class="card-title">Intel Library</div><div class="card-sub" style="margin-top:4px">Last 3 pushes · decay tracked</div></div></div>
+          <div class="intel-row">
+            <span class="intel-cat cat-venue">Venue</span>
+            <div class="intel-body"><div class="intel-title">Syntax rooftop — soft open tonight, not posted anywhere yet</div><div class="intel-meta">Source: Maya · 14 min ago · valid 10 PM ET</div></div>
+            <div class="intel-stat"><b>8</b> pushed · <b>7</b> read</div>
+            <span class="decay active">Active</span>
+          </div>
+          <div class="intel-row">
+            <span class="intel-cat cat-trend">Trend</span>
+            <div class="intel-body"><div class="intel-title">Slow-morning content outperforming nightlife +34% this week</div><div class="intel-meta">Source: cohort analytics · 2 hours ago · valid 7 days</div></div>
+            <div class="intel-stat"><b>12</b> pushed · <b>11</b> read</div>
+            <span class="decay exp">Expiring 6h</span>
+          </div>
+          <div class="intel-row">
+            <span class="intel-cat cat-brand">Brand</span>
+            <div class="intel-body"><div class="intel-title">Aesop Miami looking for 3 creators — $1,800/Reel</div><div class="intel-meta">Source: brand DM · yesterday · valid 48h</div></div>
+            <div class="intel-stat"><b>6</b> pushed · <b>6</b> read</div>
+            <span class="decay arch">Archived</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Roster -->
+      <section class="panel" data-panel="op-roster">
+        <div class="insight amber">
+          <div class="ico">○</div>
+          <div class="body">Micro-influencers deliver <strong>60% higher engagement</strong> at <strong>70% lower cost</strong> than macro creators. <strong>62% of brands</strong> are increasing influencer budgets in 2026 — most are routing it through micro/mid tiers. Your roster sits in the sweet spot.</div>
+        </div>
+
+        <div class="filter-row">
+          <span class="pill on">All tiers</span>
+          <span class="pill">VIP</span>
+          <span class="pill">Pro</span>
+          <span class="pill">Basic</span>
+          <span style="width:1px;height:20px;background:var(--line);margin:0 4px"></span>
+          <span class="pill on">All niches</span>
+          <span class="pill">Luxury</span>
+          <span class="pill">Wellness</span>
+          <span class="pill">Food</span>
+          <span class="pill">Nightlife</span>
+          <span class="pill">Fashion</span>
+          <span class="pill">Beauty</span>
+          <label class="toggle" style="margin-left:auto"><input type="checkbox" checked /><span class="switch"></span>Active only</label>
+        </div>
+
+        <div class="card" style="padding:6px 12px">
+          <table class="table">
+            <thead><tr><th>Creator</th><th>Followers</th><th>Engagement</th><th>Tier</th><th>Posts/wk</th><th>Status</th></tr></thead>
+            <tbody id="roster-body">
+              <tr><td><div class="creator-cell"><div class="avatar av-2">JT</div><div><div class="cr-name">Jade T.</div><div class="cr-meta">Lifestyle · South Beach · @jademiami</div></div></div></td><td class="mono">83.1K</td><td><div class="bar-cell"><div class="bar"><div class="bar-fill" style="width:94%"></div></div><span class="mono" style="font-size:12px">4.7%</span></div></td><td><span class="tier vip">VIP</span></td><td class="mono">5.2</td><td><span class="status-dot"></span></td></tr>
+              <tr><td><div class="creator-cell"><div class="avatar av-1">SL</div><div><div class="cr-name">Sofia L.</div><div class="cr-meta">Luxury Wellness · Brickell · @sofialux</div></div></div></td><td class="mono">47.2K</td><td><div class="bar-cell"><div class="bar"><div class="bar-fill" style="width:86%"></div></div><span class="mono" style="font-size:12px">4.3%</span></div></td><td><span class="tier vip">VIP</span></td><td class="mono">4.8</td><td><span class="status-dot"></span></td></tr>
+              <tr><td><div class="creator-cell"><div class="avatar av-5">RL</div><div><div class="cr-name">Rafael L.</div><div class="cr-meta">Nightlife · Downtown · @rafaelmiami</div></div></div></td><td class="mono">61.2K</td><td><div class="bar-cell"><div class="bar"><div class="bar-fill" style="width:82%"></div></div><span class="mono" style="font-size:12px">4.1%</span></div></td><td><span class="tier vip">VIP</span></td><td class="mono">4.4</td><td><span class="status-dot"></span></td></tr>
+              <tr><td><div class="creator-cell"><div class="avatar av-4">NV</div><div><div class="cr-name">Nia V.</div><div class="cr-meta">Wellness · Coral Gables · @niavibe</div></div></div></td><td class="mono">34.8K</td><td><div class="bar-cell"><div class="bar"><div class="bar-fill" style="width:78%"></div></div><span class="mono" style="font-size:12px">3.9%</span></div></td><td><span class="tier pro">Pro</span></td><td class="mono">4.0</td><td><span class="status-dot idle"></span></td></tr>
+              <tr><td><div class="creator-cell"><div class="avatar av-6">KL</div><div><div class="cr-name">Kai L.</div><div class="cr-meta">Beauty · Brickell · @kailoves</div></div></div></td><td class="mono">42.1K</td><td><div class="bar-cell"><div class="bar"><div class="bar-fill" style="width:76%"></div></div><span class="mono" style="font-size:12px">3.8%</span></div></td><td><span class="tier pro">Pro</span></td><td class="mono">3.8</td><td><span class="status-dot"></span></td></tr>
+              <tr><td><div class="creator-cell"><div class="avatar av-3">MR</div><div><div class="cr-name">Marco R.</div><div class="cr-meta">Food · Wynwood · @marcovibes</div></div></div></td><td class="mono">28.9K</td><td><div class="bar-cell"><div class="bar"><div class="bar-fill" style="width:72%"></div></div><span class="mono" style="font-size:12px">3.6%</span></div></td><td><span class="tier pro">Pro</span></td><td class="mono">3.6</td><td><span class="status-dot"></span></td></tr>
+              <tr><td><div class="creator-cell"><div class="avatar av-7">AK</div><div><div class="cr-name">Alex K.</div><div class="cr-meta">Fashion · Design District · @alexkstyle</div></div></div></td><td class="mono">19.4K</td><td><div class="bar-cell"><div class="bar"><div class="bar-fill" style="width:54%"></div></div><span class="mono" style="font-size:12px">2.7%</span></div></td><td><span class="tier basic">Basic</span></td><td class="mono">2.4</td><td><span class="status-dot idle"></span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Flags -->
+      <section class="panel" data-panel="op-flags">
+        <div class="insight">
+          <div class="ico">⚑</div>
+          <div class="body">Aria auto-flags messages on three triggers: <strong>brand DMs offering rates</strong>, <strong>booking requests outside business hours</strong>, and <strong>creators flagging "needs human"</strong>. Operators triage and respond — creators never feel ghosted.</div>
+        </div>
+
+        <div class="tabs">
+          <span class="tab"><span>Urgent</span><span class="count">0</span></span>
+          <span class="tab active"><span>Soft</span><span class="count" id="soft-count">2</span></span>
+        </div>
+
+        <div id="flags-list">
+          <div class="flag-card" data-flag="1">
+            <div class="flag-head">
+              <div class="avatar av-1">SL</div>
+              <div><div class="cr-name">Sofia L.</div><div class="cr-meta">VIP · 47.2K · @sofialux</div></div>
+              <span class="flag-cat">Brand · Negotiation</span>
+              <span class="flag-time">14 min ago</span>
+            </div>
+            <div class="flag-msg">"Hey Aria — Aesop Miami offered $1,800/Reel for a single asset. That feels low based on what other Brickell girls are getting. Can someone weigh in before I respond?"</div>
+            <div class="flag-actions">
+              <button class="btn pink" data-reply="1">Reply</button>
+              <button class="btn ghost" data-resolve="1">Mark Resolved</button>
+              <span class="age">Age in queue: 14m · SLA 1h</span>
+            </div>
+          </div>
+
+          <div class="flag-card" data-flag="2">
+            <div class="flag-head">
+              <div class="avatar av-7">AK</div>
+              <div><div class="cr-name">Alex K.</div><div class="cr-meta">Basic · 19.4K · @alexkstyle</div></div>
+              <span class="flag-cat">Off-platform · Direct DM</span>
+              <span class="flag-time">38 min ago</span>
+            </div>
+            <div class="flag-msg">"A brand just DM'd me on IG offering $400 for a static post — they want to skip the platform. I told them I'd check with you first."</div>
+            <div class="flag-actions">
+              <button class="btn pink" data-reply="2">Reply</button>
+              <button class="btn ghost" data-resolve="2">Mark Resolved</button>
+              <span class="age">Age in queue: 38m · SLA 2h</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Analytics -->
+      <section class="panel" data-panel="op-analytics">
+        <div class="insight amber">
+          <div class="ico">▥</div>
+          <div class="body">Leung et al. (HBR, 2022) found that creators with structured operational support close a <strong>16.6% engagement gap</strong> versus self-managed peers. Our cohort closed it in <strong>5 weeks</strong> — faster because the intel layer compounds with the bookings layer.</div>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-card"><div class="stat-label">Active Creators</div><div class="stat-value">12</div><div class="stat-delta">100% retention</div></div>
+          <div class="stat-card cyan"><div class="stat-label">Avg Engagement</div><div class="stat-value">4.2<span style="font-size:18px;color:var(--txt2)">%</span></div><div class="stat-delta">+75% vs baseline</div></div>
+          <div class="stat-card pink"><div class="stat-label">Monthly Deal Value</div><div class="stat-value">$31<span style="font-size:18px;color:var(--txt2)">K</span></div><div class="stat-delta">8 deals closed</div></div>
+          <div class="stat-card amber"><div class="stat-label">Intel → Action</div><div class="stat-value">34<span style="font-size:18px;color:var(--txt2)">%</span></div><div class="stat-delta">conversion rate</div></div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-head">
+            <div><div class="chart-title">Weekly Avg Posts per Creator</div><div class="chart-sub">Pilot weeks 1–8 · target 4.0/wk</div></div>
+            <span class="mono" style="color:var(--lime);font-size:14px;font-weight:600">+115%</span>
+          </div>
+          <div class="chart" id="chart-posts">
+            <div class="chart-launch" style="left:31%"><span style="margin-top:4px">platform launched</span></div>
+          </div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-head">
+            <div><div class="chart-title">Avg Engagement Rate</div><div class="chart-sub">Pilot weeks 1–8 · industry avg 2.5%</div></div>
+            <span class="mono" style="color:var(--cyan);font-size:14px;font-weight:600">+75%</span>
+          </div>
+          <div class="chart" id="chart-er">
+            <div class="chart-launch" style="left:31%"><span style="margin-top:4px">platform launched</span></div>
+          </div>
+        </div>
+      </section>
+
+      </div><!-- /op-view -->
+
+      <!-- ===================== CREATOR VIEW ===================== -->
+      <div id="cr-view" style="display:none">
+        <div class="creator-shell">
+          <div class="cr-status"><span>9:41</span><span>● ● ● ● ● 100%</span></div>
+          <div class="cr-content">
+
+            <!-- Feed -->
+            <section class="cr-panel active" data-cr-panel="feed">
+              <div class="cr-header">
+                <div class="cr-greet">Good morning</div>
+                <div class="cr-name-big">Sofia 👋</div>
+                <div class="cr-sub"><b>3 new updates</b> from your intelligence feed</div>
+              </div>
+
+              <div class="feed-card unread" data-feed="1">
+                <div class="feed-cat">Venue intel</div>
+                <div class="feed-title">Syntax rooftop — soft open tonight, not posted anywhere yet</div>
+                <div class="feed-time">14 min ago · valid until 10 PM</div>
+                <div class="feed-expand">
+                  West corner has the skyline + water at golden hour. Small crowd, right people. Film a Reel 6–8 PM. No talking. Post between 7–9 PM.
+                  <div class="feed-meta-grid">
+                    <div><div class="k">Post window</div><div class="v">7–9 PM</div></div>
+                    <div><div class="k">Avg ER · venue</div><div class="v">4.8%</div></div>
+                    <div><div class="k">Format</div><div class="v">Reel · 30–45s</div></div>
+                    <div><div class="k">Capacity</div><div class="v">Low · VIP only</div></div>
+                  </div>
+                  <button class="btn primary" style="width:100%" onclick="toast('Added to calendar','Syntax Rooftop · tonight 6:30 PM');event.stopPropagation()">+ Add to Calendar</button>
+                  <div class="feed-fb" onclick="event.stopPropagation()">
+                    <button class="fb-btn" data-fb="1-good">✓ Useful</button>
+                    <button class="fb-btn bad" data-fb="1-bad">✗ Not useful</button>
+                    <button class="fb-btn act" data-fb="1-act">🎯 Acted on</button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="feed-card unread trend" data-feed="2">
+                <div class="feed-cat">Trend intel</div>
+                <div class="feed-title">Slow-morning content outperforming nightlife +34% this week</div>
+                <div class="feed-time">2 hours ago · valid 7 days</div>
+                <div class="feed-expand">
+                  Coffee, light, soft fabrics, no makeup. Brickell girls are crushing it with 7–9 AM posts. Nightlife content is saturated this week.
+                  <div class="feed-meta-grid">
+                    <div><div class="k">Morning ER</div><div class="v">5.1%</div></div>
+                    <div><div class="k">Nightlife ER</div><div class="v">3.8%</div></div>
+                    <div><div class="k">Best window</div><div class="v">7–9 AM</div></div>
+                    <div><div class="k">Sample</div><div class="v">42 posts</div></div>
+                  </div>
+                  <div class="feed-fb" onclick="event.stopPropagation()">
+                    <button class="fb-btn" data-fb="2-good">✓ Useful</button>
+                    <button class="fb-btn bad" data-fb="2-bad">✗ Not useful</button>
+                    <button class="fb-btn act" data-fb="2-act">🎯 Acted on</button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="feed-card unread brand" data-feed="3">
+                <div class="feed-cat">Brand intel</div>
+                <div class="feed-title">Aesop Miami looking for 3 creators — $1,800/Reel</div>
+                <div class="feed-time">5 hours ago · valid 48h</div>
+                <div class="feed-expand">
+                  Brief: skincare routine, soft natural light, in-bathroom or balcony. They want Brickell/SoBe creators with wellness lean. Heads up: rate is below your market.
+                  <div class="feed-meta-grid">
+                    <div><div class="k">Offered rate</div><div class="v" style="color:var(--pink)">$1,800</div></div>
+                    <div><div class="k">Your market</div><div class="v" style="color:var(--lime)">$2,000–2,400</div></div>
+                    <div><div class="k">Brief</div><div class="v">Reel · 1 asset</div></div>
+                    <div><div class="k">Deadline</div><div class="v">7 days</div></div>
+                  </div>
+                  <div style="background:rgba(184,255,78,.06);border-left:3px solid var(--lime);padding:10px 12px;border-radius:8px;font-size:12px;color:var(--txt);margin-bottom:10px">
+                    <b style="color:var(--lime)">Recommendation:</b> negotiate to $2,200 — your ER + Brickell positioning support it. Maya's been notified and will reach out for you.
+                  </div>
+                  <div class="feed-fb" onclick="event.stopPropagation()">
+                    <button class="fb-btn" data-fb="3-good">✓ Useful</button>
+                    <button class="fb-btn bad" data-fb="3-bad">✗ Not useful</button>
+                    <button class="fb-btn act" data-fb="3-act">🎯 Acted on</button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="feed-card collab" data-feed="4">
+                <div class="feed-cat">Collab match</div>
+                <div class="feed-title">Nia V. wants to co-post a wellness morning series</div>
+                <div class="feed-time">Yesterday · valid 5 days</div>
+                <div class="feed-expand">
+                  4-week series. You shoot 2, she shoots 2, cross-post. Her Coral Gables wellness audience leans into your Brickell luxury angle.
+                  <div class="feed-meta-grid">
+                    <div><div class="k">Audience overlap</div><div class="v">68%</div></div>
+                    <div><div class="k">Combined reach</div><div class="v">82.0K</div></div>
+                    <div><div class="k">ER boost (est.)</div><div class="v" style="color:var(--lime)">+0.6–1.2pp</div></div>
+                    <div><div class="k">Effort</div><div class="v">2 shoots</div></div>
+                  </div>
+                  <div class="feed-fb" onclick="event.stopPropagation()">
+                    <button class="fb-btn" data-fb="4-good">✓ Useful</button>
+                    <button class="fb-btn bad" data-fb="4-bad">✗ Not useful</button>
+                    <button class="fb-btn act" data-fb="4-act">🎯 Acted on</button>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <!-- Aria -->
+            <section class="cr-panel" data-cr-panel="aria">
+              <div class="chat-head">
+                <div class="chat-avatar">✦</div>
+                <div class="chat-meta">
+                  <div class="n">Aria</div>
+                  <div class="s">your assistant</div>
+                  <div class="chat-status"><span class="d"></span>Online · knows your full schedule</div>
+                </div>
+              </div>
+
+              <div class="chat-msgs" id="chat-msgs">
+                <div class="msg bot">Morning Sofia ☀️ Heads up — you're booked at Syntax rooftop tonight at 6:30 PM. Golden hour hits the west corner around 7:08. Want me to set a 5:45 reminder?</div>
+                <div class="msg user">yes please. and what should I film?</div>
+                <div class="msg bot">West corner, skyline behind you. 30–45s Reel, no talking, slow B-roll energy. Aim for slightly underexposed — that's been your top-performing look this month. Post between 7–9 PM, that's when Brickell scrolls.</div>
+                <div class="msg user">also got an Aesop offer for $1,800. thoughts?</div>
+                <div class="msg bot">It's below your market. At 47.2K and 4.3% ER, sponsored Reels in your tier go for $2,000–$2,400. I've flagged it to Maya — she'll counter at $2,200 and loop you in before sending.</div>
+                <div class="msg user">cool. can you book a dinner Friday somewhere nice?</div>
+                <div class="msg bot">On it — sending requests to Komodo and Le Jardin for 8 PM Friday. I'll confirm whichever lands first and add it to your calendar.</div>
+              </div>
+
+              <div class="chat-input-wrap">
+                <input class="chat-input" id="chat-input" placeholder="Ask Aria anything…" />
+                <button class="chat-send" id="chat-send">↑</button>
+              </div>
+            </section>
+
+            <!-- Calendar -->
+            <section class="cr-panel" data-cr-panel="calendar">
+              <div class="cal-head">
+                <div class="cal-month" id="cal-month">April 2026</div>
+                <div class="cal-nav">
+                  <button class="cal-arrow" id="cal-prev">‹</button>
+                  <button class="cal-arrow" id="cal-next">›</button>
+                </div>
+              </div>
+              <div class="cal-grid" id="cal-grid"></div>
+
+              <div class="agenda-head" id="agenda-head">Today · Thursday April 23</div>
+              <div id="agenda-body"></div>
+
+              <button class="book-btn" id="book-btn">+ Ask Aria to book something</button>
+            </section>
+
+            <!-- Network -->
+            <section class="cr-panel" data-cr-panel="network">
+              <div class="cr-header">
+                <div class="cr-name-big" style="font-size:24px">Network</div>
+                <div class="cr-sub">Creators on babyg · Miami · Connect to collaborate</div>
+              </div>
+
+              <div class="net-grid">
+                <div class="net-card">
+                  <div class="net-avatar av-4">NV</div>
+                  <div class="net-name">Nia V.</div>
+                  <div class="net-handle">@niavibe</div>
+                  <div class="net-stats"><span>34.8K</span><span>·</span><b>3.9%</b></div>
+                  <div class="net-niche">Wellness · Coral Gables</div>
+                  <button class="net-connect connected" data-net="1">✓ Connected</button>
+                </div>
+                <div class="net-card">
+                  <div class="net-avatar av-3">MR</div>
+                  <div class="net-name">Marco R.</div>
+                  <div class="net-handle">@marcovibes</div>
+                  <div class="net-stats"><span>28.9K</span><span>·</span><b>3.6%</b></div>
+                  <div class="net-niche">Food · Wynwood</div>
+                  <button class="net-connect" data-net="2">+ Connect</button>
+                </div>
+                <div class="net-card">
+                  <div class="net-avatar av-2">JT</div>
+                  <div class="net-name">Jade T.</div>
+                  <div class="net-handle">@jademiami</div>
+                  <div class="net-stats"><span>83.1K</span><span>·</span><b>4.7%</b></div>
+                  <div class="net-niche">Lifestyle · South Beach</div>
+                  <button class="net-connect" data-net="3">+ Connect</button>
+                </div>
+                <div class="net-card">
+                  <div class="net-avatar av-5">RL</div>
+                  <div class="net-name">Rafael L.</div>
+                  <div class="net-handle">@rafaelmiami</div>
+                  <div class="net-stats"><span>61.2K</span><span>·</span><b>4.1%</b></div>
+                  <div class="net-niche">Nightlife · Downtown</div>
+                  <button class="net-connect" data-net="4">+ Connect</button>
+                </div>
+              </div>
+
+              <div class="agenda-head">Collab Board</div>
+
+              <div class="collab-card">
+                <div class="collab-head">
+                  <div class="collab-title">Aesop Miami · Q2 Campaign</div>
+                  <div class="collab-rate">$1,800/Reel</div>
+                </div>
+                <div class="collab-sub">3 creators · skincare routine Reel · Brickell/SoBe</div>
+                <button class="collab-btn handled">✓ Your manager is handling this</button>
+              </div>
+
+              <div class="collab-card">
+                <div class="collab-head">
+                  <div class="collab-title">Morning Wellness Series · with Nia V.</div>
+                  <div class="collab-rate">Rev share</div>
+                </div>
+                <div class="collab-sub">4-week series · cross-post · 82K combined reach</div>
+                <button class="collab-btn" data-collab="2">Express Interest</button>
+              </div>
+
+              <div class="collab-card">
+                <div class="collab-head">
+                  <div class="collab-title">Le Jardin Hotel · Opening Night</div>
+                  <div class="collab-rate">$600 + 1-night stay</div>
+                </div>
+                <div class="collab-sub">April 26 · 1 Reel + 3 Stories · 4 spots open</div>
+                <button class="collab-btn" data-collab="3">Express Interest</button>
+              </div>
+            </section>
+
+            <!-- Stats -->
+            <section class="cr-panel" data-cr-panel="stats">
+              <div class="cr-header">
+                <div class="cr-name-big" style="font-size:26px">Your Performance</div>
+                <div class="cr-sub">Week 6 of pilot · Miami</div>
+              </div>
+
+              <div class="cr-stats-grid">
+                <div class="cr-stat"><div class="l">Engagement</div><div class="v">4.3<span style="font-size:14px;color:var(--txt2)">%</span></div><div class="d">+1.9pp from baseline</div></div>
+                <div class="cr-stat cyan"><div class="l">Posts this week</div><div class="v">5</div><div class="d">Target: 4.0/wk</div></div>
+                <div class="cr-stat amber"><div class="l">Follower growth</div><div class="v">+1.2K</div><div class="d">last 7 days</div></div>
+                <div class="cr-stat pink"><div class="l">Brand value</div><div class="v">$3.8<span style="font-size:14px;color:var(--txt2)">K</span></div><div class="d">this month</div></div>
+              </div>
+
+              <div class="insight lime" style="margin-bottom:14px;font-size:12px">
+                <div class="ico">$</div>
+                <div class="body">At <strong>47.2K followers</strong> and <strong>4.3% engagement</strong>, your sponsored Reel rate is <strong>$2,000–$2,400</strong>. The Aesop offer of $1,800 is below market.</div>
+              </div>
+
+              <div class="card" style="margin-bottom:0">
+                <div class="card-head"><div><div class="card-title">Engagement · last 8 weeks</div><div class="card-sub" style="margin-top:4px">Platform started week 3</div></div></div>
+                <div class="mini-chart" id="mini-chart"></div>
+              </div>
+            </section>
+
+            <!-- Profile -->
+            <section class="cr-panel" data-cr-panel="profile">
+              <div class="prof-card">
+                <div class="prof-avatar">SL</div>
+                <div class="prof-name">Sofia L.</div>
+                <div class="prof-handle">@sofialux</div>
+                <div class="prof-niche">Luxury Wellness · Brickell</div>
+                <div class="prof-stats">
+                  <div class="prof-stat"><div class="v">47.2K</div><div class="l">Followers</div></div>
+                  <div class="prof-stat"><div class="v">4.3%</div><div class="l">Engagement</div></div>
+                  <div class="prof-stat"><div class="v" style="color:var(--amber)">VIP</div><div class="l">Tier</div></div>
+                </div>
+                <button class="prof-edit">Edit Profile</button>
+              </div>
+
+              <div class="settings-card">
+                <div class="settings-h">Notifications</div>
+                <div class="setting-row"><div>Daily Intel Push<small>7 AM ET</small></div><label class="toggle"><input type="checkbox" checked /><span class="switch"></span></label></div>
+                <div class="setting-row"><div>Posting Reminders<small>30 min before optimal window</small></div><label class="toggle"><input type="checkbox" checked /><span class="switch"></span></label></div>
+                <div class="setting-row"><div>Booking Reminders<small>1 hour before</small></div><label class="toggle"><input type="checkbox" checked /><span class="switch"></span></label></div>
+                <div class="setting-row"><div>SMS Alerts<small>VIP only · urgent flags</small></div><label class="toggle"><input type="checkbox" checked /><span class="switch"></span></label></div>
+                <div class="setting-row"><div>Collab Matches<small>When operators tag a fit</small></div><label class="toggle"><input type="checkbox" /><span class="switch"></span></label></div>
+                <div class="setting-row"><div>Weekly Digest<small>Sunday 8 PM</small></div><label class="toggle"><input type="checkbox" checked /><span class="switch"></span></label></div>
+              </div>
+
+              <div class="settings-card">
+                <div class="settings-h">Your Sub-bot</div>
+                <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
+                  <div class="chat-avatar" style="width:38px;height:38px;font-size:16px">✦</div>
+                  <div><div style="font-weight:600;font-size:14px">Aria</div><div style="font-size:11px;color:var(--txt3)">trained on your last 90 days</div></div>
+                </div>
+                <label class="label">Bot name</label>
+                <input class="input" id="bot-name" value="Aria" />
+                <button class="btn primary" style="margin-top:10px;width:100%" onclick="toast('Sub-bot updated','Your assistant is now called '+document.getElementById('bot-name').value)">Save</button>
+              </div>
+            </section>
+
+          </div>
+
+          <div class="cr-tabbar">
+            <div class="cr-tab active" data-cr="feed"><svg viewBox="0 0 24 24"><path d="M3 12l9-9 9 9M5 10v10h14V10"/></svg>Feed</div>
+            <div class="cr-tab" data-cr="aria" style="position:relative"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 6v3M9 12l3 3 3-3"/></svg>Aria<span class="live"></span></div>
+            <div class="cr-tab" data-cr="calendar"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Calendar</div>
+            <div class="cr-tab" data-cr="network"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Network</div>
+            <div class="cr-tab" data-cr="stats"><svg viewBox="0 0 24 24"><path d="M3 20h18M7 20V10M12 20V4M17 20v-7"/></svg>Stats</div>
+            <div class="cr-tab" data-cr="profile"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-7 8-7s8 3 8 7"/></svg>Profile</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<!-- Intel Preview Overlay -->
+<div class="overlay" id="preview-overlay">
+  <div class="phone-frame">
+    <button class="overlay-close" id="preview-close">×</button>
+    <div class="phone-screen">
+      <div class="phone-status"><span>9:41</span><span>● ● ● ● 100%</span></div>
+      <div class="phone-content">
+        <div style="font-size:11px;text-transform:uppercase;letter-spacing:.2em;color:var(--txt3);font-weight:600;margin-bottom:4px">Good morning</div>
+        <div style="font-family:'Playfair Display',serif;font-style:italic;font-size:24px;font-weight:500;margin-bottom:14px">Sofia 👋</div>
+        <div class="feed-card unread">
+          <div class="feed-cat" id="prev-cat">Venue intel</div>
+          <div class="feed-title" id="prev-title">Syntax rooftop — soft open tonight, not posted anywhere yet</div>
+          <div class="feed-time">Just now · valid until 10 PM</div>
+          <div style="margin-top:12px;font-size:13px;color:var(--txt2);line-height:1.55" id="prev-body">West corner has the skyline + water at golden hour. Small crowd, right people. Film a Reel 6–8 PM. No talking. Post between 7–9 PM.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Bottom sheet -->
+<div class="sheet-overlay" id="sheet-overlay">
+  <div class="sheet">
+    <h3>Ask Aria to book something</h3>
+    <input class="input" id="book-input" placeholder="Komodo, Friday 8 PM, table for 2" />
+    <button class="btn primary" id="book-submit" style="width:100%;margin-top:14px">Ask Aria to Book It</button>
+    <button class="btn ghost" id="book-cancel" style="width:100%;margin-top:8px">Cancel</button>
+  </div>
+</div>
+
+<div class="toast-wrap" id="toast-wrap"></div>
+
+<script>
+// ============ STATE ============
+const state = {
+  view: 'op',
+  opPanel: 'dashboard',
+  crPanel: 'feed',
+  calMonth: 3, // April (0-indexed)
+  calYear: 2026,
+  selDay: 23,
+  events: {
+    '2026-3-23': [
+      {time:'6:30 PM', title:'Syntax Rooftop', sub:'Soft open · west corner · 30–45s Reel', tag:'cyan', tagL:'Booking'},
+      {time:'8:00 PM', title:'Post Reel', sub:'Optimal window 7–9 PM', tag:'lime', tagL:'Reminder'}
+    ],
+    '2026-3-25': [
+      {time:'12:30 PM', title:'Aesop brand call', sub:'Maya joins · counter at $2,200', tag:'pink', tagL:'Brand'},
+      {time:'3:00 PM', title:'Post reminder', sub:'Skincare Reel for Aesop pitch', tag:'lime', tagL:'Reminder'}
+    ],
+    '2026-3-26': [
+      {time:'7:00 PM', title:'Le Jardin Hotel Opening', sub:'1 Reel + 3 Stories · $600 + stay', tag:'cyan', tagL:'Booking'}
+    ],
+    '2026-3-28': [
+      {time:'9:00 AM', title:'Wellness co-post · Nia V.', sub:'Morning series shoot 1 of 4', tag:'amber', tagL:'Collab'},
+      {time:'8:00 PM', title:'Weekly digest', sub:'Performance + next week priorities', tag:'lime', tagL:'Reminder'}
+    ],
+    '2026-3-30': [
+      {time:'8:00 PM', title:'Komodo dinner', sub:'Table for 2 · confirmed', tag:'cyan', tagL:'Booking'}
+    ],
+    '2026-4-2': [
+      {time:'EOD', title:'Monthly brand deal deadline', sub:'Submit final assets to Aesop', tag:'pink', tagL:'Brand'}
+    ]
+  }
+};
+
+// ============ HELPERS ============
+function toast(t, b){
+  const w = document.getElementById('toast-wrap');
+  const el = document.createElement('div');
+  el.className = 'toast';
+  el.innerHTML = `<div class="t">${t}</div><div class="b">${b}</div>`;
+  w.appendChild(el);
+  setTimeout(()=>{el.style.opacity='0';el.style.transform='translateX(20px)';setTimeout(()=>el.remove(),300)},3500);
+}
+
+// ============ VIEW SWITCH ============
+const vwOp = document.getElementById('vw-op');
+const vwCr = document.getElementById('vw-cr');
+const opView = document.getElementById('op-view');
+const crView = document.getElementById('cr-view');
+const opNav = document.getElementById('op-nav');
+const crNav = document.getElementById('cr-nav');
+const viewChip = document.getElementById('view-chip');
+
+function setView(v){
+  state.view = v;
+  if(v==='op'){
+    vwOp.classList.add('active');vwCr.classList.remove('active');
+    opView.style.display='';crView.style.display='none';
+    opNav.style.display='';crNav.style.display='none';
+    viewChip.textContent='Operator View';viewChip.className='chip view-chip op';
+    document.getElementById('user-av').textContent='M';
+    document.getElementById('user-n').textContent='Maya · babyg';
+    document.getElementById('user-r').textContent='Operator';
+    setOpPanel(state.opPanel);
+  } else {
+    vwCr.classList.add('active');vwOp.classList.remove('active');
+    opView.style.display='none';crView.style.display='';
+    opNav.style.display='none';crNav.style.display='';
+    viewChip.textContent='Creator View · Sofia';viewChip.className='chip view-chip cr';
+    document.getElementById('user-av').textContent='SL';
+    document.getElementById('user-av').className='user-avatar av-1';
+    document.getElementById('user-n').textContent='Sofia L.';
+    document.getElementById('user-r').textContent='@sofialux · VIP';
+    setCrPanel(state.crPanel);
+    if(state.crPanel==='stats') drawMini();
+  }
+}
+vwOp.addEventListener('click',()=>setView('op'));
+vwCr.addEventListener('click',()=>setView('cr'));
+
+// ============ OPERATOR PANELS ============
+const opTitles = {
+  dashboard:['Dashboard','Pilot week 6 · Miami cohort · 12 active creators'],
+  composer:['Intel Composer','Push specific, sourced, time-bounded intelligence to creators'],
+  roster:['Creator Roster','7 of 12 shown · Miami · pilot cohort'],
+  flags:['Flagged Messages','Auto-escalated by Aria · triage queue'],
+  analytics:['Analytics','Pilot weeks 1–8 · roster-wide rollup']
+};
+function setOpPanel(p){
+  state.opPanel = p;
+  document.querySelectorAll('#op-nav .nav-item').forEach(n=>n.classList.toggle('active',n.dataset.op===p));
+  document.querySelectorAll('[data-panel^="op-"]').forEach(el=>el.classList.toggle('active',el.dataset.panel==='op-'+p));
+  const [t,s] = opTitles[p];
+  document.getElementById('page-title').textContent=t;
+  document.getElementById('page-sub').textContent=s;
+  if(p==='analytics') setTimeout(drawCharts,80);
+}
+document.querySelectorAll('#op-nav .nav-item').forEach(n=>n.addEventListener('click',()=>setOpPanel(n.dataset.op)));
+document.querySelectorAll('[data-goto]').forEach(el=>el.addEventListener('click',()=>setOpPanel(el.dataset.goto)));
+
+// ============ CREATOR PANELS ============
+const crTitles = {
+  feed:['Feed','Your intelligence stream'],
+  aria:['Aria','Your assistant · always on'],
+  calendar:['Calendar','April 2026'],
+  network:['Network','Miami creator graph'],
+  stats:['Stats','Week 6 performance'],
+  profile:['Profile','Settings & sub-bot']
+};
+function setCrPanel(p){
+  state.crPanel = p;
+  document.querySelectorAll('#cr-nav .nav-item').forEach(n=>n.classList.toggle('active',n.dataset.cr===p));
+  document.querySelectorAll('.cr-tab').forEach(n=>n.classList.toggle('active',n.dataset.cr===p));
+  document.querySelectorAll('[data-cr-panel]').forEach(el=>el.classList.toggle('active',el.dataset.crPanel===p));
+  if(state.view==='cr'){
+    const [t,s] = crTitles[p];
+    document.getElementById('page-title').textContent=t;
+    document.getElementById('page-sub').textContent=s;
+  }
+  if(p==='calendar') renderCalendar();
+  if(p==='stats') drawMini();
+  if(p==='aria'){
+    const m = document.getElementById('chat-msgs');
+    if(m) m.scrollTop = m.scrollHeight;
+  }
+}
+document.querySelectorAll('#cr-nav .nav-item').forEach(n=>n.addEventListener('click',()=>setCrPanel(n.dataset.cr)));
+document.querySelectorAll('.cr-tab').forEach(n=>n.addEventListener('click',()=>setCrPanel(n.dataset.cr)));
+
+// ============ NOTIFICATIONS ============
+const bell = document.getElementById('bell');
+const notifPanel = document.getElementById('notif-panel');
+bell.addEventListener('click',(e)=>{
+  e.stopPropagation();
+  notifPanel.classList.toggle('open');
+});
+document.addEventListener('click',e=>{
+  if(!notifPanel.contains(e.target) && e.target!==bell) notifPanel.classList.remove('open');
+});
+document.getElementById('mark-read').addEventListener('click',e=>{
+  e.stopPropagation();
+  document.querySelectorAll('.notif-item.unread').forEach(i=>i.classList.remove('unread'));
+  bell.classList.add('no-dot');
+});
+
+// ============ COMPOSER ============
+document.querySelectorAll('#cmp-cats .pill').forEach(p=>{
+  p.addEventListener('click',()=>{
+    document.querySelectorAll('#cmp-cats .pill').forEach(x=>{x.classList.remove('on');x.classList.remove('cyan');x.classList.remove('pink');x.classList.remove('amber')});
+    p.classList.add('on');
+    const c = p.dataset.cat;
+    if(c==='venue'||c==='collab') p.classList.add('cyan');
+    else if(c==='brand') p.classList.add('pink');
+    else if(c==='trend') p.classList.add('amber');
+  });
+});
+function calcReach(){
+  const niches = document.querySelectorAll('#cmp-niches .pill.on').length;
+  const tiers = document.querySelectorAll('#cmp-tiers .pill.on').length;
+  const n = Math.max(1, Math.min(12, niches*tiers + 2));
+  document.getElementById('reach-count').textContent = n;
+}
+document.querySelectorAll('#cmp-niches .pill, #cmp-tiers .pill').forEach(p=>{
+  p.addEventListener('click',()=>{p.classList.toggle('on');calcReach()});
+});
+
+document.getElementById('publish-btn').addEventListener('click',()=>{
+  const t = document.getElementById('cmp-title').value || 'Untitled intel';
+  toast('Intel published',`"${t.slice(0,40)}${t.length>40?'…':''}" pushed to ${document.getElementById('reach-count').textContent} creators`);
+});
+
+// ============ INTEL PREVIEW ============
+const overlay = document.getElementById('preview-overlay');
+document.getElementById('preview-btn').addEventListener('click',()=>{
+  const cat = document.querySelector('#cmp-cats .pill.on')?.dataset.cat || 'venue';
+  document.getElementById('prev-cat').textContent = cat.charAt(0).toUpperCase()+cat.slice(1)+' intel';
+  document.getElementById('prev-title').textContent = document.getElementById('cmp-title').value || 'Syntax rooftop — soft open tonight, not posted anywhere yet';
+  document.getElementById('prev-body').textContent = document.getElementById('cmp-body').value || 'West corner has the skyline + water at golden hour. Small crowd, right people. Film a Reel 6–8 PM. No talking. Post between 7–9 PM.';
+  overlay.classList.add('open');
+});
+document.getElementById('preview-close').addEventListener('click',()=>overlay.classList.remove('open'));
+overlay.addEventListener('click',e=>{if(e.target===overlay) overlay.classList.remove('open')});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){overlay.classList.remove('open');document.getElementById('sheet-overlay').classList.remove('open')}});
+
+// ============ FLAGS ============
+function resolveFlag(id){
+  const card = document.querySelector(`.flag-card[data-flag="${id}"]`);
+  if(!card || card.classList.contains('resolved')) return;
+  card.classList.add('resolved');
+  const cnt = document.getElementById('soft-count');
+  const next = Math.max(0, parseInt(cnt.textContent)-1);
+  cnt.textContent = next;
+  document.getElementById('flag-badge').textContent = next;
+  if(next===0) document.getElementById('flag-badge').style.display='none';
+  toast('Flag resolved','Marked complete · creator notified');
+  setTimeout(()=>card.style.display='none',400);
+}
+document.querySelectorAll('[data-resolve]').forEach(b=>b.addEventListener('click',()=>resolveFlag(b.dataset.resolve)));
+document.querySelectorAll('[data-reply]').forEach(b=>b.addEventListener('click',()=>toast('Reply sent','Creator notified · thread archived')));
+
+// ============ CHARTS ============
+const postsData = [1.8, 2.1, 1.9, 2.4, 3.2, 3.8, 4.1, 4.3];
+const erData = [2.4, 2.6, 2.5, 2.9, 3.4, 3.8, 4.0, 4.2];
+function makeChart(elId, data, max, suffix, cyan){
+  const el = document.getElementById(elId);
+  // clear except launch annotation
+  Array.from(el.querySelectorAll('.bar-col')).forEach(c=>c.remove());
+  data.forEach((v,i)=>{
+    const col = document.createElement('div');
+    col.className = 'bar-col';
+    const cur = i===data.length-1;
+    const bar = document.createElement('div');
+    bar.className = 'bar-bar' + (cyan?' cyan':'') + (cur?' cur':'');
+    bar.style.height = '0';
+    const val = document.createElement('div');
+    val.className = 'bar-val';
+    val.textContent = v + suffix;
+    const lbl = document.createElement('div');
+    lbl.className = 'bar-lbl';
+    lbl.textContent = 'W'+(i+1);
+    bar.appendChild(val);
+    col.appendChild(bar);
+    col.appendChild(lbl);
+    el.appendChild(col);
+    setTimeout(()=>{
+      bar.style.height = ((v/max)*100)+'%';
+      bar.classList.add('shown');
+    }, 60+i*70);
+  });
+}
+let chartsDrawn = false;
+function drawCharts(){
+  if(chartsDrawn) return;
+  chartsDrawn = true;
+  makeChart('chart-posts', postsData, 5.0, '', false);
+  makeChart('chart-er', erData, 5.0, '%', true);
+}
+
+let miniDrawn = false;
+function drawMini(){
+  const el = document.getElementById('mini-chart');
+  if(!el) return;
+  el.innerHTML='';
+  const sofiaER = [2.6, 2.8, 2.5, 3.1, 3.6, 3.9, 4.1, 4.3];
+  sofiaER.forEach((v,i)=>{
+    const col = document.createElement('div');
+    col.className = 'mini-bar-col';
+    const bar = document.createElement('div');
+    bar.className = 'mini-bar' + (i===sofiaER.length-1?' cur':'');
+    bar.style.height = '0';
+    const lbl = document.createElement('div');
+    lbl.className='mini-lbl';
+    lbl.textContent = 'W'+(i+1);
+    col.appendChild(bar);
+    col.appendChild(lbl);
+    el.appendChild(col);
+    setTimeout(()=>bar.style.height = ((v/5)*100)+'%', 60+i*70);
+  });
+}
+
+// ============ FEED ============
+document.querySelectorAll('.feed-card').forEach(card=>{
+  card.addEventListener('click',e=>{
+    if(e.target.closest('.feed-fb')||e.target.closest('button')) return;
+    card.classList.toggle('open');
+    card.classList.remove('unread');
+  });
+});
+document.querySelectorAll('.fb-btn').forEach(b=>{
+  b.addEventListener('click',e=>{
+    e.stopPropagation();
+    const card = b.closest('.feed-card');
+    card.querySelectorAll('.fb-btn').forEach(x=>{x.classList.remove('on')});
+    b.classList.add('on');
+  });
+});
+
+// ============ NETWORK ============
+document.querySelectorAll('[data-net]').forEach(b=>{
+  b.addEventListener('click',()=>{
+    if(b.classList.contains('connected')){
+      b.classList.remove('connected');
+      b.textContent='+ Connect';
+    } else {
+      b.classList.add('connected');
+      b.textContent='✓ Connected';
+      toast('Connected','You can now collab and DM through babyg');
+    }
+  });
+});
+document.querySelectorAll('[data-collab]').forEach(b=>{
+  b.addEventListener('click',()=>{
+    if(b.classList.contains('on')) return;
+    b.classList.add('on');
+    b.textContent='✓ Interested — Aria will set it up';
+    toast('Interest sent','Aria will reach out to coordinate');
+  });
+});
+
+// ============ CALENDAR ============
+const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const dayNames = ['S','M','T','W','T','F','S'];
+function renderCalendar(){
+  const grid = document.getElementById('cal-grid');
+  grid.innerHTML='';
+  dayNames.forEach(d=>{
+    const dh = document.createElement('div');
+    dh.className='cal-dh';dh.textContent=d;
+    grid.appendChild(dh);
+  });
+  const first = new Date(state.calYear, state.calMonth, 1);
+  const startDay = first.getDay();
+  const daysInMonth = new Date(state.calYear, state.calMonth+1, 0).getDate();
+  for(let i=0;i<startDay;i++){
+    const e = document.createElement('div');e.className='cal-day empty';grid.appendChild(e);
+  }
+  const today = (state.calYear===2026 && state.calMonth===3) ? 23 : -1;
+  for(let d=1;d<=daysInMonth;d++){
+    const cell = document.createElement('div');
+    cell.className='cal-day';
+    if(d===today) cell.classList.add('today');
+    if(d===state.selDay && state.calYear===2026 && state.calMonth===3) cell.classList.add('sel');
+    cell.innerHTML = `<span>${d}</span>`;
+    const key = `${state.calYear}-${state.calMonth}-${d}`;
+    if(state.events[key]){
+      const dots = document.createElement('div');
+      dots.className='cal-dots';
+      const types = new Set(state.events[key].map(e=>e.tag));
+      types.forEach(t=>{
+        const dot = document.createElement('div');
+        dot.className='cal-dot '+t;
+        dots.appendChild(dot);
+      });
+      cell.appendChild(dots);
+    }
+    cell.addEventListener('click',()=>{
+      state.selDay = d;
+      renderCalendar();
+      renderAgenda(d);
+    });
+    grid.appendChild(cell);
+  }
+  document.getElementById('cal-month').textContent = `${monthNames[state.calMonth]} ${state.calYear}`;
+  renderAgenda(state.selDay);
+}
+function renderAgenda(d){
+  const key = `${state.calYear}-${state.calMonth}-${d}`;
+  const items = state.events[key] || [];
+  const head = document.getElementById('agenda-head');
+  const date = new Date(state.calYear, state.calMonth, d);
+  const dayName = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][date.getDay()];
+  const isToday = (state.calYear===2026 && state.calMonth===3 && d===23);
+  head.textContent = `${isToday?'Today · ':''}${dayName} ${monthNames[state.calMonth]} ${d}`;
+  const body = document.getElementById('agenda-body');
+  if(items.length===0){
+    body.innerHTML = `<div style="font-size:13px;color:var(--txt3);padding:20px 0;text-align:center">Nothing on the calendar</div>`;
+    return;
+  }
+  body.innerHTML = items.map(e=>`
+    <div class="agenda-item">
+      <div class="agenda-time">${e.time}</div>
+      <div class="agenda-bar ${e.tag}"></div>
+      <div class="agenda-body">
+        <div class="agenda-title">${e.title}</div>
+        <div class="agenda-sub">${e.sub}</div>
+        <span class="agenda-tag ${e.tag}">${e.tagL}</span>
+      </div>
+    </div>
+  `).join('');
+}
+document.getElementById('cal-prev').addEventListener('click',()=>{
+  state.calMonth--;
+  if(state.calMonth<0){state.calMonth=11;state.calYear--}
+  state.selDay = 1;
+  renderCalendar();
+});
+document.getElementById('cal-next').addEventListener('click',()=>{
+  state.calMonth++;
+  if(state.calMonth>11){state.calMonth=0;state.calYear++}
+  state.selDay = 1;
+  renderCalendar();
+});
+
+// Book sheet
+const sheet = document.getElementById('sheet-overlay');
+document.getElementById('book-btn').addEventListener('click',()=>sheet.classList.add('open'));
+document.getElementById('book-cancel').addEventListener('click',()=>sheet.classList.remove('open'));
+sheet.addEventListener('click',e=>{if(e.target===sheet)sheet.classList.remove('open')});
+document.getElementById('book-submit').addEventListener('click',()=>{
+  const v = document.getElementById('book-input').value.trim();
+  if(!v) return;
+  const key = `${state.calYear}-${state.calMonth}-${state.selDay}`;
+  if(!state.events[key]) state.events[key]=[];
+  state.events[key].push({time:'TBD',title:v.slice(0,40),sub:'Aria is sourcing options',tag:'cyan',tagL:'Booking'});
+  document.getElementById('book-input').value='';
+  sheet.classList.remove('open');
+  toast('Booking requested',`Aria is on it · "${v.slice(0,32)}${v.length>32?'…':''}"`);
+  renderCalendar();
+});
+
+// ============ ARIA CHAT ============
+const chatMsgs = document.getElementById('chat-msgs');
+const chatInput = document.getElementById('chat-input');
+const chatSend = document.getElementById('chat-send');
+
+function aria_reply(q){
+  const s = q.toLowerCase();
+  if(/book|reserve|reservation/.test(s)) return "On it. I'll send the request and add a hold to your calendar — you'll get a confirm the moment they reply.";
+  if(/remind|reminder/.test(s)) return "Reminder set. I'll ping you 30 min before — text + push.";
+  if(/calendar|schedule|week/.test(s)) return "This week: Syntax rooftop tonight 6:30, Aesop call Friday 12:30, Le Jardin opening Saturday 7 PM, Komodo dinner the 30th. Want me to send it as a digest?";
+  if(/engagement|rate(?!s)|er/.test(s)) return "You're at 4.3% engagement, up from 2.4% when we started. That puts you in the top quartile of micro creators in Miami.";
+  if(/follower/.test(s)) return "47.2K followers right now. Avg gain is +1.2K/week since we added the morning content cadence — that's roughly 5K/month at this pace.";
+  if(/post|film|content|shoot/.test(s)) return "Tonight: Syntax rooftop, west corner, golden hour at 7:08. 30–45s Reel, no voiceover, slightly underexposed. Post 7–9 PM. That look + window has been your top performer this month.";
+  if(/deal|aesop|brand/.test(s)) return "I flagged the Aesop offer to Maya. At your tier ($2,000–$2,400 market for sponsored Reels), $1,800 is light. She's countering at $2,200 and will loop you in before sending.";
+  if(/worth|value|rate(s)?/.test(s)) return "Your sponsored Reel rate: $2,000–$2,400. Static post: $900–$1,200. Story bundle (3): $700. These are based on your follower count, ER, and Brickell positioning.";
+  if(/nia|collab/.test(s)) return "Nia's wellness morning series: 4 weeks, 2 shoots from you, cross-post. Audience overlap 68%, expected ER bump +0.6–1.2pp. Want me to lock in shoot 1 for Tuesday morning?";
+  return "Got it. I'll handle it — will ping you when there's something to confirm.";
+}
+function streamMsg(text, done){
+  const el = document.createElement('div');
+  el.className='msg bot';
+  chatMsgs.appendChild(el);
+  const words = text.split(' ');
+  let i=0;
+  const tick = ()=>{
+    if(i>=words.length){done&&done();return}
+    el.textContent = words.slice(0,i+1).join(' ');
+    chatMsgs.scrollTop = chatMsgs.scrollHeight;
+    i++;
+    setTimeout(tick, 38+Math.random()*40);
+  };
+  tick();
+}
+function sendChat(){
+  const v = chatInput.value.trim();
+  if(!v) return;
+  const um = document.createElement('div');
+  um.className='msg user';um.textContent=v;
+  chatMsgs.appendChild(um);
+  chatInput.value='';
+  chatMsgs.scrollTop = chatMsgs.scrollHeight;
+  // typing
+  const typ = document.createElement('div');
+  typ.className='typing';
+  typ.innerHTML='<span></span><span></span><span></span>';
+  chatMsgs.appendChild(typ);
+  chatMsgs.scrollTop = chatMsgs.scrollHeight;
+  setTimeout(()=>{
+    typ.remove();
+    streamMsg(aria_reply(v));
+  }, 700+Math.random()*500);
+}
+chatSend.addEventListener('click',sendChat);
+chatInput.addEventListener('keydown',e=>{if(e.key==='Enter') sendChat()});
+
+// ============ INIT ============
+renderCalendar();
+// Auto-draw analytics charts when first viewed
+const obs = new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting && state.opPanel==='analytics') drawCharts()});
+});
+// initial: dashboard active
+calcReach();
+</script>
+</body>
+</html>
