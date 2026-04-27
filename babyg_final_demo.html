@@ -1,0 +1,2192 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<title>BabyG — the missing system between your lifestyle and your results</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@1,400;1,500;1,600;1,700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#06080B;--s1:#0C1018;--s2:#121820;--s3:#1A2230;
+  --lime:#B8FF4E;--cyan:#4EFFE0;--pink:#FF4EB8;--amber:#FFB84E;--blue:#4E9FFF;--red:#FF5C5C;
+  --txt:#ECF0F5;--txt2:#8899AA;--txt3:#4A5568;
+  --line:rgba(255,255,255,.06);--line2:rgba(255,255,255,.10);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--txt);font-family:'Outfit',system-ui,sans-serif;font-weight:400;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+button{font-family:inherit;color:inherit;background:none;border:none;cursor:pointer}
+input,textarea,select{font-family:inherit;color:inherit}
+a{color:inherit;text-decoration:none}
+::selection{background:var(--lime);color:#000}
+.mono{font-family:'JetBrains Mono',monospace}
+.italic{font-family:'Playfair Display',serif;font-style:italic;font-weight:500;letter-spacing:-.01em}
+:focus-visible{outline:2px solid var(--lime);outline-offset:2px;border-radius:4px}
+
+/* shell */
+.app-shell{display:grid;grid-template-columns:200px 1fr;min-height:100vh}
+.sidebar{background:var(--s1);border-right:1px solid var(--line);padding:18px 12px;position:sticky;top:0;height:100vh;display:flex;flex-direction:column;gap:4px;z-index:50}
+.logo{font-family:'Playfair Display',serif;font-style:italic;font-weight:600;font-size:28px;color:var(--lime);padding:0 8px 16px;letter-spacing:-.02em;line-height:1}
+.logo small{display:block;font-family:'Outfit',sans-serif;font-style:normal;font-weight:500;font-size:9px;color:var(--txt3);letter-spacing:.22em;text-transform:uppercase;margin-top:6px}
+.nav-section{margin-top:6px;font-size:9px;color:var(--txt3);letter-spacing:.22em;text-transform:uppercase;padding:12px 8px 4px;font-weight:600}
+.nav-item{display:flex;align-items:center;gap:11px;padding:9px 10px;border-radius:10px;color:var(--txt2);font-size:13px;font-weight:500;cursor:pointer;transition:.15s}
+.nav-item:hover{background:var(--s2);color:var(--txt)}
+.nav-item.active{background:rgba(184,255,78,.08);color:var(--lime)}
+.nav-item .ico{width:16px;height:16px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}
+.nav-item .badge{margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:10px;background:var(--pink);color:#000;padding:1px 6px;border-radius:8px;font-weight:600}
+.view-switch{margin-top:auto;background:var(--s2);border:1px solid var(--line);border-radius:12px;padding:4px;display:flex;gap:3px}
+.view-btn{flex:1;padding:9px 6px;border-radius:9px;font-size:11px;font-weight:600;color:var(--txt2);text-align:center;letter-spacing:.06em}
+.view-btn.active.op{background:var(--blue);color:#000}
+.view-btn.active.cr{background:var(--lime);color:#000}
+.user-chip{margin-top:8px;display:flex;align-items:center;gap:9px;padding:9px;background:var(--s2);border-radius:10px;border:1px solid var(--line)}
+.user-chip-meta{display:flex;flex-direction:column;min-width:0}
+.user-chip-meta .n{font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.user-chip-meta .r{font-size:9px;color:var(--txt3);letter-spacing:.12em;text-transform:uppercase}
+
+.main{min-width:0;display:flex;flex-direction:column}
+.topbar{display:flex;align-items:center;gap:12px;padding:12px 22px;border-bottom:1px solid var(--line);background:rgba(6,8,11,.85);backdrop-filter:blur(12px);position:sticky;top:0;z-index:40;height:62px}
+.title{font-size:19px;font-weight:700;letter-spacing:-.02em}
+.subtitle{font-size:11px;color:var(--txt2);margin-top:1px}
+.title-wrap{display:flex;flex-direction:column;min-width:0}
+.spacer{flex:1}
+.chip{display:inline-flex;align-items:center;gap:5px;padding:4px 9px;border-radius:999px;font-size:10px;font-weight:600;letter-spacing:.04em}
+.chip.live{background:rgba(78,255,224,.1);color:var(--cyan);border:1px solid rgba(78,255,224,.25)}
+.chip.live .dot{width:5px;height:5px;border-radius:50%;background:var(--cyan);animation:pulse 1.4s infinite}
+.chip.view-chip{background:var(--s2);color:var(--txt2);border:1px solid var(--line)}
+.chip.view-chip.op{color:var(--blue);border-color:rgba(78,159,255,.3);background:rgba(78,159,255,.08)}
+.chip.view-chip.cr{color:var(--lime);border-color:rgba(184,255,78,.3);background:rgba(184,255,78,.08)}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.45;transform:scale(.9)}}
+.bell{position:relative;width:34px;height:34px;border-radius:9px;background:var(--s2);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;color:var(--txt2)}
+.bell:hover{color:var(--txt);background:var(--s3)}
+.bell .badge-c{position:absolute;top:-3px;right:-3px;min-width:16px;height:16px;padding:0 4px;border-radius:99px;background:var(--pink);color:#000;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace}
+
+.content-area{padding:22px;max-width:1280px;margin:0 auto;width:100%;flex:1;animation:fadeIn .2s}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+/* common */
+.insight{background:linear-gradient(135deg,rgba(78,159,255,.08),rgba(184,255,78,.04));border:1px solid var(--line2);border-left:3px solid var(--blue);padding:14px 16px;border-radius:12px;margin-bottom:20px;display:flex;gap:13px}
+.insight.lime{border-left-color:var(--lime);background:linear-gradient(135deg,rgba(184,255,78,.08),rgba(78,255,224,.04))}
+.insight.amber{border-left-color:var(--amber);background:linear-gradient(135deg,rgba(255,184,78,.08),rgba(255,78,184,.03))}
+.insight .ico{flex-shrink:0;width:26px;height:26px;border-radius:7px;background:var(--s3);display:flex;align-items:center;justify-content:center;color:var(--blue);font-size:13px;font-weight:600}
+.insight.lime .ico{color:var(--lime)}
+.insight.amber .ico{color:var(--amber)}
+.insight .body{font-size:12.5px;line-height:1.55;color:var(--txt2)}
+.insight .body strong{color:var(--txt);font-weight:600}
+
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:22px}
+.stat-card{background:var(--s1);border:1px solid var(--line);border-radius:13px;padding:16px;position:relative;overflow:hidden}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--lime)}
+.stat-card.cyan::before{background:var(--cyan)}.stat-card.pink::before{background:var(--pink)}.stat-card.amber::before{background:var(--amber)}
+.stat-label{font-size:10px;color:var(--txt3);letter-spacing:.16em;text-transform:uppercase;font-weight:600;margin-bottom:8px}
+.stat-value{font-family:'JetBrains Mono',monospace;font-size:26px;font-weight:600;letter-spacing:-.02em;line-height:1}
+.stat-value .u{font-size:14px;color:var(--txt2);margin-left:2px}
+.stat-delta{font-size:11px;color:var(--lime);margin-top:6px;font-weight:500}
+.stat-delta.flat{color:var(--txt3)}
+
+.card{background:var(--s1);border:1px solid var(--line);border-radius:13px;padding:18px;margin-bottom:14px}
+.card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:13px;gap:10px}
+.card-title{font-size:13px;font-weight:600;letter-spacing:-.01em}
+.card-sub{font-size:10px;color:var(--txt3);text-transform:uppercase;letter-spacing:.16em;font-weight:600;margin-top:3px}
+.link{color:var(--blue);font-size:11px;font-weight:600;cursor:pointer}
+.link:hover{text-decoration:underline}
+
+.table{width:100%;border-collapse:collapse;font-size:13px}
+.table th{font-size:10px;color:var(--txt3);letter-spacing:.16em;text-transform:uppercase;text-align:left;padding:9px 10px;font-weight:600;border-bottom:1px solid var(--line)}
+.table td{padding:12px 10px;border-bottom:1px solid var(--line)}
+.table tr:last-child td{border-bottom:0}
+.table tbody tr{cursor:pointer;transition:.12s}
+.table tbody tr:hover td{background:var(--s2)}
+.creator-cell{display:flex;align-items:center;gap:11px}
+.cr-name{font-size:13px;font-weight:600;line-height:1.2}
+.cr-meta{font-size:10px;color:var(--txt3);margin-top:2px;letter-spacing:.02em}
+.bar-cell{display:flex;align-items:center;gap:9px}
+.bar{width:64px;height:4px;background:var(--s3);border-radius:99px;overflow:hidden}
+.bar-fill{height:100%;background:var(--lime);border-radius:99px;transition:width .6s ease}
+.tier{display:inline-block;font-size:9px;font-weight:700;padding:3px 7px;border-radius:999px;letter-spacing:.1em;text-transform:uppercase}
+.tier.vip{background:rgba(255,184,78,.12);color:var(--amber);border:1px solid rgba(255,184,78,.25)}
+.tier.pro{background:rgba(184,255,78,.12);color:var(--lime);border:1px solid rgba(184,255,78,.25)}
+.tier.basic{background:rgba(136,153,170,.12);color:var(--txt2);border:1px solid rgba(136,153,170,.2)}
+.status-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--cyan);box-shadow:0 0 0 3px rgba(78,255,224,.15)}
+.status-dot.idle{background:var(--txt3);box-shadow:0 0 0 3px rgba(74,85,104,.15)}
+
+.av{border-radius:50%;display:flex;align-items:center;justify-content:center;color:#000;font-weight:700;flex-shrink:0;font-family:'Outfit',sans-serif}
+
+/* forms */
+.form-row{margin-bottom:13px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.label{display:block;font-size:10px;color:var(--txt2);font-weight:600;letter-spacing:.1em;text-transform:uppercase;margin-bottom:7px}
+.input,.textarea,.select{width:100%;background:var(--s2);border:1px solid var(--line);border-radius:10px;padding:10px 13px;color:var(--txt);font-size:13px;font-family:inherit;transition:.15s}
+.input:focus,.textarea:focus,.select:focus{outline:none;border-color:var(--lime);background:var(--s3)}
+.textarea{resize:vertical;min-height:84px;line-height:1.5}
+.pill-row{display:flex;flex-wrap:wrap;gap:7px}
+.pill{padding:6px 12px;background:var(--s2);border:1px solid var(--line);border-radius:999px;font-size:11px;font-weight:500;color:var(--txt2);cursor:pointer;transition:.15s;user-select:none}
+.pill:hover{border-color:var(--line2);color:var(--txt)}
+.pill.on{background:var(--lime);color:#000;border-color:var(--lime);font-weight:600}
+.pill.on.cyan{background:var(--cyan);border-color:var(--cyan)}
+.pill.on.pink{background:var(--pink);border-color:var(--pink)}
+.pill.on.amber{background:var(--amber);border-color:var(--amber)}
+.pill.on.blue{background:var(--blue);border-color:var(--blue)}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:10px 16px;border-radius:10px;font-size:12.5px;font-weight:600;cursor:pointer;transition:.15s;border:1px solid transparent;white-space:nowrap}
+.btn.primary{background:var(--lime);color:#000}
+.btn.primary:hover{background:#cdff7a;transform:translateY(-1px)}
+.btn.ghost{background:var(--s2);color:var(--txt);border-color:var(--line2)}
+.btn.ghost:hover{background:var(--s3)}
+.btn.cyan{background:var(--cyan);color:#000}
+.btn.pink{background:var(--pink);color:#000}
+.btn.danger{background:rgba(255,92,92,.12);color:var(--red);border-color:rgba(255,92,92,.3)}
+.btn.danger:hover{background:rgba(255,92,92,.2)}
+.btn.sm{padding:7px 11px;font-size:11px}
+.btn.full{width:100%}
+.btn-row{display:flex;gap:9px;align-items:center;margin-top:8px;flex-wrap:wrap}
+.btn-row .reach{margin-left:auto;font-size:11.5px;color:var(--txt2)}
+.btn-row .reach b{color:var(--lime);font-family:'JetBrains Mono',monospace}
+
+/* tabs */
+.tabs{display:flex;gap:4px;margin-bottom:16px;background:var(--s2);padding:4px;border-radius:10px;width:fit-content;border:1px solid var(--line);flex-wrap:wrap}
+.tab{padding:7px 14px;font-size:11.5px;font-weight:600;color:var(--txt2);border-radius:7px;cursor:pointer;display:flex;align-items:center;gap:6px}
+.tab.active{background:var(--s3);color:var(--txt)}
+.tab .count{font-family:'JetBrains Mono',monospace;font-size:9px;background:var(--s3);padding:1px 6px;border-radius:99px;color:var(--txt2)}
+.tab.active .count{background:var(--pink);color:#000}
+
+/* hot drop library row */
+.intel-row{display:flex;align-items:center;gap:12px;padding:13px;border-radius:11px;background:var(--s2);margin-bottom:7px;border:1px solid transparent}
+.intel-row:hover{border-color:var(--line2)}
+.intel-cat{flex-shrink:0;font-size:9px;font-weight:700;padding:3px 7px;border-radius:5px;text-transform:uppercase;letter-spacing:.1em}
+.cat-venue{background:rgba(78,255,224,.12);color:var(--cyan)}
+.cat-trend{background:rgba(255,184,78,.12);color:var(--amber)}
+.cat-brand{background:rgba(255,78,184,.12);color:var(--pink)}
+.cat-collab{background:rgba(78,255,224,.12);color:var(--cyan)}
+.cat-alert{background:rgba(255,92,92,.12);color:var(--red)}
+.intel-body{flex:1;min-width:0}
+.intel-title{font-size:12.5px;font-weight:600;margin-bottom:2px}
+.intel-meta{font-size:10px;color:var(--txt3)}
+.intel-stat{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--txt2);text-align:right;white-space:nowrap}
+.intel-stat b{color:var(--txt);font-weight:600}
+.decay{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:3px 7px;border-radius:5px;white-space:nowrap}
+.decay.active{background:rgba(184,255,78,.12);color:var(--lime)}
+.decay.exp{background:rgba(255,184,78,.12);color:var(--amber)}
+.decay.arch{background:rgba(136,153,170,.1);color:var(--txt3)}
+.intel-actions{display:flex;gap:5px}
+.intel-actions .btn{padding:5px 9px;font-size:10px}
+
+/* activity */
+.activity-item{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--line);cursor:pointer}
+.activity-item:hover{padding-left:4px;transition:padding .15s}
+.activity-item:last-child{border-bottom:0}
+.activity-icon{width:30px;height:30px;border-radius:8px;background:var(--s3);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.activity-text{flex:1;font-size:12.5px;min-width:0}
+.activity-text small{display:block;color:var(--txt3);font-size:10.5px;margin-top:2px}
+.activity-time{font-size:10.5px;color:var(--txt3);font-family:'JetBrains Mono',monospace;white-space:nowrap}
+
+/* filters */
+.filter-row{display:flex;gap:8px;align-items:center;margin-bottom:14px;flex-wrap:wrap}
+.toggle{position:relative;display:inline-flex;align-items:center;gap:8px;cursor:pointer;font-size:11.5px;color:var(--txt2)}
+.toggle input{display:none}
+.switch{width:30px;height:17px;background:var(--s3);border-radius:99px;position:relative;transition:.2s;border:1px solid var(--line)}
+.switch::after{content:'';position:absolute;top:2px;left:2px;width:11px;height:11px;background:var(--txt2);border-radius:50%;transition:.2s}
+.toggle input:checked + .switch{background:var(--lime);border-color:var(--lime)}
+.toggle input:checked + .switch::after{background:#000;left:15px}
+.search{flex:1;min-width:180px;background:var(--s2);border:1px solid var(--line);border-radius:10px;padding:8px 13px;color:var(--txt);font-size:12.5px}
+.search:focus{outline:none;border-color:var(--lime)}
+
+/* notifications */
+.notif-panel{position:absolute;top:calc(100% + 8px);right:22px;width:340px;background:var(--s1);border:1px solid var(--line2);border-radius:14px;box-shadow:0 20px 60px rgba(0,0,0,.6);z-index:60;display:none;overflow:hidden}
+.notif-panel.open{display:block}
+.notif-head{display:flex;justify-content:space-between;align-items:center;padding:13px 16px;border-bottom:1px solid var(--line)}
+.notif-head .t{font-size:12.5px;font-weight:600}
+.notif-head .a{font-size:11px;color:var(--blue);cursor:pointer}
+.notif-item{display:flex;gap:11px;padding:13px 16px;border-bottom:1px solid var(--line);transition:.15s;cursor:pointer}
+.notif-item:last-child{border-bottom:0}
+.notif-item.unread{background:rgba(184,255,78,.04)}
+.notif-item:hover{background:var(--s2)}
+.notif-ico{width:28px;height:28px;border-radius:8px;background:var(--s2);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+.notif-body{flex:1;font-size:12.5px;line-height:1.4}
+.notif-body small{display:block;color:var(--txt3);font-size:10.5px;margin-top:3px}
+
+/* overlay/modal/sheet */
+.overlay{position:fixed;inset:0;background:rgba(6,8,11,.85);backdrop-filter:blur(6px);z-index:100;display:flex;align-items:center;justify-content:center;padding:20px;animation:fadeIn .15s}
+.modal{background:var(--s1);border:1px solid var(--line2);border-radius:14px;padding:22px;max-width:480px;width:100%;max-height:90vh;overflow-y:auto;animation:modalIn .2s}
+@keyframes modalIn{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:none}}
+.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.modal-title{font-size:18px;font-weight:600;letter-spacing:-.01em}
+.modal-close{width:30px;height:30px;border-radius:8px;background:var(--s2);color:var(--txt);display:flex;align-items:center;justify-content:center;font-size:18px}
+
+.phone-frame{width:300px;background:#000;border-radius:36px;padding:14px;border:6px solid #1a1a1a;box-shadow:0 30px 80px rgba(0,0,0,.6),0 0 0 2px rgba(255,255,255,.04);position:relative}
+.phone-screen{background:var(--bg);border-radius:24px;overflow:hidden;min-height:520px}
+.phone-status{display:flex;justify-content:space-between;align-items:center;padding:12px 18px 8px;font-size:10.5px;font-family:'JetBrains Mono',monospace;color:var(--txt2)}
+.overlay-close{position:absolute;top:-44px;right:0;width:36px;height:36px;border-radius:50%;background:var(--s2);border:1px solid var(--line2);color:var(--txt);display:flex;align-items:center;justify-content:center;font-size:18px}
+
+.sheet-overlay{position:fixed;inset:0;background:rgba(0,0,0,.65);backdrop-filter:blur(4px);z-index:90;display:flex;align-items:flex-end;justify-content:center;animation:fadeIn .15s}
+.sheet{background:var(--s1);border:1px solid var(--line);border-bottom:0;border-radius:22px 22px 0 0;padding:20px;width:100%;max-width:430px;animation:sheetIn .25s ease;max-height:80vh;overflow-y:auto}
+@keyframes sheetIn{from{transform:translateY(100%)}to{transform:none}}
+.sheet h3{margin:0 0 14px;font-family:'Playfair Display',serif;font-style:italic;font-size:22px;font-weight:500}
+.sheet-handle{width:36px;height:4px;border-radius:2px;background:var(--s3);margin:0 auto 12px}
+
+/* toast */
+.toast-wrap{position:fixed;bottom:22px;right:22px;z-index:200;display:flex;flex-direction:column;gap:9px;pointer-events:none}
+.toast{background:var(--s1);border:1px solid var(--line2);border-left:3px solid var(--lime);padding:13px 16px;border-radius:10px;min-width:260px;max-width:340px;box-shadow:0 10px 40px rgba(0,0,0,.5);animation:toastIn .25s ease;pointer-events:auto}
+.toast.error{border-left-color:var(--red)}
+.toast.info{border-left-color:var(--blue)}
+.toast .t{font-size:12.5px;font-weight:600;color:var(--lime);margin-bottom:2px}
+.toast.error .t{color:var(--red)}
+.toast.info .t{color:var(--blue)}
+.toast .b{font-size:11.5px;color:var(--txt2);line-height:1.4}
+@keyframes toastIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:none}}
+
+/* charts */
+.chart{display:flex;align-items:flex-end;gap:12px;height:180px;position:relative;padding-bottom:30px;border-bottom:1px dashed var(--line);margin-top:10px}
+.chart-launch{position:absolute;top:0;bottom:30px;border-left:1px dashed rgba(184,255,78,.4);font-size:9px;color:var(--lime);font-weight:600;padding-left:6px;letter-spacing:.1em;text-transform:uppercase}
+.bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:8px;height:100%;justify-content:flex-end;position:relative;cursor:pointer}
+.bar-bar{width:100%;max-width:36px;background:rgba(184,255,78,.3);border-radius:5px 5px 0 0;height:0;transition:height .9s cubic-bezier(.2,.8,.2,1);position:relative}
+.bar-bar.cyan{background:rgba(78,255,224,.3)}
+.bar-bar.cur{background:var(--lime)}
+.bar-bar.cur.cyan{background:var(--cyan)}
+.bar-col:hover .bar-bar{filter:brightness(1.2)}
+.bar-tip{position:absolute;top:-32px;left:50%;transform:translateX(-50%);background:#000;border:1px solid var(--line2);padding:4px 8px;border-radius:6px;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--lime);font-weight:600;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .15s}
+.bar-col:hover .bar-tip{opacity:1}
+.bar-lbl{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--txt3);position:absolute;bottom:-22px;letter-spacing:.04em}
+
+.ring{width:120px;height:120px;position:relative;margin:0 auto}
+.ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.ring circle{fill:none;stroke-width:8}
+.ring .bg{stroke:var(--s3)}
+.ring .fg{stroke:var(--lime);stroke-linecap:round;transition:stroke-dashoffset 1s ease}
+.ring .v{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.ring .v .n{font-family:'JetBrains Mono',monospace;font-size:24px;font-weight:600}
+.ring .v .l{font-size:9px;color:var(--txt3);letter-spacing:.16em;text-transform:uppercase;font-weight:600;margin-top:2px}
+
+/* ===== CREATOR (phone) ===== */
+.creator-shell{max-width:390px;margin:0 auto;background:var(--bg);min-height:calc(100vh - 110px);position:relative;border-radius:28px;border:1px solid var(--line);overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.5);display:flex;flex-direction:column}
+.cr-loginbar{display:flex;align-items:center;justify-content:space-between;padding:8px 14px;border-bottom:1px solid var(--line);background:var(--s1);font-size:10.5px;color:var(--txt3)}
+.cr-loginbar select{background:var(--s2);border:1px solid var(--line);border-radius:8px;padding:5px 8px;color:var(--lime);font-size:11px;font-weight:600}
+.cr-status{display:flex;justify-content:space-between;align-items:center;padding:12px 22px 6px;font-size:10.5px;font-family:'JetBrains Mono',monospace;color:var(--txt2)}
+.cr-content{padding:0 16px 80px;min-height:520px;flex:1;overflow-y:auto}
+.cr-tabbar{position:sticky;bottom:0;background:rgba(12,16,24,.95);backdrop-filter:blur(20px);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(6,1fr);padding:7px 4px 11px}
+.cr-tab{display:flex;flex-direction:column;align-items:center;gap:3px;padding:5px 3px;color:var(--txt3);font-size:9px;letter-spacing:.04em;border-radius:8px;cursor:pointer;position:relative}
+.cr-tab svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8}
+.cr-tab.active{color:var(--lime)}
+.cr-tab .live{position:absolute;top:5px;right:18px;width:5px;height:5px;background:var(--cyan);border-radius:50%}
+
+.cr-header{padding:18px 4px 14px}
+.cr-greet{font-size:11px;text-transform:uppercase;letter-spacing:.2em;color:var(--txt3);font-weight:600}
+.cr-name-big{font-family:'Playfair Display',serif;font-style:italic;font-size:32px;font-weight:500;margin-top:4px;letter-spacing:-.02em}
+.cr-sub{font-size:12.5px;color:var(--txt2);margin-top:6px}
+.cr-sub b{color:var(--lime);font-weight:600}
+
+/* feed */
+.feed-card{background:var(--s1);border:1px solid var(--line);border-radius:13px;padding:13px;margin-bottom:11px;border-left:3px solid var(--cyan);cursor:pointer;transition:.2s;position:relative}
+.feed-card.unread::before{content:'';position:absolute;top:13px;right:13px;width:7px;height:7px;border-radius:50%;background:var(--lime);box-shadow:0 0 0 3px rgba(184,255,78,.2)}
+.feed-card.trend{border-left-color:var(--amber)}
+.feed-card.brand{border-left-color:var(--pink)}
+.feed-card.collab{border-left-color:var(--cyan)}
+.feed-card.alert{border-left-color:var(--red)}
+.feed-cat{font-size:9.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--cyan);margin-bottom:5px}
+.feed-card.trend .feed-cat{color:var(--amber)}
+.feed-card.brand .feed-cat{color:var(--pink)}
+.feed-card.collab .feed-cat{color:var(--cyan)}
+.feed-card.alert .feed-cat{color:var(--red)}
+.feed-title{font-size:13.5px;font-weight:600;line-height:1.35;padding-right:18px}
+.feed-time{font-size:10.5px;color:var(--txt3);margin-top:5px;font-family:'JetBrains Mono',monospace}
+.feed-expand{display:none;margin-top:13px;padding-top:13px;border-top:1px solid var(--line);font-size:12.5px;line-height:1.6;color:var(--txt2)}
+.feed-card.open .feed-expand{display:block}
+.feed-meta-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:11px 0;background:var(--s2);padding:11px;border-radius:9px}
+.feed-meta-grid .k{font-size:9.5px;color:var(--txt3);text-transform:uppercase;letter-spacing:.1em;font-weight:600}
+.feed-meta-grid .v{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--txt);font-weight:600;margin-top:2px}
+.feed-fb{display:flex;gap:5px;margin-top:11px}
+.fb-btn{flex:1;padding:7px;background:var(--s2);border:1px solid var(--line);border-radius:7px;font-size:10.5px;font-weight:600;color:var(--txt2);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px}
+.fb-btn:hover{color:var(--txt);border-color:var(--line2)}
+.fb-btn.on{background:var(--lime);color:#000;border-color:var(--lime)}
+.fb-btn.on.bad{background:var(--red);color:#fff;border-color:var(--red)}
+.fb-btn.on.act{background:var(--cyan);color:#000;border-color:var(--cyan)}
+
+/* aria chat */
+.chat-head{display:flex;align-items:center;gap:11px;padding:14px 4px 16px;border-bottom:1px solid var(--line);margin-bottom:13px}
+.chat-avatar{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,var(--lime),var(--cyan));display:flex;align-items:center;justify-content:center;color:#000;font-size:19px;font-weight:700;position:relative;flex-shrink:0}
+.chat-avatar::after{content:'';position:absolute;bottom:0;right:0;width:11px;height:11px;border-radius:50%;background:var(--cyan);border:2px solid var(--bg)}
+.chat-meta .n{font-family:'Playfair Display',serif;font-style:italic;font-size:19px;font-weight:500}
+.chat-meta .s{font-size:10.5px;color:var(--txt3);text-transform:uppercase;letter-spacing:.12em;font-weight:600}
+.chat-status{font-size:10.5px;color:var(--cyan);margin-top:3px;display:flex;align-items:center;gap:5px}
+.chat-status .d{width:5px;height:5px;background:var(--cyan);border-radius:50%}
+.chat-msgs{max-height:420px;overflow-y:auto;padding:4px;display:flex;flex-direction:column;gap:11px}
+.chat-msgs::-webkit-scrollbar{width:0}
+.msg{max-width:80%;padding:9px 13px;border-radius:14px;font-size:13px;line-height:1.5;white-space:pre-wrap}
+.msg.bot{background:var(--s2);color:var(--txt);border-top-left-radius:4px;align-self:flex-start}
+.msg.user{background:var(--lime);color:#000;border-top-right-radius:4px;align-self:flex-end;font-weight:500}
+.msg-time{font-size:9.5px;color:var(--txt3);margin-top:3px;font-family:'JetBrains Mono',monospace;align-self:inherit;padding:0 6px}
+.typing{display:flex;gap:4px;padding:13px;background:var(--s2);border-radius:14px;border-top-left-radius:4px;align-self:flex-start;width:fit-content}
+.typing span{width:6px;height:6px;background:var(--txt3);border-radius:50%;animation:bounce 1.2s infinite}
+.typing span:nth-child(2){animation-delay:.15s}
+.typing span:nth-child(3){animation-delay:.3s}
+@keyframes bounce{0%,60%,100%{transform:translateY(0);opacity:.4}30%{transform:translateY(-6px);opacity:1}}
+.chat-input-wrap{display:flex;gap:7px;margin-top:12px;padding-top:12px;border-top:1px solid var(--line)}
+.chat-input{flex:1;background:var(--s2);border:1px solid var(--line);border-radius:14px;padding:10px 13px;color:var(--txt);font-size:13px}
+.chat-input:focus{outline:none;border-color:var(--lime)}
+.chat-send{width:40px;height:40px;border-radius:13px;background:var(--lime);color:#000;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:700;flex-shrink:0}
+.chat-quick{display:flex;gap:6px;padding:0 4px 12px;flex-wrap:wrap}
+.chat-quick .pill{font-size:10.5px;padding:5px 10px}
+
+/* calendar */
+.cal-head{display:flex;justify-content:space-between;align-items:center;padding:14px 4px 16px}
+.cal-month{font-family:'Playfair Display',serif;font-style:italic;font-size:22px;font-weight:500}
+.cal-nav{display:flex;gap:5px}
+.cal-arrow{width:30px;height:30px;border-radius:8px;background:var(--s2);border:1px solid var(--line);color:var(--txt);display:flex;align-items:center;justify-content:center}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:16px}
+.cal-dh{font-size:9.5px;font-weight:700;color:var(--txt3);text-align:center;letter-spacing:.1em;padding:5px 0}
+.cal-day{aspect-ratio:1;background:var(--s2);border:1px solid var(--line);border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:4px;cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--txt2);position:relative;transition:.15s}
+.cal-day:hover{background:var(--s3);color:var(--txt)}
+.cal-day.empty{visibility:hidden}
+.cal-day.today{border-color:var(--lime);color:var(--lime);background:rgba(184,255,78,.06)}
+.cal-day.sel{background:var(--lime);color:#000;border-color:var(--lime);font-weight:700}
+.cal-dots{display:flex;gap:2px;margin-top:auto;padding-bottom:2px}
+.cal-dot{width:5px;height:5px;border-radius:50%;background:var(--cyan)}
+.cal-dot.pink{background:var(--pink)}
+.cal-dot.amber{background:var(--amber)}
+.cal-dot.lime{background:var(--lime)}
+.agenda-head{font-size:11.5px;text-transform:uppercase;letter-spacing:.16em;color:var(--txt3);font-weight:600;margin-bottom:11px}
+.agenda-item{display:flex;gap:11px;padding:11px 0;border-bottom:1px solid var(--line);cursor:pointer}
+.agenda-item:last-child{border-bottom:0}
+.agenda-item:hover{padding-left:4px;transition:padding .15s}
+.agenda-item.cancelled .agenda-title{text-decoration:line-through;color:var(--txt3)}
+.agenda-time{font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--txt2);width:60px;flex-shrink:0;padding-top:2px}
+.agenda-bar{width:3px;border-radius:2px;background:var(--cyan);flex-shrink:0}
+.agenda-bar.pink{background:var(--pink)}
+.agenda-bar.amber{background:var(--amber)}
+.agenda-bar.lime{background:var(--lime)}
+.agenda-body{flex:1;min-width:0}
+.agenda-title{font-size:12.5px;font-weight:600}
+.agenda-sub{font-size:10.5px;color:var(--txt3);margin-top:2px}
+.agenda-tag{display:inline-block;font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:2px 7px;border-radius:5px;margin-top:5px}
+.agenda-tag.cyan{background:rgba(78,255,224,.1);color:var(--cyan)}
+.agenda-tag.pink{background:rgba(255,78,184,.1);color:var(--pink)}
+.agenda-tag.amber{background:rgba(255,184,78,.1);color:var(--amber)}
+.agenda-tag.lime{background:rgba(184,255,78,.1);color:var(--lime)}
+.book-btn{margin-top:16px;width:100%;padding:13px;background:var(--s2);border:1px dashed var(--line2);border-radius:13px;color:var(--lime);font-size:12.5px;font-weight:600;cursor:pointer}
+.book-btn:hover{background:var(--s3)}
+
+/* network */
+.net-tabs{display:flex;gap:4px;margin-bottom:14px;background:var(--s2);padding:3px;border-radius:9px;border:1px solid var(--line);overflow-x:auto}
+.net-tab{padding:7px 11px;font-size:10.5px;font-weight:600;color:var(--txt2);border-radius:6px;cursor:pointer;white-space:nowrap}
+.net-tab.active{background:var(--s3);color:var(--txt)}
+.net-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:18px}
+.net-card{background:var(--s1);border:1px solid var(--line);border-radius:13px;padding:13px;text-align:center;cursor:pointer;transition:.15s}
+.net-card:hover{border-color:var(--line2)}
+.net-name{font-size:13px;font-weight:600;margin-top:9px}
+.net-handle{font-size:10.5px;color:var(--txt3);margin-top:1px;font-family:'JetBrains Mono',monospace}
+.net-stats{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--txt2);margin-top:7px;display:flex;justify-content:center;gap:7px}
+.net-stats b{color:var(--lime)}
+.net-niche{font-size:9.5px;color:var(--txt3);text-transform:uppercase;letter-spacing:.1em;margin-top:3px;font-weight:600}
+.net-overlap{font-size:10px;color:var(--cyan);margin-top:5px;font-weight:600}
+.net-actions{display:flex;gap:5px;margin-top:9px}
+.net-actions .btn{flex:1;padding:6px;font-size:10px}
+.net-connect.connected{background:rgba(184,255,78,.1);color:var(--lime);border-color:rgba(184,255,78,.3)}
+
+.collab-card{background:var(--s1);border:1px solid var(--line);border-radius:12px;padding:13px;margin-bottom:9px}
+.collab-head{display:flex;justify-content:space-between;align-items:start;gap:8px;margin-bottom:7px}
+.collab-by{display:flex;align-items:center;gap:7px;font-size:10.5px;color:var(--txt3);margin-bottom:7px}
+.collab-by .badge-op{background:rgba(78,159,255,.12);color:var(--blue);padding:2px 7px;border-radius:99px;font-weight:600;font-size:9.5px;letter-spacing:.08em;text-transform:uppercase}
+.collab-title{font-size:13px;font-weight:600;flex:1}
+.collab-rate{font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--lime);font-weight:600;white-space:nowrap}
+.collab-sub{font-size:11px;color:var(--txt3);margin-bottom:9px;line-height:1.5}
+.collab-tags{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:9px}
+.collab-tag{background:var(--s3);color:var(--txt2);font-size:9.5px;padding:2px 7px;border-radius:99px;font-weight:500}
+.collab-meta{display:flex;justify-content:space-between;align-items:center;font-size:10.5px;color:var(--txt3);margin-bottom:9px}
+.collab-btn{width:100%;padding:8px;background:var(--s2);border:1px solid var(--line2);border-radius:8px;font-size:10.5px;font-weight:600;color:var(--txt);cursor:pointer}
+.collab-btn.on,.collab-btn.handled{background:rgba(184,255,78,.1);color:var(--lime);border-color:rgba(184,255,78,.3)}
+
+.dm-thread{display:flex;align-items:center;gap:11px;padding:11px 4px;border-bottom:1px solid var(--line);cursor:pointer}
+.dm-thread:hover{padding-left:8px;transition:padding .15s}
+.dm-thread-body{flex:1;min-width:0}
+.dm-thread-name{font-size:13px;font-weight:600}
+.dm-thread-msg{font-size:11.5px;color:var(--txt3);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dm-thread-meta{text-align:right;flex-shrink:0}
+.dm-thread-time{font-size:10px;color:var(--txt3);font-family:'JetBrains Mono',monospace}
+.dm-thread-badge{margin-top:4px;display:inline-block;background:var(--lime);color:#000;font-size:9.5px;font-weight:700;padding:1px 6px;border-radius:99px;font-family:'JetBrains Mono',monospace}
+
+/* creator stats */
+.cr-stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:14px}
+.cr-stat{background:var(--s1);border:1px solid var(--line);border-radius:13px;padding:14px;border-top:2px solid var(--lime)}
+.cr-stat.cyan{border-top-color:var(--cyan)}
+.cr-stat.pink{border-top-color:var(--pink)}
+.cr-stat.amber{border-top-color:var(--amber)}
+.cr-stat .l{font-size:9.5px;text-transform:uppercase;letter-spacing:.14em;color:var(--txt3);font-weight:600;margin-bottom:7px}
+.cr-stat .v{font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:600;letter-spacing:-.02em}
+.cr-stat .v .u{font-size:13px;color:var(--txt2)}
+.cr-stat .d{font-size:10.5px;color:var(--lime);margin-top:5px;font-weight:500}
+
+/* profile */
+.prof-card{background:var(--s1);border:1px solid var(--line);border-radius:13px;padding:20px;text-align:center;margin-bottom:13px}
+.prof-name{font-family:'Playfair Display',serif;font-style:italic;font-size:23px;font-weight:500}
+.prof-handle{font-size:11.5px;color:var(--txt3);margin-top:3px;font-family:'JetBrains Mono',monospace}
+.prof-niche{font-size:10.5px;text-transform:uppercase;letter-spacing:.14em;color:var(--lime);font-weight:600;margin-top:7px}
+.prof-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:16px;padding-top:16px;border-top:1px solid var(--line)}
+.prof-stat .v{font-family:'JetBrains Mono',monospace;font-size:17px;font-weight:600}
+.prof-stat .l{font-size:9px;text-transform:uppercase;letter-spacing:.12em;color:var(--txt3);font-weight:600;margin-top:3px}
+
+.settings-card{background:var(--s1);border:1px solid var(--line);border-radius:13px;padding:16px;margin-bottom:13px}
+.settings-h{font-size:10.5px;text-transform:uppercase;letter-spacing:.14em;color:var(--txt3);font-weight:600;margin-bottom:11px}
+.setting-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--line);font-size:12.5px;gap:10px}
+.setting-row:last-child{border-bottom:0}
+.setting-row small{color:var(--txt3);display:block;font-size:10.5px;margin-top:2px}
+
+.voice-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.voice-chip{background:var(--s2);border:1px solid var(--line);padding:6px 10px;border-radius:8px;font-size:11px;color:var(--txt);font-style:italic;display:flex;align-items:center;gap:6px}
+.voice-chip .x{color:var(--txt3);cursor:pointer;font-weight:700}
+
+/* mini chart */
+.mini-chart{display:flex;align-items:flex-end;gap:5px;height:80px;margin-top:11px;padding-bottom:18px;border-bottom:1px dashed var(--line);position:relative}
+.mini-bar-col{flex:1;display:flex;flex-direction:column;align-items:center;height:100%;justify-content:flex-end;position:relative}
+.mini-bar{width:100%;background:rgba(184,255,78,.3);border-radius:3px 3px 0 0;height:0;transition:height .9s cubic-bezier(.2,.8,.2,1)}
+.mini-bar.cur{background:var(--lime)}
+.mini-bar.cyan{background:rgba(78,255,224,.3)}
+.mini-bar.cyan.cur{background:var(--cyan)}
+.mini-lbl{position:absolute;bottom:-16px;font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--txt3)}
+
+/* sparkline */
+.spark{display:flex;align-items:flex-end;gap:2px;height:24px;width:80px}
+.spark-bar{flex:1;background:var(--lime);border-radius:1px;opacity:.6;min-height:2px}
+.spark-bar:last-child{opacity:1}
+
+/* inline edit */
+.editable{padding:4px 8px;border-radius:6px;cursor:text;display:inline-block;border:1px dashed transparent;transition:.15s}
+.editable:hover{border-color:var(--line2);background:var(--s2)}
+
+/* profile detail back */
+.back-btn{background:var(--s2);border:1px solid var(--line);color:var(--txt2);padding:7px 12px;border-radius:9px;font-size:11.5px;font-weight:600;display:inline-flex;align-items:center;gap:5px;margin-bottom:14px;cursor:pointer}
+.back-btn:hover{color:var(--txt);background:var(--s3)}
+
+/* profile big header */
+.prof-big{background:var(--s1);border:1px solid var(--line);border-radius:14px;padding:22px;margin-bottom:14px;display:flex;gap:18px;flex-wrap:wrap;align-items:center}
+.prof-big-meta{flex:1;min-width:200px}
+.prof-big-name{font-family:'Playfair Display',serif;font-style:italic;font-size:30px;font-weight:500;letter-spacing:-.02em}
+.prof-big-sub{font-size:13px;color:var(--txt2);margin-top:5px;display:flex;flex-wrap:wrap;gap:9px;align-items:center}
+.prof-big-sub .dot{width:3px;height:3px;background:var(--txt3);border-radius:50%}
+.delta-box{background:var(--s2);border:1px solid var(--line);border-radius:11px;padding:13px;text-align:center}
+.delta-row{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:14px}
+.delta-l{font-size:9.5px;color:var(--txt3);letter-spacing:.14em;text-transform:uppercase;font-weight:600;margin-bottom:6px}
+.delta-v{font-family:'JetBrains Mono',monospace;font-size:14px}
+.delta-base{color:var(--txt3);font-size:11px;font-family:'JetBrains Mono',monospace}
+.delta-arrow{color:var(--txt3);margin:0 4px}
+.delta-now{color:var(--txt);font-weight:600}
+.delta-pct{color:var(--lime);font-size:10.5px;font-weight:600;margin-top:3px}
+
+/* mobile */
+@media (max-width:768px){
+  .app-shell{grid-template-columns:54px 1fr}
+  .logo{font-size:0;padding:0 0 14px;text-align:center}
+  .logo::before{content:'b';font-family:'Playfair Display',serif;font-style:italic;font-size:28px;color:var(--lime)}
+  .logo small{display:none}
+  .nav-section{display:none}
+  .nav-item{justify-content:center;padding:10px;font-size:0;border-radius:8px}
+  .nav-item .ico{font-size:14px}
+  .nav-item .badge{display:none}
+  .view-switch{flex-direction:column;padding:3px}
+  .view-btn{font-size:0;padding:7px}
+  .view-btn::before{font-size:9px}
+  .view-btn.op-btn::before{content:'OP'}
+  .view-btn.cr-btn::before{content:'CR'}
+  .user-chip{justify-content:center}
+  .user-chip-meta{display:none}
+  .stats-grid{grid-template-columns:repeat(2,1fr)}
+  .form-grid,.form-grid-3{grid-template-columns:1fr}
+  .content-area{padding:14px}
+  .topbar{padding:10px 14px}
+  .title{font-size:16px}
+  .notif-panel{right:14px;width:calc(100vw - 28px);max-width:340px}
+  .delta-row{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<div class="app-shell" id="app-shell">
+  <aside class="sidebar" id="sidebar"></aside>
+  <main class="main">
+    <div class="topbar" id="topbar"></div>
+    <div class="content-area" id="content-area"></div>
+  </main>
+</div>
+
+<div id="overlay-host"></div>
+<div class="toast-wrap" id="toast-wrap"></div>
+
+<script>
+/* =========================================================================
+   BabyG — single-file interactive prototype
+   STATE-driven. All UI rendered from window.STATE.
+   ========================================================================= */
+
+window.STATE = {
+  currentView: 'operator',
+  currentCreatorId: 'sofia',
+  operatorPanel: 'dashboard',
+  creatorPanel: 'feed',
+  viewingCreatorId: null,    // operator-side: which creator's profile detail is open
+  profileTab: 'overview',
+  networkSection: 'directory',
+  networkSubTab: 'all',
+  viewingNetCreator: null,   // creator-side: which other creator's full profile is open
+  openDmThread: null,
+  selCalDay: 23, selCalMonth: 3, selCalYear: 2026,
+  composer: { title:'', body:'', source:'', confidence:'high', validUntil:'', category:'venue', niches:['Luxury Wellness','Lifestyle'], tiers:['pro','vip'], city:'Miami', editingId:null },
+  dropFilter: { category:'all', status:'all' },
+  flagTab: 'soft',
+  expandedFlag: null,
+  expandedFeed: {},   // {intelId: true}
+  feedFb: {},         // {intelId: 'good'|'bad'|'act'}
+  notifOpen: false,
+  notifications: [
+    { id:'n1', icon:'⚑', title:'Sofia flagged a brand deal', body:'Asking to negotiate Aesop above $1,800', time:'14 min ago', read:false, link:'flags' },
+    { id:'n2', icon:'⚡', title:'Hot Drop pushed to 8 creators', body:'Syntax rooftop soft open — tonight', time:'2h ago', read:false, link:'hotdrop' },
+    { id:'n3', icon:'📅', title:'Booking confirmed', body:'Jade T. — Komodo 8:30 PM Friday', time:'5h ago', read:true, link:null },
+    { id:'n4', icon:'📈', title:'Engagement milestone', body:'Roster avg hit 4.2% — above industry avg', time:'Yesterday', read:true, link:'analytics' },
+    { id:'n5', icon:'🤝', title:'New collab match', body:'Sofia + Nia — wellness series 68% overlap', time:'2 days ago', read:true, link:null },
+  ],
+  settings: { botName:'Aria', platformName:'BabyG' },
+  notes: { sofia:[{op:'Maya',time:'Apr 22, 10:14 AM',text:'Sofia is the strongest pilot signal — 75% lift in 5 weeks. Loop her into the next brand pitch.'}] },
+  receipts: { sofia:[{url:'instagram.com/p/abc123',type:'Reel',excerpt:'Brickell rooftop golden hour. no filter needed.',likes:3420,comments:184,intelId:'intel1',date:'Apr 22'}] },
+  creators: {
+    sofia:{ id:'sofia',name:'Sofia L.',handle:'@sofialux',niche:'Luxury Wellness',city:'Miami',neighborhood:'Brickell',followers:47200,engagementRate:4.3,tier:'vip',postsPerWeek:5,active:true,
+      bio:"Miami-based luxury wellness creator. Brickell girl. Morning routines, clean beauty, and the right rooms.",
+      avatarGradient:'linear-gradient(135deg,#B8FF4E,#4EFFE0)',avatarInitials:'SL',
+      baselineFollowers:46000,baselineEngagement:2.4,baselinePostsPerWeek:2.0,
+      brandDealsActive:2,brandDealValue:3800,
+      voiceProfile:['morning light hits different when your routine is built right 🤍','Brickell rooftop golden hour. no filter needed.','the brand reached out. we talked. the collab made sense. that simple.','consistency over virality. always.'],
+      connections:['nia','jade'],
+      notificationSettings:{dailyIntel:true,postingReminders:true,bookingReminders:true,smsAlerts:true,collabMatches:false,weeklyDigest:true},
+      performance:[{week:1,posts:2,engagement:2.4,followerDelta:120,brandDeals:1,brandValue:1800},{week:2,posts:2,engagement:2.6,followerDelta:145,brandDeals:1,brandValue:1800},{week:3,posts:2,engagement:2.5,followerDelta:110,brandDeals:1,brandValue:1800},{week:4,posts:3,engagement:2.9,followerDelta:280,brandDeals:1,brandValue:1800},{week:5,posts:4,engagement:3.4,followerDelta:520,brandDeals:2,brandValue:3200},{week:6,posts:5,engagement:3.8,followerDelta:780,brandDeals:2,brandValue:3800},{week:7,posts:5,engagement:4.0,followerDelta:890,brandDeals:2,brandValue:3800},{week:8,posts:5,engagement:4.3,followerDelta:1200,brandDeals:2,brandValue:3800}] },
+    jade:{ id:'jade',name:'Jade T.',handle:'@jademiami',niche:'Lifestyle',city:'Miami',neighborhood:'South Beach',followers:83100,engagementRate:4.7,tier:'vip',postsPerWeek:6,active:true,
+      bio:"South Beach. Lifestyle curator. If it's worth experiencing, it's worth documenting.",
+      avatarGradient:'linear-gradient(135deg,#4EFFE0,#4E9FFF)',avatarInitials:'JT',
+      baselineFollowers:79000,baselineEngagement:2.8,baselinePostsPerWeek:2.5,brandDealsActive:3,brandDealValue:6200,
+      voiceProfile:['South Beach mornings','curated chaos','the right rooms find you'],
+      connections:['sofia','rafael'],
+      notificationSettings:{dailyIntel:true,postingReminders:true,bookingReminders:true,smsAlerts:true,collabMatches:true,weeklyDigest:true},
+      performance:[{week:1,posts:3,engagement:2.8,followerDelta:200,brandDeals:1,brandValue:2200},{week:2,posts:3,engagement:3.0,followerDelta:240,brandDeals:1,brandValue:2200},{week:3,posts:3,engagement:2.9,followerDelta:180,brandDeals:2,brandValue:3800},{week:4,posts:4,engagement:3.4,followerDelta:380,brandDeals:2,brandValue:3800},{week:5,posts:5,engagement:3.9,followerDelta:620,brandDeals:2,brandValue:4400},{week:6,posts:6,engagement:4.3,followerDelta:920,brandDeals:3,brandValue:6200},{week:7,posts:6,engagement:4.5,followerDelta:1040,brandDeals:3,brandValue:6200},{week:8,posts:6,engagement:4.7,followerDelta:1340,brandDeals:3,brandValue:6200}] },
+    marco:{ id:'marco',name:'Marco R.',handle:'@marcovibes',niche:'Food',city:'Miami',neighborhood:'Wynwood',followers:28900,engagementRate:3.6,tier:'pro',postsPerWeek:4,active:true,
+      bio:"Food and culture in Wynwood. I find the spots before they blow up.",
+      avatarGradient:'linear-gradient(135deg,#FF4EB8,#FFB84E)',avatarInitials:'MR',
+      baselineFollowers:27200,baselineEngagement:2.1,baselinePostsPerWeek:1.8,brandDealsActive:1,brandDealValue:1200,
+      voiceProfile:['the spot before the spot','Wynwood after dark','if you know you know'],
+      connections:['rafael'],
+      notificationSettings:{dailyIntel:true,postingReminders:true,bookingReminders:true,smsAlerts:false,collabMatches:true,weeklyDigest:true},
+      performance:[{week:1,posts:2,engagement:2.1,followerDelta:80,brandDeals:0,brandValue:0},{week:2,posts:2,engagement:2.2,followerDelta:90,brandDeals:0,brandValue:0},{week:3,posts:2,engagement:2.0,followerDelta:60,brandDeals:0,brandValue:0},{week:4,posts:3,engagement:2.5,followerDelta:180,brandDeals:1,brandValue:800},{week:5,posts:3,engagement:2.9,followerDelta:280,brandDeals:1,brandValue:1200},{week:6,posts:4,engagement:3.2,followerDelta:420,brandDeals:1,brandValue:1200},{week:7,posts:4,engagement:3.4,followerDelta:520,brandDeals:1,brandValue:1200},{week:8,posts:4,engagement:3.6,followerDelta:680,brandDeals:1,brandValue:1200}] },
+    nia:{ id:'nia',name:'Nia V.',handle:'@niavibe',niche:'Wellness',city:'Miami',neighborhood:'Coral Gables',followers:34800,engagementRate:3.9,tier:'pro',postsPerWeek:4,active:true,
+      bio:"Wellness, movement, and mindful living. Coral Gables to South Beach.",
+      avatarGradient:'linear-gradient(135deg,#4E9FFF,#4EFFE0)',avatarInitials:'NV',
+      baselineFollowers:33100,baselineEngagement:2.3,baselinePostsPerWeek:2.0,brandDealsActive:1,brandDealValue:1600,
+      voiceProfile:['slow is the new fast','your nervous system runs the show','five minute reset'],
+      connections:['sofia'],
+      notificationSettings:{dailyIntel:true,postingReminders:true,bookingReminders:true,smsAlerts:false,collabMatches:true,weeklyDigest:true},
+      performance:[{week:1,posts:2,engagement:2.3,followerDelta:90,brandDeals:0,brandValue:0},{week:2,posts:2,engagement:2.4,followerDelta:110,brandDeals:0,brandValue:0},{week:3,posts:2,engagement:2.3,followerDelta:80,brandDeals:0,brandValue:0},{week:4,posts:3,engagement:2.7,followerDelta:200,brandDeals:0,brandValue:0},{week:5,posts:3,engagement:3.1,followerDelta:340,brandDeals:1,brandValue:1200},{week:6,posts:4,engagement:3.5,followerDelta:480,brandDeals:1,brandValue:1600},{week:7,posts:4,engagement:3.7,followerDelta:580,brandDeals:1,brandValue:1600},{week:8,posts:4,engagement:3.9,followerDelta:720,brandDeals:1,brandValue:1600}] },
+    rafael:{ id:'rafael',name:'Rafael L.',handle:'@rafaelmiami',niche:'Nightlife',city:'Miami',neighborhood:'Downtown',followers:61200,engagementRate:4.1,tier:'vip',postsPerWeek:5,active:true,
+      bio:"Downtown Miami nightlife. I'm in the room before the room is the room.",
+      avatarGradient:'linear-gradient(135deg,#FF4EB8,#4E9FFF)',avatarInitials:'RL',
+      baselineFollowers:58000,baselineEngagement:2.6,baselinePostsPerWeek:2.2,brandDealsActive:2,brandDealValue:4400,
+      voiceProfile:['the room before the room','no flash needed','downtown is back'],
+      connections:['jade','marco'],
+      notificationSettings:{dailyIntel:true,postingReminders:true,bookingReminders:true,smsAlerts:true,collabMatches:true,weeklyDigest:true},
+      performance:[{week:1,posts:2,engagement:2.6,followerDelta:140,brandDeals:1,brandValue:1800},{week:2,posts:2,engagement:2.8,followerDelta:160,brandDeals:1,brandValue:1800},{week:3,posts:2,engagement:2.7,followerDelta:120,brandDeals:1,brandValue:1800},{week:4,posts:3,engagement:3.1,followerDelta:240,brandDeals:1,brandValue:2200},{week:5,posts:4,engagement:3.5,followerDelta:420,brandDeals:2,brandValue:3600},{week:6,posts:5,engagement:3.8,followerDelta:680,brandDeals:2,brandValue:4400},{week:7,posts:5,engagement:4.0,followerDelta:820,brandDeals:2,brandValue:4400},{week:8,posts:5,engagement:4.1,followerDelta:1040,brandDeals:2,brandValue:4400}] },
+    alex:{ id:'alex',name:'Alex K.',handle:'@alexkstyle',niche:'Fashion',city:'Miami',neighborhood:'Design District',followers:19400,engagementRate:2.7,tier:'basic',postsPerWeek:2,active:true,
+      bio:"Fashion and street style from the Design District. Building something.",
+      avatarGradient:'linear-gradient(135deg,#FFB84E,#FF4EB8)',avatarInitials:'AK',
+      baselineFollowers:18800,baselineEngagement:2.1,baselinePostsPerWeek:1.2,brandDealsActive:0,brandDealValue:0,
+      voiceProfile:['fit check','Design District days','still cooking'],
+      connections:[],
+      notificationSettings:{dailyIntel:true,postingReminders:true,bookingReminders:false,smsAlerts:false,collabMatches:true,weeklyDigest:false},
+      performance:[{week:1,posts:1,engagement:2.1,followerDelta:30,brandDeals:0,brandValue:0},{week:2,posts:1,engagement:2.0,followerDelta:25,brandDeals:0,brandValue:0},{week:3,posts:1,engagement:2.2,followerDelta:40,brandDeals:0,brandValue:0},{week:4,posts:2,engagement:2.4,followerDelta:90,brandDeals:0,brandValue:0},{week:5,posts:2,engagement:2.5,followerDelta:120,brandDeals:0,brandValue:0},{week:6,posts:2,engagement:2.6,followerDelta:140,brandDeals:0,brandValue:0},{week:7,posts:2,engagement:2.7,followerDelta:155,brandDeals:0,brandValue:0},{week:8,posts:2,engagement:2.7,followerDelta:170,brandDeals:0,brandValue:0}] },
+    kai:{ id:'kai',name:'Kai L.',handle:'@kailoves',niche:'Beauty',city:'Miami',neighborhood:'Brickell',followers:42100,engagementRate:3.8,tier:'pro',postsPerWeek:4,active:true,
+      bio:"Clean beauty and skincare from Brickell. If it works on Miami humidity, it works.",
+      avatarGradient:'linear-gradient(135deg,#FF4EB8,#B8FF4E)',avatarInitials:'KL',
+      baselineFollowers:40200,baselineEngagement:2.4,baselinePostsPerWeek:2.0,brandDealsActive:1,brandDealValue:1800,
+      voiceProfile:['humidity-tested','glass skin in Miami','one product change'],
+      connections:[],
+      notificationSettings:{dailyIntel:true,postingReminders:true,bookingReminders:true,smsAlerts:false,collabMatches:true,weeklyDigest:true},
+      performance:[{week:1,posts:2,engagement:2.4,followerDelta:120,brandDeals:0,brandValue:0},{week:2,posts:2,engagement:2.5,followerDelta:130,brandDeals:0,brandValue:0},{week:3,posts:2,engagement:2.4,followerDelta:100,brandDeals:0,brandValue:0},{week:4,posts:3,engagement:2.8,followerDelta:240,brandDeals:1,brandValue:1200},{week:5,posts:3,engagement:3.2,followerDelta:380,brandDeals:1,brandValue:1800},{week:6,posts:4,engagement:3.5,followerDelta:520,brandDeals:1,brandValue:1800},{week:7,posts:4,engagement:3.7,followerDelta:640,brandDeals:1,brandValue:1800},{week:8,posts:4,engagement:3.8,followerDelta:780,brandDeals:1,brandValue:1800}] },
+  },
+  intelPosts:[
+    {id:'intel1',title:'Syntax rooftop — soft open tonight, not posted anywhere yet',body:"New rooftop bar on Brickell Ave doing a soft open tonight. Small crowd, right people. Perfect golden hour lighting 6–8pm. Film the view from the west corner — skyline + water. No talking needed. They're looking for early creators to tag in their opening content.",category:'venue',source:'Direct — venue contact',confidence:'high',targetNiches:['Luxury Wellness','Lifestyle'],targetTiers:['pro','vip'],city:'Miami',validUntil:'2026-04-24T20:00:00',isPublished:true,isArchived:false,pushCount:8,readCount:7,usefulCount:5,actedOnCount:3,createdAt:'2026-04-23T14:00:00'},
+    {id:'intel2',title:'Slow-morning content outperforming nightlife content +34% this week',body:'Engagement data across the roster shows calm morning aesthetic Reels averaging 4.8% ER vs 2.9% for nightlife content this week. The pattern holds across niches. Post the morning after, not the night of. Let the location do the work the next day when your audience is awake.',category:'trend',source:'Internal — platform analytics',confidence:'high',targetNiches:['Luxury Wellness','Lifestyle','Food','Wellness','Beauty'],targetTiers:['basic','pro','vip'],city:'Miami',validUntil:'2026-04-28T23:59:00',isPublished:true,isArchived:false,pushCount:12,readCount:11,usefulCount:9,actedOnCount:6,createdAt:'2026-04-22T09:00:00'},
+    {id:'intel3',title:'Aesop Miami looking for 3 micro-creators — $1,800/Reel',body:'Aesop Miami is running a Q2 luxury skincare campaign. Looking for creators 15K–80K followers, luxury lifestyle niche. Rate: $1,800 per Reel. 2 posts per month. No exclusivity clause. Direct contact via their Miami flagship manager. Rate is negotiable at 4%+ engagement.',category:'brand',source:'Aesop Miami flagship — direct outreach',confidence:'high',targetNiches:['Luxury Wellness','Lifestyle','Beauty','Wellness'],targetTiers:['pro','vip'],city:'Miami',validUntil:'2026-05-15T23:59:00',isPublished:true,isArchived:false,pushCount:5,readCount:5,usefulCount:4,actedOnCount:2,createdAt:'2026-04-21T11:00:00'},
+    {id:'intel4',title:'Le Jardin Hotel opening night — 4 creator slots available',body:'New boutique hotel in South Beach opening next Friday. 4 creator slots for the opening event. Includes 1-night stay, dinner, and rooftop access. $600 flat rate plus the stay. Looking for lifestyle and luxury niches. Small event, curated crowd.',category:'collab',source:'Le Jardin PR team',confidence:'high',targetNiches:['Lifestyle','Luxury Wellness'],targetTiers:['pro','vip'],city:'Miami',validUntil:'2026-04-30T23:59:00',isPublished:true,isArchived:false,pushCount:6,readCount:4,usefulCount:3,actedOnCount:2,createdAt:'2026-04-20T15:00:00'},
+  ],
+  bookings:{
+    sofia:[
+      {id:'b1',venue:'Syntax Rooftop',type:'event',dateTime:'2026-04-23T18:30:00',notes:'Golden hour shoot. West corner for skyline shot.',status:'confirmed',createdByBot:true},
+      {id:'b2',venue:'Aesop Brand Call',type:'brand',dateTime:'2026-04-25T12:30:00',notes:'Manager handling negotiation. Rate discussion.',status:'confirmed',createdByBot:false},
+      {id:'b3',venue:'Le Jardin Hotel Opening',type:'event',dateTime:'2026-04-26T19:00:00',notes:'$600 + 1-night stay. South Beach.',status:'pending',createdByBot:true},
+      {id:'b4',venue:'Komodo Dinner',type:'restaurant',dateTime:'2026-04-30T20:00:00',notes:'Table for 4. Brickell.',status:'confirmed',createdByBot:true},
+      {id:'b5',venue:'Wellness Co-post with Nia V.',type:'collab',dateTime:'2026-04-28T09:00:00',notes:'4-part morning wellness series. First session.',status:'confirmed',createdByBot:false},
+    ]
+  },
+  messages:{
+    sofia:[
+      {id:'m1',role:'bot',content:"Good morning Sofia 🌅 You have Syntax Rooftop tonight at 6:30 PM. Golden hour window is 6–8pm. I'd suggest arriving by 6:15 to get the west corner before it fills up. The skyline shot from there is exactly what's performing right now. Want me to set a reminder for 5:45?",time:'9:04 AM'},
+      {id:'m2',role:'user',content:'Yes set the reminder. What should I actually film there?',time:'9:06 AM'},
+      {id:'m3',role:'bot',content:"Reminder set for 5:45 PM ✓\n\nFor tonight: west corner, skyline + water behind you. 30–45 second Reel, no talking. Slightly underexposed — it looks cleaner than bright in that space. Post between 7–9 PM when your audience is most active. Caption can be one line or nothing. The location speaks for itself.",time:'9:06 AM'},
+      {id:'m4',role:'user',content:'What about the Aesop deal? Should I take it?',time:'9:10 AM'},
+      {id:'m5',role:'bot',content:"Flagging that to your manager — brand deal negotiation is their lane 🎯\n\nContext for you though: at 4.3% engagement and 47.2K followers, your market rate for a luxury skincare Reel is $2,000–$2,400. The $1,800 offer is below your value. Your manager will push back. You'll hear from them today.",time:'9:10 AM'},
+    ]
+  },
+  dmThreads:{
+    'sofia-nia':{participants:['sofia','nia'],messages:[
+      {from:'nia',content:'Hey! Loved the idea of doing a morning wellness series together. My audience overlaps a lot with yours I think.',time:'2 days ago',read:true},
+      {from:'sofia',content:'Yes totally. I was thinking 4 posts, alternating between our accounts? Morning routine format.',time:'2 days ago',read:true},
+      {from:'nia',content:'Perfect. Want to do a planning call this week?',time:'1 day ago',read:false},
+    ],unread:1},
+    'sofia-jade':{participants:['sofia','jade'],messages:[
+      {from:'jade',content:'You going to Le Jardin opening?',time:'3 hours ago',read:false},
+    ],unread:1},
+  },
+  collabPosts:[
+    {id:'c1',postedBy:'operator',title:'Aesop Miami — Q2 Campaign',description:'Luxury skincare campaign. 15K–80K followers, lifestyle or wellness niche. 2 Reels per month, no exclusivity. Miami-based required.',type:'brand_deal',compensation:'$1,800/Reel',targetNiches:['Luxury Wellness','Lifestyle','Beauty','Wellness'],deadline:'2026-05-15',isActive:true,interested:['sofia','kai']},
+    {id:'c2',postedBy:'nia',title:'Morning Wellness Series — Co-Post',description:'4-part morning wellness content series. Looking for luxury lifestyle creator with audience overlap. Organic, no brand brief. Revenue share on any brand deals that come from it.',type:'co_post',compensation:'Revenue share',targetNiches:['Luxury Wellness','Wellness','Lifestyle'],deadline:null,isActive:true,interested:['sofia']},
+    {id:'c3',postedBy:'operator',title:'Le Jardin Hotel — Opening Night',description:'New boutique hotel South Beach opening next Friday. 4 creator slots. Includes dinner, 1-night stay, rooftop access.',type:'event',compensation:'$600 + 1-night stay',targetNiches:['Lifestyle','Luxury Wellness'],deadline:'2026-04-30',isActive:true,interested:['sofia','jade']},
+    {id:'c4',postedBy:'rafael',title:'Nightlife Collab — Komodo Saturday',description:'Looking for a lifestyle or fashion creator to co-post from Komodo this Saturday. My audience is 61K, nightlife heavy. Good crossover opportunity.',type:'co_post',compensation:'Mutual exposure',targetNiches:['Lifestyle','Fashion','Luxury Wellness'],deadline:'2026-04-26',isActive:true,interested:[]},
+    {id:'c5',postedBy:'kai',title:'UGC Creator Needed — Clean Beauty Brand',description:'Brand reached out to me with more slots than I can fill. Looking for 2 more creators for a UGC campaign. Clean beauty, Miami-based, no follower minimum.',type:'brand_deal',compensation:'$400/video',targetNiches:['Beauty','Wellness','Luxury Wellness'],deadline:'2026-05-01',isActive:true,interested:[]},
+  ],
+  flags:[
+    {id:'f1',creatorId:'sofia',message:"Hey can you help me negotiate the Aesop deal? They offered $1,800 but I've seen other creators with my engagement getting $2,200+ for a single Reel.",category:'brand',severity:'soft',timestamp:'14 min ago',resolved:false},
+    {id:'f2',creatorId:'alex',message:"A brand just DM'd me directly offering a collab. Should I take it or run it through you? It's a fashion label, $400 for a static post.",category:'brand',severity:'soft',timestamp:'2h ago',resolved:false},
+  ],
+  pilotStats:{ activeCreators:12,avgEngagement:4.2,baselineEngagement:2.4,avgPostsPerWeek:4.3,baselinePostsPerWeek:2.0,monthlyDealValue:31000,avgWeeklyFollowerGrowth:847,dealsClosedPilot:8,intelActedOnRate:34,weeklyPosts:[1.8,2.1,1.9,2.4,3.2,3.8,4.1,4.3],weeklyER:[2.4,2.6,2.5,2.9,3.4,3.8,4.0,4.2] },
+  rosterFilter:{ search:'',tier:'all',niche:'all',activeOnly:false },
+};
+
+// ====== utils ======
+const $ = s => document.querySelector(s);
+const fmt = n => n>=1000 ? (n/1000).toFixed(1).replace(/\.0$/,'')+'K' : String(n);
+const esc = s => String(s||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const NICHES = ['Luxury Wellness','Lifestyle','Food','Wellness','Nightlife','Fashion','Beauty'];
+
+function toast(t,b,type='success'){
+  const w=$('#toast-wrap');const el=document.createElement('div');
+  el.className='toast '+(type==='error'?'error':type==='info'?'info':'');
+  el.innerHTML=`<div class="t">${esc(t)}</div><div class="b">${esc(b)}</div>`;
+  w.appendChild(el);
+  setTimeout(()=>{el.style.opacity='0';el.style.transform='translateX(20px)';setTimeout(()=>el.remove(),300)},3500);
+}
+function avatar(c,size=36){
+  if(!c) return '';
+  return `<div class="av" style="width:${size}px;height:${size}px;font-size:${Math.max(10,size*.32)}px;background:${c.avatarGradient}">${c.avatarInitials}</div>`;
+}
+function tierBadge(t){return `<span class="tier ${t}">${t.toUpperCase()}</span>`}
+function engBar(rate,max=6){const pct=Math.min(100,(rate/max)*100);return `<div class="bar-cell"><div class="bar"><div class="bar-fill" style="width:${pct}%"></div></div><span class="mono" style="font-size:11.5px">${rate.toFixed(1)}%</span></div>`}
+function marketRate(c){
+  const baseLow = Math.round((c.followers/1000)*40);
+  const baseHigh = Math.round((c.followers/1000)*55);
+  const erMult = c.engagementRate >= 4 ? 1.15 : c.engagementRate >= 3 ? 1 : 0.8;
+  return { reelLow: Math.round(baseLow*erMult/50)*50, reelHigh: Math.round(baseHigh*erMult/50)*50 };
+}
+function unreadNotifCount(){return STATE.notifications.filter(n=>!n.read).length}
+function unreadDmCount(creatorId){
+  let n=0;
+  Object.values(STATE.dmThreads).forEach(t=>{if(t.participants.includes(creatorId)) n+=t.unread||0});
+  return n;
+}
+function activeFlagCount(){return STATE.flags.filter(f=>!f.resolved).length}
+function dateKey(y,m,d){return `${y}-${m}-${d}`}
+function bookingDot(type){
+  if(type==='brand')return'pink';if(type==='collab')return'amber';if(type==='reminder')return'lime';return'cyan';
+}
+function timeFromIso(iso){const d=new Date(iso);let h=d.getHours();const m=d.getMinutes().toString().padStart(2,'0');const ap=h>=12?'PM':'AM';h=h%12||12;return `${h}:${m} ${ap}`}
+
+// ====== TOP-LEVEL RENDER ======
+function render(){
+  renderSidebar();
+  renderTopbar();
+  renderContent();
+}
+function renderSidebar(){
+  const sb=$('#sidebar');
+  const v=STATE.currentView;
+  let html=`<div class="logo">${STATE.settings.platformName.toLowerCase()}<small>Miami · Pilot W6</small></div>`;
+  if(v==='operator'){
+    html+=`<div class="nav-section">Operator</div>`;
+    const items=[['dashboard','▦','Dashboard',null],['hotdrop','🔥','Hot Drop',null],['roster','○','Creator Roster',null],['flags','⚑','Flags',activeFlagCount()||null],['analytics','▥','Analytics',null],['personas','✦',STATE.settings.botName+' Settings',null]];
+    items.forEach(([k,i,n,b])=>{
+      const a=STATE.operatorPanel===k?'active':'';
+      html+=`<div class="nav-item ${a}" data-act="op-nav" data-k="${k}"><span class="ico">${i}</span>${n}${b?`<span class="badge">${b}</span>`:''}</div>`;
+    });
+  } else {
+    const c=STATE.creators[STATE.currentCreatorId];
+    html+=`<div class="nav-section">${esc(c.name.split(' ')[0])} · ${esc(c.handle)}</div>`;
+    const dm=unreadDmCount(c.id);
+    const items=[['feed','⌂','Feed',null],['aria','✦',STATE.settings.botName,null],['calendar','◷','Calendar',null],['network','◫','Network',dm||null],['stats','▤','Stats',null],['profile','◉','Profile',null]];
+    items.forEach(([k,i,n,b])=>{
+      const a=STATE.creatorPanel===k?'active':'';
+      html+=`<div class="nav-item ${a}" data-act="cr-nav" data-k="${k}"><span class="ico">${i}</span>${n}${b?`<span class="badge">${b}</span>`:''}</div>`;
+    });
+  }
+  html+=`<div class="view-switch">
+    <button class="view-btn op-btn op ${v==='operator'?'active':''}" data-act="set-view" data-v="operator">Operator</button>
+    <button class="view-btn cr-btn cr ${v==='creator'?'active':''}" data-act="set-view" data-v="creator">Creator</button>
+  </div>`;
+  if(v==='operator'){
+    html+=`<div class="user-chip"><div class="av" style="width:30px;height:30px;font-size:11px;background:linear-gradient(135deg,var(--blue),var(--lime))">M</div><div class="user-chip-meta"><span class="n">Maya · ${esc(STATE.settings.platformName)}</span><span class="r">Operator</span></div></div>`;
+  } else {
+    const c=STATE.creators[STATE.currentCreatorId];
+    html+=`<div class="user-chip">${avatar(c,30)}<div class="user-chip-meta"><span class="n">${esc(c.name)}</span><span class="r">${esc(c.handle)} · ${c.tier.toUpperCase()}</span></div></div>`;
+  }
+  sb.innerHTML=html;
+}
+function renderTopbar(){
+  const tb=$('#topbar');
+  const v=STATE.currentView;
+  const titles={
+    'op-dashboard':['Dashboard','Pilot week 6 · Miami cohort · 12 active creators'],
+    'op-hotdrop':['Hot Drop','Push specific, sourced, time-bounded intelligence'],
+    'op-roster':['Creator Roster',`${Object.keys(STATE.creators).length} creators · pilot cohort`],
+    'op-profile':['Creator Profile','Operator view'],
+    'op-flags':['Flags','Auto-escalated by '+STATE.settings.botName+' · triage queue'],
+    'op-analytics':['Analytics','Pilot weeks 1–8 · roster-wide rollup'],
+    'op-personas':['Bot Configuration','Sub-bot settings & moderation'],
+    'cr-feed':['Feed','Your intelligence stream'],
+    'cr-aria':[STATE.settings.botName,'Your assistant · always on'],
+    'cr-calendar':['Calendar','April 2026'],
+    'cr-network':['Network','Miami creator graph & DMs'],
+    'cr-stats':['Stats','Week 6 performance'],
+    'cr-profile':['Profile','Settings & sub-bot']
+  };
+  const key = v==='operator' ? ('op-'+(STATE.viewingCreatorId?'profile':STATE.operatorPanel)) : ('cr-'+STATE.creatorPanel);
+  const [t,s] = titles[key]||['',''];
+  const unread = unreadNotifCount();
+  tb.innerHTML = `
+    <div class="title-wrap"><div class="title">${esc(t)}</div><div class="subtitle">${esc(s)}</div></div>
+    <div class="spacer"></div>
+    <span class="chip live"><span class="dot"></span>Live Demo</span>
+    <span class="chip view-chip ${v==='operator'?'op':'cr'}">${v==='operator'?'Operator View':'Creator App · '+STATE.creators[STATE.currentCreatorId].name}</span>
+    <button class="bell" data-act="toggle-notif">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      ${unread?`<span class="badge-c">${unread}</span>`:''}
+    </button>
+    <div class="notif-panel ${STATE.notifOpen?'open':''}" id="notif-panel">
+      <div class="notif-head"><span class="t">Notifications</span><span class="a" data-act="mark-all-read">Mark all as read</span></div>
+      ${STATE.notifications.map(n=>`
+        <div class="notif-item ${n.read?'':'unread'}" data-act="notif-click" data-id="${n.id}">
+          <div class="notif-ico">${n.icon}</div>
+          <div class="notif-body">${esc(n.title)}<small>${esc(n.body)} · ${esc(n.time)}</small></div>
+        </div>`).join('')}
+    </div>
+  `;
+}
+function renderContent(){
+  const ca=$('#content-area');
+  ca.innerHTML='';
+  if(STATE.currentView==='operator'){
+    if(STATE.viewingCreatorId) ca.innerHTML=renderOpProfile();
+    else if(STATE.operatorPanel==='dashboard') ca.innerHTML=renderOpDashboard();
+    else if(STATE.operatorPanel==='hotdrop') ca.innerHTML=renderOpHotDrop();
+    else if(STATE.operatorPanel==='roster') ca.innerHTML=renderOpRoster();
+    else if(STATE.operatorPanel==='flags') ca.innerHTML=renderOpFlags();
+    else if(STATE.operatorPanel==='analytics'){ ca.innerHTML=renderOpAnalytics(); setTimeout(animateAnalytics,40); }
+    else if(STATE.operatorPanel==='personas') ca.innerHTML=renderOpPersonas();
+  } else {
+    ca.innerHTML=renderCreatorShell();
+    if(STATE.creatorPanel==='calendar') renderCalendarGrid();
+    if(STATE.creatorPanel==='stats') setTimeout(animateCreatorStats,40);
+    if(STATE.creatorPanel==='aria'){ const m=$('#chat-msgs'); if(m) m.scrollTop=m.scrollHeight; }
+  }
+}
+
+// ====== OPERATOR: DASHBOARD ======
+function renderOpDashboard(){
+  const ps = STATE.pilotStats;
+  const erDelta = (ps.avgEngagement - ps.baselineEngagement).toFixed(1);
+  const top = Object.values(STATE.creators).sort((a,b)=>b.engagementRate-a.engagementRate).slice(0,4);
+  const recent = [...STATE.intelPosts].sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt)).slice(0,2);
+  return `
+    <div class="insight">
+      <div class="ico">i</div>
+      <div class="body">Micro-influencers (10K–100K followers) deliver <strong>60% higher engagement at 70% lower cost</strong> than macro creators. Industry benchmark for lifestyle: <strong>2–3% ER</strong>. Your roster sits at <strong>${ps.avgEngagement}%</strong> — a 75% lift over the ${ps.baselineEngagement}% baseline. Posting cadence up <strong>115%</strong>.</div>
+    </div>
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-label">Active Creators</div><div class="stat-value">${ps.activeCreators}</div><div class="stat-delta">+3 onboarded this month</div></div>
+      <div class="stat-card cyan"><div class="stat-label">Avg Engagement</div><div class="stat-value">${ps.avgEngagement}<span class="u">%</span></div><div class="stat-delta">+${erDelta}pp from baseline</div></div>
+      <div class="stat-card pink"><div class="stat-label">Monthly Deal Value</div><div class="stat-value">$${(ps.monthlyDealValue/1000)}<span class="u">K</span></div><div class="stat-delta">${ps.dealsClosedPilot} deals closed in pilot</div></div>
+      <div class="stat-card amber"><div class="stat-label">Avg Weekly Growth</div><div class="stat-value">+${ps.avgWeeklyFollowerGrowth}</div><div class="stat-delta">followers per creator</div></div>
+    </div>
+    <div class="btn-row" style="margin-bottom:18px">
+      <button class="btn primary" data-act="goto-hotdrop">+ New Hot Drop</button>
+      <button class="btn ghost" data-act="open-log-perf">Log Performance</button>
+      <button class="btn ghost" data-act="open-add-creator">Add Creator</button>
+    </div>
+    <div class="card">
+      <div class="card-head">
+        <div><div class="card-title">Roster Snapshot</div><div class="card-sub">Top 4 by engagement · click any row</div></div>
+        <span class="link" data-act="goto-roster">View all →</span>
+      </div>
+      <table class="table"><thead><tr><th>Creator</th><th>Followers</th><th>Engagement</th><th>Tier</th><th>Posts/wk</th><th>Status</th></tr></thead>
+      <tbody>
+        ${top.map(c=>`
+          <tr data-act="open-profile" data-id="${c.id}">
+            <td><div class="creator-cell">${avatar(c,34)}<div><div class="cr-name">${esc(c.name)}</div><div class="cr-meta">${esc(c.niche)} · ${esc(c.neighborhood)}</div></div></div></td>
+            <td class="mono">${fmt(c.followers)}</td>
+            <td>${engBar(c.engagementRate)}</td>
+            <td>${tierBadge(c.tier)}</td>
+            <td class="mono">${c.postsPerWeek}</td>
+            <td><span class="status-dot ${c.active?'':'idle'}"></span></td>
+          </tr>`).join('')}
+      </tbody></table>
+    </div>
+    <div class="card">
+      <div class="card-head"><div><div class="card-title">Recent Hot Drops</div><div class="card-sub">Pushed to creator feeds</div></div><span class="link" data-act="goto-hotdrop">Push new →</span></div>
+      ${recent.map(p=>`
+        <div class="activity-item" data-act="goto-hotdrop">
+          <div class="activity-icon" style="color:var(--${p.category==='venue'?'cyan':p.category==='trend'?'amber':p.category==='brand'?'pink':'cyan'})">${p.category==='venue'?'⚡':p.category==='trend'?'📈':p.category==='brand'?'$':'🤝'}</div>
+          <div class="activity-text"><b>${esc(p.title)}</b><small>Pushed to ${p.pushCount} creators · ${p.readCount} read · ${p.actedOnCount} acted on</small></div>
+          <span class="activity-time">${esc(new Date(p.createdAt).toLocaleDateString('en-US',{month:'short',day:'numeric'}))}</span>
+        </div>`).join('')}
+    </div>
+  `;
+}
+
+// ====== OPERATOR: HOT DROP ======
+function renderOpHotDrop(){
+  const c = STATE.composer;
+  const reach = Object.values(STATE.creators).filter(cr=>cr.active && c.niches.includes(cr.niche) && c.tiers.includes(cr.tier)).length;
+  const filtered = STATE.intelPosts.filter(p=>{
+    if(STATE.dropFilter.category!=='all' && p.category!==STATE.dropFilter.category) return false;
+    if(STATE.dropFilter.status==='active' && p.isArchived) return false;
+    if(STATE.dropFilter.status==='archived' && !p.isArchived) return false;
+    return true;
+  });
+  return `
+    <div class="insight lime">
+      <div class="ico">🔥</div>
+      <div class="body">Hot Drops are the product. Push <strong>specific, sourced, time-bounded</strong> intelligence — venue openings, brand briefs, trend shifts. Generic posting tips kill trust. Last week's drop-to-action conversion: <strong>34%</strong>.</div>
+    </div>
+    <div class="card">
+      <div class="card-head"><div><div class="card-title">${c.editingId?'Edit Hot Drop':'Compose Hot Drop'}</div><div class="card-sub">Publishes to creator feeds instantly</div></div>${c.editingId?`<button class="btn ghost sm" data-act="cancel-edit">Cancel edit</button>`:''}</div>
+      <div class="form-row"><label class="label">Title</label><input class="input" id="cmp-title" value="${esc(c.title)}" placeholder="Syntax rooftop — soft open tonight" /></div>
+      <div class="form-row"><label class="label">Body — what the bot delivers</label><textarea class="textarea" id="cmp-body" placeholder="West corner has the skyline + water at golden hour. Film a Reel 6–8 PM. Post 7–9 PM.">${esc(c.body)}</textarea></div>
+      <div class="form-row"><label class="label">Category</label>
+        <div class="pill-row" id="cmp-cats">
+          ${['venue','trend','brand','collab','alert'].map(cat=>{
+            const colorClass = cat==='venue'||cat==='collab'?'cyan':cat==='brand'?'pink':cat==='trend'?'amber':cat==='alert'?'pink':'';
+            return `<span class="pill ${c.category===cat?'on '+colorClass:''}" data-act="cmp-cat" data-v="${cat}">${cat[0].toUpperCase()+cat.slice(1)}</span>`;
+          }).join('')}
+        </div>
+      </div>
+      <div class="form-grid-3">
+        <div class="form-row"><label class="label">Source</label><input class="input" id="cmp-source" value="${esc(c.source)}" placeholder="Maya · in-person walkthrough" /></div>
+        <div class="form-row"><label class="label">Confidence</label>
+          <div class="pill-row" style="gap:5px">
+            ${['low','medium','high'].map(v=>`<span class="pill ${c.confidence===v?'on':''}" data-act="cmp-conf" data-v="${v}">${v[0].toUpperCase()+v.slice(1)}</span>`).join('')}
+          </div>
+        </div>
+        <div class="form-row"><label class="label">Valid Until</label><input class="input" type="datetime-local" id="cmp-valid" value="${esc(c.validUntil)}" /></div>
+      </div>
+      <div class="form-row"><label class="label">Target Niches</label>
+        <div class="pill-row" id="cmp-niches">${NICHES.map(n=>`<span class="pill ${c.niches.includes(n)?'on':''}" data-act="cmp-niche" data-v="${n}">${n}</span>`).join('')}</div>
+      </div>
+      <div class="form-row"><label class="label">Target Tiers</label>
+        <div class="pill-row" id="cmp-tiers">${['basic','pro','vip'].map(tr=>`<span class="pill ${c.tiers.includes(tr)?'on '+(tr==='vip'?'amber':''):''}" data-act="cmp-tier" data-v="${tr}">${tr.toUpperCase()}</span>`).join('')}</div>
+      </div>
+      <div class="form-row"><label class="label">City</label><input class="input" id="cmp-city" value="${esc(c.city)}" /></div>
+      <div class="btn-row">
+        <button class="btn primary" data-act="cmp-publish">🔥 ${c.editingId?'Save Changes':'Drop It'}</button>
+        <button class="btn ghost" data-act="cmp-preview">👁 Preview</button>
+        <button class="btn ghost" data-act="cmp-draft">Save Draft</button>
+        <span class="reach">Reaches <b>${reach}</b> creator${reach===1?'':'s'}</span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head"><div><div class="card-title">Hot Drop Library</div><div class="card-sub">${STATE.intelPosts.length} drops · filter and edit</div></div></div>
+      <div class="filter-row" style="margin-bottom:12px">
+        ${['all','venue','trend','brand','collab','alert'].map(k=>`<span class="pill ${STATE.dropFilter.category===k?'on':''}" data-act="drop-filter-cat" data-v="${k}">${k==='all'?'All':k[0].toUpperCase()+k.slice(1)}</span>`).join('')}
+        <span style="width:1px;height:18px;background:var(--line);margin:0 4px"></span>
+        ${['all','active','archived'].map(k=>`<span class="pill ${STATE.dropFilter.status===k?'on':''}" data-act="drop-filter-status" data-v="${k}">${k[0].toUpperCase()+k.slice(1)}</span>`).join('')}
+      </div>
+      ${filtered.map(p=>{
+        const decay = p.isArchived?'arch':(new Date(p.validUntil)-Date.now() < 1000*60*60*48)?'exp':'active';
+        const decayLabel = p.isArchived?'Archived':(decay==='exp'?'Expiring soon':'Active');
+        return `
+        <div class="intel-row">
+          <span class="intel-cat cat-${p.category}">${p.category}</span>
+          <div class="intel-body"><div class="intel-title">${esc(p.title)}</div><div class="intel-meta">Source: ${esc(p.source)} · valid until ${new Date(p.validUntil).toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'})}</div></div>
+          <div class="intel-stat"><b>${p.pushCount}</b> push · <b>${p.readCount}</b> read · <b>${p.usefulCount}</b> useful · <b>${p.actedOnCount}</b> acted</div>
+          <span class="decay ${decay}">${decayLabel}</span>
+          <div class="intel-actions">
+            <button class="btn ghost" data-act="drop-edit" data-id="${p.id}">Edit</button>
+            <button class="btn ghost" data-act="drop-dup" data-id="${p.id}">Duplicate</button>
+            <button class="btn ghost" data-act="drop-arch" data-id="${p.id}">${p.isArchived?'Unarchive':'Archive'}</button>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>
+  `;
+}
+
+// ====== OPERATOR: ROSTER ======
+function renderOpRoster(){
+  const f = STATE.rosterFilter;
+  const list = Object.values(STATE.creators).filter(c=>{
+    if(f.activeOnly && !c.active) return false;
+    if(f.tier!=='all' && c.tier!==f.tier) return false;
+    if(f.niche!=='all' && c.niche!==f.niche) return false;
+    if(f.search){const s=f.search.toLowerCase();if(!c.name.toLowerCase().includes(s)&&!c.handle.toLowerCase().includes(s)&&!c.niche.toLowerCase().includes(s))return false}
+    return true;
+  });
+  return `
+    <div class="insight amber">
+      <div class="ico">○</div>
+      <div class="body">Micro-influencers deliver <strong>60% higher engagement</strong> at <strong>70% lower cost</strong> than macro creators. <strong>62% of brands</strong> are increasing influencer budgets in 2026 — most through micro/mid tiers. Your roster sits in the sweet spot.</div>
+    </div>
+    <div class="filter-row">
+      <input class="search" id="roster-search" value="${esc(f.search)}" placeholder="Search by name, handle, or niche…" data-act="roster-search" />
+      <select class="select" style="width:auto" id="roster-tier" data-act="roster-tier">
+        <option value="all" ${f.tier==='all'?'selected':''}>All tiers</option>
+        <option value="basic" ${f.tier==='basic'?'selected':''}>Basic</option>
+        <option value="pro" ${f.tier==='pro'?'selected':''}>Pro</option>
+        <option value="vip" ${f.tier==='vip'?'selected':''}>VIP</option>
+      </select>
+      <select class="select" style="width:auto" id="roster-niche" data-act="roster-niche">
+        <option value="all" ${f.niche==='all'?'selected':''}>All niches</option>
+        ${NICHES.map(n=>`<option value="${esc(n)}" ${f.niche===n?'selected':''}>${esc(n)}</option>`).join('')}
+      </select>
+      <label class="toggle"><input type="checkbox" ${f.activeOnly?'checked':''} data-act="roster-active" /><span class="switch"></span>Active only</label>
+    </div>
+    <div class="card" style="padding:6px 12px">
+      <table class="table"><thead><tr><th>Creator</th><th>Followers</th><th>Engagement</th><th>Tier</th><th>Posts/wk</th><th>Status</th><th></th></tr></thead>
+      <tbody>
+        ${list.length===0?`<tr><td colspan="7" style="text-align:center;color:var(--txt3);padding:30px">No creators match these filters.</td></tr>`:list.map(c=>`
+          <tr data-act="open-profile" data-id="${c.id}">
+            <td><div class="creator-cell">${avatar(c,34)}<div><div class="cr-name">${esc(c.name)}</div><div class="cr-meta">${esc(c.niche)} · ${esc(c.neighborhood)} · ${esc(c.handle)}</div></div></div></td>
+            <td class="mono">${fmt(c.followers)}</td>
+            <td>${engBar(c.engagementRate)}</td>
+            <td>${tierBadge(c.tier)}</td>
+            <td class="mono">${c.postsPerWeek}</td>
+            <td><span class="status-dot ${c.active?'':'idle'}"></span></td>
+            <td><label class="toggle" onclick="event.stopPropagation()"><input type="checkbox" ${c.active?'checked':''} data-act="toggle-active" data-id="${c.id}" /><span class="switch"></span></label></td>
+          </tr>`).join('')}
+      </tbody></table>
+    </div>
+  `;
+}
+
+// ====== OPERATOR: PROFILE DETAIL ======
+function renderOpProfile(){
+  const c = STATE.creators[STATE.viewingCreatorId]; if(!c) return '';
+  const tab = STATE.profileTab;
+  const followerDelta = c.followers - c.baselineFollowers;
+  const erDelta = (c.engagementRate - c.baselineEngagement).toFixed(1);
+  const postsDelta = (c.postsPerWeek - c.baselinePostsPerWeek).toFixed(1);
+  return `
+    <button class="back-btn" data-act="back-roster">← Back to Roster</button>
+    <div class="prof-big">
+      ${avatar(c,80)}
+      <div class="prof-big-meta">
+        <div class="prof-big-name">${esc(c.name)}</div>
+        <div class="prof-big-sub">
+          <span>${esc(c.handle)}</span><span class="dot"></span>
+          <span>${esc(c.niche)}</span><span class="dot"></span>
+          <span>${esc(c.neighborhood)}, ${esc(c.city)}</span><span class="dot"></span>
+          ${tierBadge(c.tier)}<span class="dot"></span>
+          <span style="color:${c.active?'var(--cyan)':'var(--txt3)'}">${c.active?'● Active':'○ Inactive'}</span>
+        </div>
+      </div>
+      <div><button class="btn ghost" data-act="edit-creator" data-id="${c.id}">Edit Profile</button></div>
+    </div>
+    <div class="delta-row">
+      <div class="delta-box"><div class="delta-l">Followers</div><div class="delta-v"><span class="delta-base">${fmt(c.baselineFollowers)}</span><span class="delta-arrow">→</span><span class="delta-now mono">${fmt(c.followers)}</span></div><div class="delta-pct">+${fmt(followerDelta)} (${((followerDelta/c.baselineFollowers)*100).toFixed(1)}%)</div></div>
+      <div class="delta-box"><div class="delta-l">Engagement</div><div class="delta-v"><span class="delta-base">${c.baselineEngagement}%</span><span class="delta-arrow">→</span><span class="delta-now mono">${c.engagementRate}%</span></div><div class="delta-pct">+${erDelta}pp</div></div>
+      <div class="delta-box"><div class="delta-l">Posts / wk</div><div class="delta-v"><span class="delta-base">${c.baselinePostsPerWeek}</span><span class="delta-arrow">→</span><span class="delta-now mono">${c.postsPerWeek}</span></div><div class="delta-pct">+${postsDelta}</div></div>
+    </div>
+    <div class="tabs">
+      ${['overview','messages','bookings','performance','notes','receipts'].map(k=>`<span class="tab ${tab===k?'active':''}" data-act="prof-tab" data-v="${k}">${k[0].toUpperCase()+k.slice(1)}</span>`).join('')}
+    </div>
+    <div class="card">${renderProfileTab(c, tab)}</div>
+  `;
+}
+function renderProfileTab(c, tab){
+  if(tab==='overview'){
+    return `
+      <div class="card-head"><div class="card-title">Bio</div></div>
+      <div style="font-size:13px;color:var(--txt2);line-height:1.6;margin-bottom:18px">${esc(c.bio)}</div>
+      <div class="card-head"><div class="card-title">Voice Profile</div><div class="card-sub">Example captions in their tone</div></div>
+      <div class="voice-chips" style="margin-bottom:18px">${(c.voiceProfile||[]).map(v=>`<span class="voice-chip">"${esc(v)}"</span>`).join('')}</div>
+      <div class="card-head"><div class="card-title">Brand Activity</div></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><div class="stat-card"><div class="stat-label">Active Deals</div><div class="stat-value">${c.brandDealsActive}</div></div><div class="stat-card pink"><div class="stat-label">Monthly Value</div><div class="stat-value">$${fmt(c.brandDealValue)}</div></div></div>
+    `;
+  }
+  if(tab==='messages'){
+    const msgs = STATE.messages[c.id]||[];
+    if(msgs.length===0) return `<div style="text-align:center;color:var(--txt3);padding:30px">No bot messages yet for ${esc(c.name)}.</div>`;
+    return msgs.slice().reverse().map(m=>`
+      <div style="padding:12px;background:var(--s2);border-radius:10px;margin-bottom:8px;border-left:3px solid ${m.role==='bot'?'var(--lime)':'var(--blue)'}">
+        <div style="font-size:10.5px;color:var(--txt3);text-transform:uppercase;letter-spacing:.12em;font-weight:600;margin-bottom:5px">${m.role==='bot'?STATE.settings.botName:c.name} · ${esc(m.time)}</div>
+        <div style="font-size:13px;line-height:1.5;white-space:pre-wrap">${esc(m.content)}</div>
+      </div>`).join('');
+  }
+  if(tab==='bookings'){
+    const bks = STATE.bookings[c.id]||[];
+    return `
+      <div class="card-head"><div class="card-title">Bookings · ${bks.length}</div><button class="btn primary sm" data-act="op-add-booking" data-id="${c.id}">+ Add Booking</button></div>
+      ${bks.length===0?`<div style="text-align:center;color:var(--txt3);padding:30px">No bookings yet.</div>`:bks.map(b=>`
+        <div class="agenda-item">
+          <div class="agenda-time">${timeFromIso(b.dateTime)}</div>
+          <div class="agenda-bar ${bookingDot(b.type)}"></div>
+          <div class="agenda-body">
+            <div class="agenda-title">${esc(b.venue)}</div>
+            <div class="agenda-sub">${new Date(b.dateTime).toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'})} · ${esc(b.notes)}</div>
+            <span class="agenda-tag ${bookingDot(b.type)}">${b.status}</span>
+          </div>
+        </div>`).join('')}
+    `;
+  }
+  if(tab==='performance'){
+    const p = c.performance||[];
+    return `
+      <div class="card-head"><div class="card-title">8-Week Performance</div><button class="btn primary sm" data-act="op-log-perf" data-id="${c.id}">+ Log Week</button></div>
+      <div style="font-size:11px;color:var(--txt3);text-transform:uppercase;letter-spacing:.14em;font-weight:600;margin:12px 0 8px">Posts / week</div>
+      <div class="mini-chart" id="perf-posts">${p.map((w,i)=>`<div class="mini-bar-col"><div class="mini-bar ${i===p.length-1?'cur':''}" style="height:${(w.posts/7)*100}%"></div><div class="mini-lbl">W${w.week}</div></div>`).join('')}</div>
+      <div style="font-size:11px;color:var(--txt3);text-transform:uppercase;letter-spacing:.14em;font-weight:600;margin:24px 0 8px">Engagement %</div>
+      <div class="mini-chart" id="perf-er">${p.map((w,i)=>`<div class="mini-bar-col"><div class="mini-bar cyan ${i===p.length-1?'cur':''}" style="height:${(w.engagement/6)*100}%"></div><div class="mini-lbl">W${w.week}</div></div>`).join('')}</div>
+      <table class="table" style="margin-top:24px"><thead><tr><th>Week</th><th>Posts</th><th>ER</th><th>Δ Followers</th><th>Deals</th><th>Value</th></tr></thead>
+      <tbody>${p.map(w=>`<tr><td class="mono">W${w.week}</td><td class="mono">${w.posts}</td><td class="mono">${w.engagement}%</td><td class="mono" style="color:var(--lime)">+${w.followerDelta}</td><td class="mono">${w.brandDeals}</td><td class="mono">$${fmt(w.brandValue)}</td></tr>`).join('')}</tbody></table>
+    `;
+  }
+  if(tab==='notes'){
+    const notes = STATE.notes[c.id]||[];
+    return `
+      <div class="card-head"><div class="card-title">Operator Notes</div><div class="card-sub">Private · ${notes.length} entries</div></div>
+      <div class="form-row"><textarea class="textarea" id="note-input" placeholder="Add a private note about ${esc(c.name)}…"></textarea></div>
+      <button class="btn primary sm" data-act="add-note" data-id="${c.id}">Add Note</button>
+      <div style="margin-top:18px">${notes.length===0?`<div style="color:var(--txt3);padding:20px;text-align:center;font-size:12.5px">No notes yet.</div>`:notes.slice().reverse().map(n=>`
+        <div style="padding:13px;background:var(--s2);border-radius:10px;margin-bottom:8px">
+          <div style="font-size:10.5px;color:var(--txt3);text-transform:uppercase;letter-spacing:.12em;font-weight:600;margin-bottom:6px">${esc(n.op)} · ${esc(n.time)}</div>
+          <div style="font-size:13px;line-height:1.5">${esc(n.text)}</div>
+        </div>`).join('')}</div>
+    `;
+  }
+  if(tab==='receipts'){
+    const r = STATE.receipts[c.id]||[];
+    return `
+      <div class="card-head"><div class="card-title">Content Receipts</div><div class="card-sub">${r.length} posts logged · self-reported</div></div>
+      ${r.length===0?`<div style="color:var(--txt3);padding:30px;text-align:center">No receipts yet. Creator can log posts from their Stats tab.</div>`:r.map(x=>{
+        const intel = STATE.intelPosts.find(i=>i.id===x.intelId);
+        return `<div style="padding:13px;background:var(--s2);border-radius:10px;margin-bottom:8px">
+          <div style="display:flex;gap:9px;align-items:center;margin-bottom:6px">
+            <span class="agenda-tag cyan">${esc(x.type)}</span>
+            <span class="mono" style="font-size:11px;color:var(--txt3)">${esc(x.url)}</span>
+            <span style="margin-left:auto;font-size:10.5px;color:var(--txt3)">${esc(x.date)}</span>
+          </div>
+          <div style="font-size:13px;font-style:italic;color:var(--txt);margin-bottom:6px">"${esc(x.excerpt)}"</div>
+          <div class="mono" style="font-size:11px;color:var(--txt2)">♥ ${fmt(x.likes)} · 💬 ${x.comments}${intel?` · linked to: <span style="color:var(--lime)">${esc(intel.title.slice(0,40))}…</span>`:''}</div>
+        </div>`;
+      }).join('')}
+    `;
+  }
+  return '';
+}
+// ====== OPERATOR: FLAGS ======
+function renderOpFlags(){
+  const tab = STATE.flagTab;
+  const flags = STATE.flags.filter(f=>!f.resolved && f.severity===tab);
+  const urgent = STATE.flags.filter(f=>!f.resolved && f.severity==='urgent').length;
+  const soft = STATE.flags.filter(f=>!f.resolved && f.severity==='soft').length;
+  return `
+    <div class="insight">
+      <div class="ico">⚑</div>
+      <div class="body">${esc(STATE.settings.botName)} auto-flags messages on three triggers: <strong>brand DMs offering rates</strong>, <strong>booking requests outside business hours</strong>, and <strong>creators flagging "needs human"</strong>. Operators triage and respond — creators never feel ghosted.</div>
+    </div>
+    <div class="tabs">
+      <span class="tab ${tab==='urgent'?'active':''}" data-act="flag-tab" data-v="urgent">Urgent <span class="count">${urgent}</span></span>
+      <span class="tab ${tab==='soft'?'active':''}" data-act="flag-tab" data-v="soft">Soft <span class="count">${soft}</span></span>
+    </div>
+    ${flags.length===0?`
+      <div class="card" style="text-align:center;padding:50px 20px">
+        <div style="font-size:48px;color:var(--lime);margin-bottom:12px">✓</div>
+        <div style="font-size:16px;font-weight:600;margin-bottom:6px">All clear</div>
+        <div style="color:var(--txt3);font-size:13px">No ${tab} flags to review.</div>
+      </div>
+    `:flags.map(f=>{
+      const c = STATE.creators[f.creatorId];
+      const expanded = STATE.expandedFlag === f.id;
+      const context = (STATE.messages[f.creatorId]||[]).slice(-3);
+      return `
+      <div class="card" data-act="expand-flag" data-id="${f.id}" style="cursor:pointer">
+        <div style="display:flex;align-items:center;gap:11px;margin-bottom:11px">
+          ${avatar(c,36)}
+          <div><div class="cr-name">${esc(c.name)}</div><div class="cr-meta">${tierBadge(c.tier).replace(/<\/?span[^>]*>/g,'')} · ${fmt(c.followers)} · ${esc(c.handle)}</div></div>
+          <span class="agenda-tag pink" style="margin-left:auto">${esc(f.category)} · ${esc(f.severity)}</span>
+          <span class="mono" style="font-size:11px;color:var(--txt3)">${esc(f.timestamp)}</span>
+        </div>
+        <div style="font-size:13.5px;line-height:1.55;background:var(--s2);padding:13px;border-radius:10px;border-left:3px solid var(--amber);margin-bottom:13px">"${esc(f.message)}"</div>
+        ${expanded?`
+          <div style="margin-bottom:13px;padding:11px;background:var(--s2);border-radius:10px;border:1px solid var(--line)">
+            <div style="font-size:10px;color:var(--txt3);text-transform:uppercase;letter-spacing:.14em;font-weight:600;margin-bottom:8px">Context · last 3 messages with ${esc(STATE.settings.botName)}</div>
+            ${context.map(m=>`<div style="font-size:12px;line-height:1.5;margin-bottom:6px"><b style="color:${m.role==='bot'?'var(--lime)':'var(--blue)'}">${m.role==='bot'?STATE.settings.botName:c.name.split(' ')[0]}:</b> ${esc(m.content.slice(0,140))}${m.content.length>140?'…':''}</div>`).join('')}
+            <div style="margin-top:11px;display:flex;gap:7px"><input class="input" id="reply-${f.id}" placeholder="Reply to ${esc(c.name.split(' ')[0])}…" style="font-size:12.5px" onclick="event.stopPropagation()" /><button class="btn primary sm" data-act="send-reply" data-id="${f.id}" onclick="event.stopPropagation()">Send</button></div>
+          </div>
+        `:''}
+        <div class="btn-row" onclick="event.stopPropagation()">
+          <button class="btn pink sm" data-act="reply-flag" data-id="${f.id}">Reply</button>
+          <button class="btn ghost sm" data-act="resolve-flag" data-id="${f.id}">Mark Resolved</button>
+          <span style="margin-left:auto;font-size:11px;color:var(--txt3)">SLA · respond within ${f.severity==='urgent'?'30 min':'2 hours'}</span>
+        </div>
+      </div>`;
+    }).join('')}
+  `;
+}
+
+// ====== OPERATOR: ANALYTICS ======
+function renderOpAnalytics(){
+  const ps = STATE.pilotStats;
+  const sortedCreators = Object.values(STATE.creators).sort((a,b)=>b.engagementRate-a.engagementRate);
+  return `
+    <div class="insight amber">
+      <div class="ico">▥</div>
+      <div class="body">Leung et al. (HBR, 2022) found that creators with structured operational support close a <strong>16.6% engagement gap</strong> versus self-managed peers. Our cohort closed it in <strong>5 weeks</strong> — faster because the intel layer compounds with the bookings layer.</div>
+    </div>
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-label">Active Creators</div><div class="stat-value">${ps.activeCreators}</div><div class="stat-delta">100% retention</div></div>
+      <div class="stat-card cyan"><div class="stat-label">Avg Engagement</div><div class="stat-value">${ps.avgEngagement}<span class="u">%</span></div><div class="stat-delta">+75% vs baseline</div></div>
+      <div class="stat-card pink"><div class="stat-label">Monthly Deal Value</div><div class="stat-value">$${fmt(ps.monthlyDealValue)}</div><div class="stat-delta">${ps.dealsClosedPilot} deals closed</div></div>
+      <div class="stat-card amber"><div class="stat-label">Drop → Action</div><div class="stat-value">${ps.intelActedOnRate}<span class="u">%</span></div><div class="stat-delta">conversion rate</div></div>
+    </div>
+    <div class="card">
+      <div class="card-head"><div><div class="card-title">Weekly Avg Posts per Creator</div><div class="card-sub">Pilot weeks 1–8 · target 4.0/wk</div></div><span class="mono" style="color:var(--lime);font-weight:600">+115%</span></div>
+      <div class="chart" id="chart-posts"><div class="chart-launch" style="left:31%"><span style="margin-top:4px">platform launched</span></div></div>
+    </div>
+    <div class="card">
+      <div class="card-head"><div><div class="card-title">Avg Engagement Rate</div><div class="card-sub">Pilot weeks 1–8 · industry avg 2.5%</div></div><span class="mono" style="color:var(--cyan);font-weight:600">+75%</span></div>
+      <div class="chart" id="chart-er"><div class="chart-launch" style="left:31%"><span style="margin-top:4px">platform launched</span></div></div>
+    </div>
+    <div class="card" style="display:grid;grid-template-columns:1fr 2fr;gap:24px;align-items:center">
+      <div>
+        <div class="card-title">Drop-to-Action Rate</div>
+        <div class="card-sub" style="margin-top:4px">% of pushed Hot Drops marked acted on</div>
+        <div class="ring" id="ring">
+          <svg viewBox="0 0 120 120">
+            <circle class="bg" cx="60" cy="60" r="52"/>
+            <circle class="fg" id="ring-fg" cx="60" cy="60" r="52" stroke-dasharray="${2*Math.PI*52}" stroke-dashoffset="${2*Math.PI*52}"/>
+          </svg>
+          <div class="v"><div class="n">${ps.intelActedOnRate}%</div><div class="l">acted on</div></div>
+        </div>
+      </div>
+      <div>
+        <div class="card-title">Per-Creator Engagement</div>
+        <div class="card-sub" style="margin-top:4px">8-week sparklines</div>
+        <table class="table" style="margin-top:10px"><tbody>
+          ${sortedCreators.map(c=>{
+            const p=c.performance||[];const max=Math.max(...p.map(x=>x.engagement));
+            return `<tr style="cursor:pointer" data-act="open-profile" data-id="${c.id}">
+              <td style="width:40%"><div class="creator-cell">${avatar(c,28)}<div><div style="font-size:12.5px;font-weight:600">${esc(c.name)}</div><div style="font-size:10px;color:var(--txt3)">${esc(c.niche)}</div></div></div></td>
+              <td><div class="spark">${p.map(w=>`<div class="spark-bar" style="height:${(w.engagement/max)*100}%"></div>`).join('')}</div></td>
+              <td class="mono" style="color:var(--lime);font-weight:600">${c.engagementRate}%</td>
+            </tr>`;
+          }).join('')}
+        </tbody></table>
+      </div>
+    </div>
+    <div style="text-align:right;margin-top:8px"><button class="btn ghost sm" data-act="export-csv">⤓ Export CSV</button></div>
+  `;
+}
+
+// ====== OPERATOR: PERSONAS / BOT CONFIG ======
+function renderOpPersonas(){
+  return `
+    <div class="insight">
+      <div class="ico">✦</div>
+      <div class="body">Each creator has a sub-bot that delivers Hot Drops in a configurable persona. Default name: <strong>${esc(STATE.settings.botName)}</strong>. Changing the name here updates every chat header, sidebar label, and reference instantly.</div>
+    </div>
+    <div class="card">
+      <div class="card-head"><div><div class="card-title">Bot Identity</div><div class="card-sub">Active across all ${Object.keys(STATE.creators).length} creators</div></div></div>
+      <div class="form-row"><label class="label">Bot Name</label><input class="input" id="bot-name-input" value="${esc(STATE.settings.botName)}" /></div>
+      <div class="form-row"><label class="label">Platform Name</label><input class="input" id="platform-name-input" value="${esc(STATE.settings.platformName)}" /></div>
+      <button class="btn primary" data-act="save-bot-name">Save & Propagate</button>
+    </div>
+    <div class="card">
+      <div class="card-head"><div><div class="card-title">Persona Moderation Queue</div><div class="card-sub">Flagged custom names for review</div></div></div>
+      <div style="text-align:center;padding:40px;color:var(--txt3)">
+        <div style="font-size:32px;margin-bottom:8px">✓</div>
+        <div style="font-size:13px">No flagged names · queue empty</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head"><div><div class="card-title">Per-Creator Bot Names</div><div class="card-sub">Creators can override the global name</div></div></div>
+      <table class="table"><tbody>
+        ${Object.values(STATE.creators).map(c=>`<tr><td><div class="creator-cell">${avatar(c,28)}<div><div style="font-size:12.5px;font-weight:600">${esc(c.name)}</div></div></div></td><td style="text-align:right"><span class="mono" style="color:var(--lime);font-size:12px">${esc(STATE.settings.botName)}</span> <span style="color:var(--txt3);font-size:11px;margin-left:6px">(default)</span></td></tr>`).join('')}
+      </tbody></table>
+    </div>
+  `;
+}
+// ====== CREATOR SHELL ======
+function renderCreatorShell(){
+  const c = STATE.creators[STATE.currentCreatorId];
+  let inner = '';
+  if(STATE.creatorPanel==='feed') inner = renderCrFeed(c);
+  else if(STATE.creatorPanel==='aria') inner = renderCrAria(c);
+  else if(STATE.creatorPanel==='calendar') inner = renderCrCalendar(c);
+  else if(STATE.creatorPanel==='network') inner = renderCrNetwork(c);
+  else if(STATE.creatorPanel==='stats') inner = renderCrStats(c);
+  else if(STATE.creatorPanel==='profile') inner = renderCrProfile(c);
+  return `
+    <div class="creator-shell">
+      <div class="cr-loginbar">
+        <span>Logged in as</span>
+        <select data-act="switch-creator">
+          ${Object.values(STATE.creators).map(x=>`<option value="${x.id}" ${x.id===STATE.currentCreatorId?'selected':''}>${esc(x.name)} · ${esc(x.handle)}</option>`).join('')}
+        </select>
+      </div>
+      <div class="cr-status"><span>9:41</span><span>● ● ● ● 100%</span></div>
+      <div class="cr-content">${inner}</div>
+      <div class="cr-tabbar">
+        ${[
+          ['feed','M3 12l9-9 9 9M5 10v10h14V10','Feed',false],
+          ['aria','','✦',true],
+          ['calendar','','◷',false],
+          ['network','','◫',false],
+          ['stats','','▤',false],
+          ['profile','','◉',false]
+        ].map(([k,_,lbl,live])=>`<div class="cr-tab ${STATE.creatorPanel===k?'active':''}" data-act="cr-nav" data-k="${k}">${crTabIcon(k)}${k==='aria'?STATE.settings.botName:k[0].toUpperCase()+k.slice(1)}${live?'<span class="live"></span>':''}</div>`).join('')}
+      </div>
+    </div>
+  `;
+}
+function crTabIcon(k){
+  const icons={
+    feed:'<svg viewBox="0 0 24 24"><path d="M3 12l9-9 9 9M5 10v10h14V10"/></svg>',
+    aria:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 6v3M9 12l3 3 3-3"/></svg>',
+    calendar:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
+    network:'<svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>',
+    stats:'<svg viewBox="0 0 24 24"><path d="M3 20h18M7 20V10M12 20V4M17 20v-7"/></svg>',
+    profile:'<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-7 8-7s8 3 8 7"/></svg>'
+  };
+  return icons[k]||'';
+}
+
+// ====== CREATOR: FEED ======
+function renderCrFeed(c){
+  const matched = STATE.intelPosts.filter(p=>!p.isArchived && p.targetNiches.includes(c.niche) && p.targetTiers.includes(c.tier)).sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt));
+  const unread = matched.filter(p=>!STATE.expandedFeed[p.id]).length;
+  const hour = new Date().getHours();
+  const greet = hour<12?'Good morning':hour<18?'Good afternoon':'Good evening';
+  return `
+    <div class="cr-header">
+      <div class="cr-greet">${greet}</div>
+      <div class="cr-name-big">${esc(c.name.split(' ')[0])} 👋</div>
+      <div class="cr-sub"><b>${unread} new ${unread===1?'update':'updates'}</b> from your intelligence feed</div>
+    </div>
+    ${matched.length===0?`<div style="text-align:center;color:var(--txt3);padding:40px 20px;font-size:13px">No drops match your niche right now. Check back soon.</div>`:matched.map(p=>renderFeedCard(p,c)).join('')}
+  `;
+}
+function renderFeedCard(p, c){
+  const open = !!STATE.expandedFeed[p.id];
+  const fb = STATE.feedFb[p.id];
+  const validMs = new Date(p.validUntil) - Date.now();
+  const expSoon = validMs > 0 && validMs < 1000*60*60*48;
+  const expLabel = expSoon ? `Expires in ${Math.floor(validMs/(1000*60*60))}h` : '';
+  const catLabel = p.category[0].toUpperCase()+p.category.slice(1)+' drop';
+  const recs = {
+    venue:[['Post window','7–9 PM'],['Avg ER · venue','4.8%'],['Format','Reel · 30–45s'],['Confidence',p.confidence]],
+    trend:[['Best window','7–9 AM'],['Sample','42 posts'],['Lift','+34%'],['Confidence',p.confidence]],
+    brand:[['Offered',p.body.match(/\$[\d,]+/)?.[0]||'See body'],['Your market','$2,000–2,400'],['Brief','1 Reel'],['Deadline','7 days']],
+    collab:[['Reach','82K combined'],['Overlap','68%'],['ER lift','+0.6–1.2pp'],['Effort','2 shoots']],
+    alert:[['Action','Review now'],['Severity',p.confidence],['Window','Immediate'],['Confidence',p.confidence]]
+  }[p.category]||[];
+  return `
+    <div class="feed-card ${p.category} ${open?'open':!STATE.expandedFeed[p.id+'_seen']?'unread':''}" data-act="feed-toggle" data-id="${p.id}">
+      <div class="feed-cat">${esc(catLabel)}</div>
+      <div class="feed-title">${esc(p.title)}</div>
+      <div class="feed-time">${new Date(p.createdAt).toLocaleString('en-US',{hour:'numeric',minute:'2-digit'})} · ${expLabel||'valid until '+new Date(p.validUntil).toLocaleDateString('en-US',{month:'short',day:'numeric'})}</div>
+      <div class="feed-expand">
+        ${esc(p.body)}
+        <div class="feed-meta-grid">${recs.map(([k,v])=>`<div><div class="k">${k}</div><div class="v">${esc(v)}</div></div>`).join('')}</div>
+        <button class="btn primary full" data-act="add-to-cal" data-id="${p.id}" onclick="event.stopPropagation()">+ Add to Calendar</button>
+        <div class="feed-fb" onclick="event.stopPropagation()">
+          <button class="fb-btn ${fb==='good'?'on':''}" data-act="feed-fb" data-id="${p.id}" data-v="good">✓ Useful</button>
+          <button class="fb-btn bad ${fb==='bad'?'on':''}" data-act="feed-fb" data-id="${p.id}" data-v="bad">✗ Not useful</button>
+          <button class="fb-btn act ${fb==='act'?'on':''}" data-act="feed-fb" data-id="${p.id}" data-v="act">🎯 Acted on</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// ====== CREATOR: ARIA CHAT ======
+function renderCrAria(c){
+  const msgs = STATE.messages[c.id] || [];
+  const botName = STATE.settings.botName;
+  return `
+    <div class="chat-head">
+      <div class="chat-avatar">✦</div>
+      <div class="chat-meta">
+        <div class="n">${esc(botName)}</div>
+        <div class="s">your assistant</div>
+        <div class="chat-status"><span class="d"></span>Online · knows your full schedule</div>
+      </div>
+    </div>
+    <div class="chat-quick">
+      <span class="pill" data-act="quick-msg" data-v="What's on my calendar this week?">📅 What's on this week</span>
+      <span class="pill" data-act="quick-msg" data-v="What should I post today?">📸 What to post</span>
+      <span class="pill" data-act="quick-msg" data-v="What's my engagement rate?">📈 My stats</span>
+      <span class="pill" data-act="ask-draft-dm">✏️ Draft a DM</span>
+    </div>
+    <div class="chat-msgs" id="chat-msgs">
+      ${msgs.map(m=>`<div class="msg ${m.role}">${esc(m.content)}</div><div class="msg-time" style="align-self:${m.role==='user'?'flex-end':'flex-start'}">${esc(m.time)}</div>`).join('')}
+    </div>
+    <div class="chat-input-wrap">
+      <input class="chat-input" id="chat-input" placeholder="Ask ${esc(botName)} anything…" />
+      <button class="chat-send" data-act="chat-send">↑</button>
+    </div>
+  `;
+}
+
+// ====== CREATOR: CALENDAR ======
+function renderCrCalendar(c){
+  const monthNames=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  return `
+    <div class="cal-head">
+      <div class="cal-month">${monthNames[STATE.selCalMonth]} ${STATE.selCalYear}</div>
+      <div class="cal-nav"><button class="cal-arrow" data-act="cal-prev">‹</button><button class="cal-arrow" data-act="cal-next">›</button></div>
+    </div>
+    <div class="cal-grid" id="cal-grid"></div>
+    <div class="agenda-head" id="agenda-head"></div>
+    <div id="agenda-body"></div>
+    <button class="book-btn" data-act="open-book-sheet">+ Ask ${esc(STATE.settings.botName)} to book something</button>
+  `;
+}
+function renderCalendarGrid(){
+  const grid=$('#cal-grid');if(!grid)return;
+  const monthNames=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const dayNames=['S','M','T','W','T','F','S'];
+  let html=dayNames.map(d=>`<div class="cal-dh">${d}</div>`).join('');
+  const first=new Date(STATE.selCalYear,STATE.selCalMonth,1);
+  const startDay=first.getDay();
+  const dim=new Date(STATE.selCalYear,STATE.selCalMonth+1,0).getDate();
+  const today=(STATE.selCalYear===2026 && STATE.selCalMonth===3)?23:-1;
+  const bks=STATE.bookings[STATE.currentCreatorId]||[];
+  for(let i=0;i<startDay;i++) html+=`<div class="cal-day empty"></div>`;
+  for(let d=1;d<=dim;d++){
+    const cls=[];
+    if(d===today) cls.push('today');
+    if(d===STATE.selCalDay) cls.push('sel');
+    const dayBookings = bks.filter(b=>{const bd=new Date(b.dateTime);return bd.getFullYear()===STATE.selCalYear && bd.getMonth()===STATE.selCalMonth && bd.getDate()===d});
+    const types = [...new Set(dayBookings.map(b=>bookingDot(b.type)))];
+    html+=`<div class="cal-day ${cls.join(' ')}" data-act="cal-day" data-d="${d}"><span>${d}</span>${types.length?`<div class="cal-dots">${types.map(t=>`<div class="cal-dot ${t}"></div>`).join('')}</div>`:''}</div>`;
+  }
+  grid.innerHTML=html;
+  // agenda
+  renderAgenda();
+}
+function renderAgenda(){
+  const head=$('#agenda-head');const body=$('#agenda-body');if(!head||!body)return;
+  const bks=(STATE.bookings[STATE.currentCreatorId]||[]).filter(b=>{const bd=new Date(b.dateTime);return bd.getFullYear()===STATE.selCalYear && bd.getMonth()===STATE.selCalMonth && bd.getDate()===STATE.selCalDay}).sort((a,b)=>new Date(a.dateTime)-new Date(b.dateTime));
+  const monthNames=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const dayNames=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const date=new Date(STATE.selCalYear,STATE.selCalMonth,STATE.selCalDay);
+  const isToday=(STATE.selCalYear===2026 && STATE.selCalMonth===3 && STATE.selCalDay===23);
+  head.textContent=`${isToday?'Today · ':''}${dayNames[date.getDay()]} ${monthNames[STATE.selCalMonth]} ${STATE.selCalDay}`;
+  if(bks.length===0){body.innerHTML=`<div style="text-align:center;color:var(--txt3);padding:24px 0;font-size:12.5px">Nothing on the calendar.</div>`;return}
+  body.innerHTML=bks.map(b=>`
+    <div class="agenda-item ${b.status==='cancelled'?'cancelled':''}" data-act="open-event" data-id="${b.id}">
+      <div class="agenda-time">${timeFromIso(b.dateTime)}</div>
+      <div class="agenda-bar ${bookingDot(b.type)}"></div>
+      <div class="agenda-body">
+        <div class="agenda-title">${esc(b.venue)}</div>
+        <div class="agenda-sub">${esc(b.notes)}</div>
+        <span class="agenda-tag ${bookingDot(b.type)}">${esc(b.type)} · ${esc(b.status)}</span>
+      </div>
+    </div>`).join('');
+}
+
+function animateAnalytics(){
+  const postsData = STATE.pilotStats.weeklyPosts;
+  const erData = STATE.pilotStats.weeklyER;
+  buildChart('chart-posts', postsData, 5.0, '', false);
+  buildChart('chart-er', erData, 5.0, '%', true);
+  const fg=$('#ring-fg'); if(fg){const C=2*Math.PI*52;requestAnimationFrame(()=>fg.style.strokeDashoffset = C*(1-(STATE.pilotStats.intelActedOnRate/100)))}
+}
+function buildChart(id,data,max,suffix,cyan){
+  const el=document.getElementById(id);if(!el)return;
+  el.querySelectorAll('.bar-col').forEach(x=>x.remove());
+  data.forEach((v,i)=>{
+    const col=document.createElement('div');col.className='bar-col';
+    const cur=i===data.length-1;
+    const bar=document.createElement('div');bar.className='bar-bar'+(cyan?' cyan':'')+(cur?' cur':'');bar.style.height='0';
+    const tip=document.createElement('div');tip.className='bar-tip';tip.textContent='W'+(i+1)+': '+v+suffix;
+    const lbl=document.createElement('div');lbl.className='bar-lbl';lbl.textContent='W'+(i+1);
+    bar.appendChild(tip);col.appendChild(bar);col.appendChild(lbl);el.appendChild(col);
+    setTimeout(()=>bar.style.height=((v/max)*100)+'%',60+i*70);
+  });
+}
+function animateCreatorStats(){
+  const c=STATE.creators[STATE.currentCreatorId];const p=c.performance||[];
+  const ids=['cr-mini-er','cr-mini-posts'];
+  ids.forEach(id=>{
+    const el=document.getElementById(id);if(!el)return;
+    el.querySelectorAll('.mini-bar').forEach((b,i)=>{
+      const v=id==='cr-mini-er'?p[i]?.engagement:p[i]?.posts;
+      const max=id==='cr-mini-er'?6:7;
+      b.style.height='0';
+      setTimeout(()=>b.style.height=((v/max)*100)+'%',60+i*60);
+    });
+  });
+}
+
+// ====== CREATOR: NETWORK ======
+function renderCrNetwork(c){
+  if(STATE.viewingNetCreator) return renderNetProfile(c, STATE.viewingNetCreator);
+  if(STATE.openDmThread) return renderDmView(c, STATE.openDmThread);
+  const sec = STATE.networkSection;
+  return `
+    <div class="cr-header">
+      <div class="cr-name-big" style="font-size:24px">Network</div>
+      <div class="cr-sub">Miami creator graph · DMs · collab board</div>
+    </div>
+    <div class="net-tabs">
+      ${[['directory','Creators'],['collabs','Collabs'],['dms','Messages '+(unreadDmCount(c.id)?`(${unreadDmCount(c.id)})`:'')]].map(([k,l])=>`<span class="net-tab ${sec===k?'active':''}" data-act="net-section" data-v="${k}">${esc(l)}</span>`).join('')}
+    </div>
+    ${sec==='directory'?renderNetDirectory(c):sec==='collabs'?renderNetCollabs(c):renderNetDms(c)}
+  `;
+}
+function renderNetDirectory(c){
+  const f = STATE.rosterFilter;
+  const list = Object.values(STATE.creators).filter(x=>x.id!==c.id);
+  const filtered = list.filter(x=>{
+    if(f.niche!=='all' && x.niche!==f.niche) return false;
+    if(f.search){const s=f.search.toLowerCase();if(!x.name.toLowerCase().includes(s)&&!x.handle.toLowerCase().includes(s)&&!x.niche.toLowerCase().includes(s))return false}
+    return true;
+  });
+  const niches = ['all',...NICHES];
+  return `
+    <input class="search" id="net-search" value="${esc(f.search)}" placeholder="Search creators…" data-act="net-search" style="margin-bottom:11px;width:100%" />
+    <div class="pill-row" style="margin-bottom:14px;overflow-x:auto;flex-wrap:nowrap">
+      ${niches.map(n=>`<span class="pill ${(f.niche==='all'&&n==='all')||f.niche===n?'on':''}" data-act="net-niche" data-v="${n}" style="white-space:nowrap">${n==='all'?'All Niches':esc(n)}</span>`).join('')}
+    </div>
+    <div class="net-grid">
+      ${filtered.map(x=>{
+        const overlap = audienceOverlap(c, x);
+        const mutual = (c.connections||[]).filter(id=>(x.connections||[]).includes(id)).length;
+        const connected = (c.connections||[]).includes(x.id);
+        return `
+        <div class="net-card" data-act="net-view" data-id="${x.id}">
+          ${avatar(x,52)}
+          <div class="net-name">${esc(x.name)}</div>
+          <div class="net-handle">${esc(x.handle)}</div>
+          <div class="net-stats"><span>${fmt(x.followers)}</span><span>·</span><b>${x.engagementRate}%</b></div>
+          <div class="net-niche">${esc(x.niche)} · ${esc(x.neighborhood)}</div>
+          <div class="net-overlap">${overlap}% audience overlap${mutual?` · ${mutual} mutual`:''}</div>
+          <div class="net-actions" onclick="event.stopPropagation()">
+            <button class="btn ghost net-connect ${connected?'connected':''}" data-act="net-connect" data-id="${x.id}">${connected?'✓ Connected':'+ Connect'}</button>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>
+  `;
+}
+function audienceOverlap(a, b){
+  if(a.niche===b.niche) return 68;
+  const adjacent = {'Luxury Wellness':['Wellness','Beauty','Lifestyle'],'Lifestyle':['Luxury Wellness','Fashion','Nightlife','Food'],'Wellness':['Luxury Wellness','Beauty','Lifestyle'],'Beauty':['Wellness','Luxury Wellness','Fashion'],'Food':['Lifestyle','Nightlife'],'Nightlife':['Food','Lifestyle','Fashion'],'Fashion':['Beauty','Lifestyle','Nightlife']};
+  return (adjacent[a.niche]||[]).includes(b.niche)?45:22;
+}
+function renderNetProfile(c, id){
+  const x = STATE.creators[id]; if(!x) return '';
+  const overlap = audienceOverlap(c, x);
+  const connected = (c.connections||[]).includes(x.id);
+  const mutual = (c.connections||[]).filter(mid=>(x.connections||[]).includes(mid));
+  return `
+    <button class="back-btn" data-act="net-back">← Back to Network</button>
+    <div style="text-align:center;padding:18px 0">
+      ${avatar(x,84)}
+      <div class="prof-name" style="margin-top:11px">${esc(x.name)}</div>
+      <div class="prof-handle">${esc(x.handle)}</div>
+      <div style="margin-top:9px">${tierBadge(x.tier)}</div>
+      <div class="prof-niche">${esc(x.niche)} · ${esc(x.neighborhood)}, ${esc(x.city)}</div>
+    </div>
+    <div class="card" style="font-size:13px;line-height:1.6;color:var(--txt2)">${esc(x.bio)}</div>
+    <div class="prof-stats" style="border-top:0;background:var(--s1);border:1px solid var(--line);border-radius:13px;padding:14px;margin-bottom:13px">
+      <div class="prof-stat"><div class="v">${fmt(x.followers)}</div><div class="l">Followers</div></div>
+      <div class="prof-stat"><div class="v" style="color:var(--lime)">${x.engagementRate}%</div><div class="l">Engagement</div></div>
+      <div class="prof-stat"><div class="v">${x.postsPerWeek}</div><div class="l">Posts/wk</div></div>
+    </div>
+    <div class="card">
+      <div class="card-head"><div class="card-title">Audience Match</div></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div style="text-align:center;padding:11px;background:var(--s2);border-radius:10px"><div class="mono" style="font-size:22px;color:var(--cyan);font-weight:600">${overlap}%</div><div style="font-size:10px;color:var(--txt3);text-transform:uppercase;letter-spacing:.12em;font-weight:600;margin-top:3px">Overlap</div></div>
+        <div style="text-align:center;padding:11px;background:var(--s2);border-radius:10px"><div class="mono" style="font-size:22px;color:var(--lime);font-weight:600">${mutual.length}</div><div style="font-size:10px;color:var(--txt3);text-transform:uppercase;letter-spacing:.12em;font-weight:600;margin-top:3px">Mutual</div></div>
+      </div>
+      ${mutual.length?`<div style="margin-top:13px;display:flex;align-items:center;gap:7px;font-size:11.5px;color:var(--txt2)">Mutual: ${mutual.map(mid=>{const m=STATE.creators[mid];return `<span style="display:inline-flex;align-items:center;gap:5px">${avatar(m,22)}${esc(m.name.split(' ')[0])}</span>`}).join('')}</div>`:''}
+    </div>
+    ${(x.voiceProfile||[]).length?`<div class="card"><div class="card-head"><div class="card-title">Voice</div></div><div class="voice-chips">${x.voiceProfile.slice(0,3).map(v=>`<span class="voice-chip">"${esc(v)}"</span>`).join('')}</div></div>`:''}
+    <div class="card">
+      <div class="card-head"><div class="card-title">Recent Content</div></div>
+      ${[
+        {type:'Reel',excerpt:'Morning routine in 60 seconds',engagement:'4.8% ER · 2.1K likes'},
+        {type:'Carousel',excerpt:'5 spots that don\'t require a reservation',engagement:'3.9% ER · 890 likes'},
+        {type:'Story',excerpt:'Behind the scenes at Le Jardin',engagement:'12% completion · 480 views'},
+      ].map(p=>`<div style="padding:10px 0;border-bottom:1px solid var(--line);display:flex;gap:11px"><span class="agenda-tag cyan">${p.type}</span><div style="flex:1;font-size:12.5px">${esc(p.excerpt)}<div style="font-size:10.5px;color:var(--txt3);margin-top:3px">${esc(p.engagement)}</div></div></div>`).join('')}
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+      <button class="btn ${connected?'ghost':'primary'}" data-act="net-connect" data-id="${x.id}">${connected?'✓ Connected':'+ Connect'}</button>
+      <button class="btn ghost" data-act="net-message" data-id="${x.id}" ${connected?'':'disabled style="opacity:.5"'}>Message</button>
+      <button class="btn ghost" data-act="suggest-collab" data-id="${x.id}">Collab</button>
+    </div>
+  `;
+}
+function renderNetCollabs(c){
+  const sub=STATE.networkSubTab;
+  const all=STATE.collabPosts.filter(p=>p.isActive);
+  const filtered=all.filter(p=>{
+    if(sub==='all') return true;
+    if(sub==='brand_deal') return p.type==='brand_deal';
+    if(sub==='co_post') return p.type==='co_post';
+    if(sub==='event') return p.type==='event';
+    if(sub==='ugc') return p.type==='brand_deal' && /UGC/i.test(p.title);
+    return true;
+  });
+  return `
+    <div class="net-tabs">
+      ${[['all','All'],['brand_deal','Brand Deals'],['co_post','Co-Posts'],['event','Events'],['ugc','UGC']].map(([k,l])=>`<span class="net-tab ${sub===k?'active':''}" data-act="collab-sub" data-v="${k}">${l}</span>`).join('')}
+    </div>
+    <button class="btn primary full" data-act="open-post-collab" style="margin-bottom:13px">+ Post a Collab</button>
+    ${filtered.length===0?`<div style="text-align:center;color:var(--txt3);padding:30px">No collabs in this category.</div>`:filtered.map(p=>{
+      const interested = p.interested.includes(c.id);
+      const poster = p.postedBy==='operator' ? null : STATE.creators[p.postedBy];
+      return `
+      <div class="collab-card">
+        <div class="collab-by">
+          ${poster?`${avatar(poster,22)}<span style="color:var(--txt);font-weight:600">${esc(poster.name)}</span>`:`<span class="badge-op">${esc(STATE.settings.platformName)} Op</span>`}
+          <span style="margin-left:auto">${p.deadline?`Deadline ${new Date(p.deadline).toLocaleDateString('en-US',{month:'short',day:'numeric'})}`:'No deadline'}</span>
+        </div>
+        <div class="collab-head">
+          <div class="collab-title">${esc(p.title)}</div>
+          <div class="collab-rate">${esc(p.compensation)}</div>
+        </div>
+        <div class="collab-sub">${esc(p.description)}</div>
+        <div class="collab-tags">${p.targetNiches.map(n=>`<span class="collab-tag">${esc(n)}</span>`).join('')}</div>
+        <div class="collab-meta">
+          <span>${p.interested.length} interested</span>
+          ${p.interested.length?`<span style="display:flex;gap:-4px">${p.interested.slice(0,3).map(id=>STATE.creators[id]?avatar(STATE.creators[id],18):'').join('')}</span>`:''}
+        </div>
+        <button class="collab-btn ${interested?'on':''}" data-act="collab-interest" data-id="${p.id}">${interested?'✓ Interested — '+STATE.settings.botName+' will set it up':'Express Interest'}</button>
+      </div>`;
+    }).join('')}
+  `;
+}
+function renderNetDms(c){
+  const threads = Object.entries(STATE.dmThreads).filter(([k,t])=>t.participants.includes(c.id));
+  if(threads.length===0) return `<div style="text-align:center;color:var(--txt3);padding:40px">No DMs yet. Connect with creators to start a thread.</div>`;
+  return `
+    <div class="agenda-head">Messages · ${threads.length}</div>
+    ${threads.map(([k,t])=>{
+      const otherId = t.participants.find(x=>x!==c.id);
+      const other = STATE.creators[otherId];
+      const last = t.messages[t.messages.length-1];
+      return `
+      <div class="dm-thread" data-act="open-dm" data-k="${k}">
+        ${avatar(other,40)}
+        <div class="dm-thread-body">
+          <div class="dm-thread-name">${esc(other.name)}</div>
+          <div class="dm-thread-msg">${esc(last.from===c.id?'You: ':'')}${esc(last.content)}</div>
+        </div>
+        <div class="dm-thread-meta">
+          <div class="dm-thread-time">${esc(last.time)}</div>
+          ${t.unread?`<div class="dm-thread-badge">${t.unread}</div>`:''}
+        </div>
+      </div>`;
+    }).join('')}
+  `;
+}
+function renderDmView(c, key){
+  const t=STATE.dmThreads[key];const otherId=t.participants.find(x=>x!==c.id);const other=STATE.creators[otherId];
+  return `
+    <button class="back-btn" data-act="dm-back">← Back to Messages</button>
+    <div class="chat-head">
+      ${avatar(other,40)}
+      <div class="chat-meta">
+        <div class="n" style="font-size:18px">${esc(other.name)}</div>
+        <div class="s">${esc(other.handle)}</div>
+        <div class="chat-status"><span class="d"></span>● Online</div>
+      </div>
+    </div>
+    <div class="chat-msgs" id="dm-msgs">
+      ${t.messages.map(m=>`<div class="msg ${m.from===c.id?'user':'bot'}">${esc(m.content)}</div><div class="msg-time" style="align-self:${m.from===c.id?'flex-end':'flex-start'}">${esc(m.time)}</div>`).join('')}
+      <div id="dm-typing-slot"></div>
+    </div>
+    <div class="chat-input-wrap">
+      <input class="chat-input" id="dm-input" placeholder="Message ${esc(other.name.split(' ')[0])}…" data-act="dm-typing" />
+      <button class="chat-send" data-act="dm-send" data-k="${key}">↑</button>
+    </div>
+    <div style="margin-top:8px;text-align:center"><button class="btn ghost sm" data-act="dm-draft" data-k="${key}">✏️ Ask ${esc(STATE.settings.botName)} to draft this DM</button></div>
+  `;
+}
+
+// ====== CREATOR: STATS ======
+function renderCrStats(c){
+  const last = c.performance ? c.performance[c.performance.length-1] : null;
+  const erDelta = last ? (last.engagement - c.baselineEngagement).toFixed(1) : 0;
+  const rate = marketRate(c);
+  return `
+    <div class="cr-header">
+      <div class="cr-name-big" style="font-size:26px">Your Performance</div>
+      <div class="cr-sub">Week 6 of pilot · ${esc(c.neighborhood)}</div>
+    </div>
+    <div class="cr-stats-grid">
+      <div class="cr-stat"><div class="l">Engagement</div><div class="v">${c.engagementRate}<span class="u">%</span></div><div class="d">+${erDelta}pp from baseline</div></div>
+      <div class="cr-stat cyan"><div class="l">Posts this week</div><div class="v">${c.postsPerWeek}</div><div class="d">Target: 4.0/wk</div></div>
+      <div class="cr-stat amber"><div class="l">Follower growth</div><div class="v">+${last?fmt(last.followerDelta):0}</div><div class="d">last 7 days</div></div>
+      <div class="cr-stat pink"><div class="l">Brand value</div><div class="v">$${fmt(c.brandDealValue)}</div><div class="d">${c.brandDealsActive} active deal${c.brandDealsActive===1?'':'s'}</div></div>
+    </div>
+    <div class="insight lime" style="margin-bottom:13px;font-size:12px">
+      <div class="ico">$</div>
+      <div class="body">At <strong>${fmt(c.followers)} followers</strong> and <strong>${c.engagementRate}% ER</strong>, your sponsored Reel rate is <strong>$${fmt(rate.reelLow)}–$${fmt(rate.reelHigh)}</strong>. Static post: $${fmt(rate.reelLow*.55|0)}–$${fmt(rate.reelHigh*.55|0)}. Story bundle: $${fmt(rate.reelLow*.4|0)}.</div>
+    </div>
+    <div class="card">
+      <div class="card-head"><div><div class="card-title">Engagement · 8 weeks</div><div class="card-sub">Platform launched W3</div></div></div>
+      <div class="mini-chart" id="cr-mini-er">${(c.performance||[]).map((w,i,a)=>`<div class="mini-bar-col"><div class="mini-bar cyan ${i===a.length-1?'cur':''}" style="height:0"></div><div class="mini-lbl">W${w.week}</div></div>`).join('')}</div>
+    </div>
+    <div class="card">
+      <div class="card-head"><div><div class="card-title">Posts / week</div><div class="card-sub">Trending up since W4</div></div></div>
+      <div class="mini-chart" id="cr-mini-posts">${(c.performance||[]).map((w,i,a)=>`<div class="mini-bar-col"><div class="mini-bar ${i===a.length-1?'cur':''}" style="height:0"></div><div class="mini-lbl">W${w.week}</div></div>`).join('')}</div>
+    </div>
+    <div class="card">
+      <div class="card-head"><div><div class="card-title">Brand Deals</div><div class="card-sub">${c.brandDealsActive} active</div></div></div>
+      <table class="table"><tbody>
+        <tr><td><b>Aesop Miami</b><br><small style="color:var(--txt3);font-size:10.5px">Negotiation in progress</small></td><td class="mono">$2,200</td><td><span class="agenda-tag amber">pending</span></td></tr>
+        <tr><td><b>Le Jardin Hotel</b><br><small style="color:var(--txt3);font-size:10.5px">Opening night content</small></td><td class="mono">$600 + stay</td><td><span class="agenda-tag cyan">confirmed</span></td></tr>
+      </tbody></table>
+    </div>
+    <div class="card">
+      <div class="card-head"><div><div class="card-title">Content Receipts</div><div class="card-sub">${(STATE.receipts[c.id]||[]).length} logged</div></div><button class="btn primary sm" data-act="open-log-post">+ Log a Post</button></div>
+      ${(STATE.receipts[c.id]||[]).map(r=>{
+        const intel = STATE.intelPosts.find(i=>i.id===r.intelId);
+        return `<div style="padding:11px;background:var(--s2);border-radius:10px;margin-bottom:7px">
+          <div style="display:flex;gap:7px;align-items:center;margin-bottom:5px">
+            <span class="agenda-tag cyan">${esc(r.type)}</span>
+            <span class="mono" style="font-size:10.5px;color:var(--txt3)">${esc(r.url)}</span>
+            <span style="margin-left:auto;font-size:10px;color:var(--txt3)">${esc(r.date)}</span>
+          </div>
+          <div style="font-size:12.5px;font-style:italic;margin-bottom:4px">"${esc(r.excerpt)}"</div>
+          <div class="mono" style="font-size:10.5px;color:var(--txt2)">♥ ${fmt(r.likes)} · 💬 ${r.comments}${intel?` · from: <span style="color:var(--lime)">${esc(intel.title.slice(0,32))}…</span>`:''}</div>
+        </div>`;
+      }).join('')}
+    </div>
+  `;
+}
+
+// ====== CREATOR: PROFILE ======
+function renderCrProfile(c){
+  const rate = marketRate(c);
+  const ns = c.notificationSettings;
+  return `
+    <div class="prof-card">
+      ${avatar(c,80)}
+      <div class="prof-name" style="margin-top:11px">${esc(c.name)}</div>
+      <div class="prof-handle">${esc(c.handle)}</div>
+      <div class="prof-niche">${esc(c.niche)} · ${esc(c.neighborhood)}</div>
+      <div class="prof-stats">
+        <div class="prof-stat"><div class="v">${fmt(c.followers)}</div><div class="l">Followers</div></div>
+        <div class="prof-stat"><div class="v" style="color:var(--lime)">${c.engagementRate}%</div><div class="l">Engagement</div></div>
+        <div class="prof-stat"><div class="v" style="color:var(--amber)">${c.tier.toUpperCase()}</div><div class="l">Tier</div></div>
+      </div>
+      <button class="btn ghost full" style="margin-top:14px" data-act="cr-edit-profile">Edit Profile</button>
+    </div>
+    <div class="settings-card">
+      <div class="settings-h">Bio</div>
+      <textarea class="textarea" id="cr-bio" maxlength="200" data-act="cr-bio-input">${esc(c.bio)}</textarea>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:7px"><span style="font-size:10.5px;color:var(--txt3)" id="cr-bio-count">${c.bio.length}/200</span><button class="btn primary sm" data-act="cr-save-bio">Save Bio</button></div>
+    </div>
+    <div class="settings-card">
+      <div class="settings-h">Voice Profile</div>
+      <div class="voice-chips" id="voice-chips">
+        ${(c.voiceProfile||[]).map((v,i)=>`<span class="voice-chip">"${esc(v)}"<span class="x" data-act="remove-voice" data-i="${i}">×</span></span>`).join('')}
+      </div>
+      <div style="display:flex;gap:7px;margin-top:11px"><input class="input" id="voice-add" placeholder="Add a caption example…" /><button class="btn primary sm" data-act="add-voice">Add</button></div>
+    </div>
+    <div class="settings-card">
+      <div class="settings-h">Market Rate</div>
+      <div style="font-size:12.5px;color:var(--txt2);line-height:1.6">
+        Sponsored Reel: <b style="color:var(--lime);font-family:'JetBrains Mono',monospace">$${fmt(rate.reelLow)}–$${fmt(rate.reelHigh)}</b><br>
+        Static post: <b class="mono" style="color:var(--lime)">$${fmt(rate.reelLow*.55|0)}–$${fmt(rate.reelHigh*.55|0)}</b><br>
+        Story bundle: <b class="mono" style="color:var(--lime)">$${fmt(rate.reelLow*.4|0)}</b><br>
+        <small style="color:var(--txt3);font-size:10.5px">Calculated from ${fmt(c.followers)} followers × ${c.engagementRate}% ER × ${esc(c.neighborhood)} positioning</small>
+      </div>
+    </div>
+    <div class="settings-card">
+      <div class="settings-h">Sub-bot</div>
+      <div style="display:flex;align-items:center;gap:11px;margin-bottom:13px"><div class="chat-avatar" style="width:36px;height:36px;font-size:16px">✦</div><div><div style="font-weight:600;font-size:13px">${esc(STATE.settings.botName)}</div><div style="font-size:10.5px;color:var(--txt3)">trained on your last 90 days</div></div></div>
+      <label class="label">Bot Name</label>
+      <input class="input" id="cr-bot-name" value="${esc(STATE.settings.botName)}" />
+      <button class="btn primary full" style="margin-top:9px" data-act="cr-save-bot-name">Save & Propagate</button>
+    </div>
+    <div class="settings-card">
+      <div class="settings-h">Notifications</div>
+      ${[
+        ['dailyIntel','Daily Hot Drop Push','7 AM ET'],
+        ['postingReminders','Posting Reminders','30 min before optimal window'],
+        ['bookingReminders','Booking Reminders','1 hour before'],
+        ['smsAlerts','SMS Alerts','VIP only · urgent flags'],
+        ['collabMatches','Collab Matches','When operators tag a fit'],
+        ['weeklyDigest','Weekly Digest','Sunday 8 PM']
+      ].map(([k,l,s])=>`<div class="setting-row"><div>${l}<small>${s}</small></div><label class="toggle"><input type="checkbox" ${ns[k]?'checked':''} data-act="cr-toggle-notif" data-k="${k}" /><span class="switch"></span></label></div>`).join('')}
+    </div>
+    <div class="settings-card">
+      <div class="settings-h">Account</div>
+      <div class="setting-row"><div>Switch Creator</div>
+        <select data-act="switch-creator" style="background:var(--s2);border:1px solid var(--line);border-radius:8px;padding:5px 8px;color:var(--txt);font-size:11.5px">
+          ${Object.values(STATE.creators).map(x=>`<option value="${x.id}" ${x.id===c.id?'selected':''}>${esc(x.name)}</option>`).join('')}
+        </select>
+      </div>
+      <div class="setting-row" data-act="data-export" style="cursor:pointer"><div>Data Export<small>Download your full account data</small></div><span style="color:var(--blue);font-size:11px">→</span></div>
+      <div class="setting-row"><div>Pilot Status<small>Week 6 of 12 — Pilot Phase</small></div><span class="tier vip">W6</span></div>
+    </div>
+  `;
+}
+
+// ====== EVENT DELEGATION ======
+document.addEventListener('click', e=>{
+  const t = e.target.closest('[data-act]');
+  if(!t){
+    if(STATE.notifOpen && !e.target.closest('#notif-panel') && !e.target.closest('[data-act="toggle-notif"]')){
+      STATE.notifOpen=false; renderTopbar();
+    }
+    return;
+  }
+  const act = t.dataset.act;
+  if(act==='set-view'){ STATE.currentView=t.dataset.v; STATE.viewingCreatorId=null; STATE.viewingNetCreator=null; STATE.openDmThread=null; render(); }
+  else if(act==='op-nav'){ STATE.operatorPanel=t.dataset.k; STATE.viewingCreatorId=null; render(); }
+  else if(act==='cr-nav'){ STATE.creatorPanel=t.dataset.k; STATE.viewingNetCreator=null; STATE.openDmThread=null; render(); }
+  else if(act==='toggle-notif'){ e.stopPropagation(); STATE.notifOpen=!STATE.notifOpen; renderTopbar(); }
+  else if(act==='mark-all-read'){ STATE.notifications.forEach(n=>n.read=true); renderTopbar(); }
+  else if(act==='notif-click'){ const n=STATE.notifications.find(x=>x.id===t.dataset.id); if(n){n.read=true; if(n.link==='flags'){STATE.currentView='operator';STATE.operatorPanel='flags'} else if(n.link==='hotdrop'){STATE.currentView='operator';STATE.operatorPanel='hotdrop'} else if(n.link==='analytics'){STATE.currentView='operator';STATE.operatorPanel='analytics'} STATE.notifOpen=false; render();} }
+  else handleAction(act, t, e);
+});
+
+// ====== ACTION HANDLER ======
+function handleAction(act, t, e){
+  // operator dashboard navigation shortcuts
+  if(act==='goto-hotdrop'){STATE.operatorPanel='hotdrop';render();return}
+  if(act==='goto-roster'){STATE.operatorPanel='roster';render();return}
+  if(act==='open-profile'){STATE.viewingCreatorId=t.dataset.id;STATE.profileTab='overview';render();return}
+  if(act==='back-roster'){STATE.viewingCreatorId=null;STATE.operatorPanel='roster';render();return}
+  if(act==='prof-tab'){STATE.profileTab=t.dataset.v;render();return}
+  if(act==='toggle-active'){const c=STATE.creators[t.dataset.id];c.active=!c.active;toast('Status updated',`${c.name} is now ${c.active?'active':'inactive'}`);render();return}
+  if(act==='roster-search'){STATE.rosterFilter.search=t.value;render();const i=$('#roster-search');if(i){i.focus();i.setSelectionRange(i.value.length,i.value.length)};return}
+  if(act==='roster-tier'){STATE.rosterFilter.tier=t.value;render();return}
+  if(act==='roster-niche'){STATE.rosterFilter.niche=t.value;render();return}
+  if(act==='roster-active'){STATE.rosterFilter.activeOnly=t.checked;render();return}
+
+  // composer
+  if(act==='cmp-cat'){STATE.composer.category=t.dataset.v;render();return}
+  if(act==='cmp-conf'){STATE.composer.confidence=t.dataset.v;render();return}
+  if(act==='cmp-niche'){const v=t.dataset.v;const arr=STATE.composer.niches;const i=arr.indexOf(v);if(i>=0)arr.splice(i,1);else arr.push(v);commitComposerForm();render();return}
+  if(act==='cmp-tier'){const v=t.dataset.v;const arr=STATE.composer.tiers;const i=arr.indexOf(v);if(i>=0)arr.splice(i,1);else arr.push(v);commitComposerForm();render();return}
+  if(act==='cmp-publish'){
+    commitComposerForm();
+    const c=STATE.composer;
+    if(!c.title||!c.body){toast('Missing fields','Title and body are required','error');return}
+    if(c.editingId){
+      const p=STATE.intelPosts.find(x=>x.id===c.editingId);
+      Object.assign(p,{title:c.title,body:c.body,source:c.source,confidence:c.confidence,validUntil:c.validUntil,category:c.category,targetNiches:[...c.niches],targetTiers:[...c.tiers],city:c.city});
+      toast('Hot Drop updated','Changes propagated to all creator feeds');
+    } else {
+      const reach=Object.values(STATE.creators).filter(cr=>cr.active && c.niches.includes(cr.niche) && c.tiers.includes(cr.tier)).length;
+      const newPost={id:'intel'+Date.now(),title:c.title,body:c.body,category:c.category,source:c.source,confidence:c.confidence,targetNiches:[...c.niches],targetTiers:[...c.tiers],city:c.city,validUntil:c.validUntil||'2026-12-31T23:59:00',isPublished:true,isArchived:false,pushCount:reach,readCount:0,usefulCount:0,actedOnCount:0,createdAt:new Date().toISOString()};
+      STATE.intelPosts.unshift(newPost);
+      STATE.notifications.unshift({id:'n'+Date.now(),icon:'⚡',title:'Hot Drop pushed to '+reach+' creators',body:c.title.slice(0,50),time:'just now',read:false,link:'hotdrop'});
+      toast('🔥 Hot Drop published',`Pushed to ${reach} creator${reach===1?'':'s'}`);
+    }
+    STATE.composer={title:'',body:'',source:'',confidence:'high',validUntil:'',category:'venue',niches:[],tiers:[],city:'Miami',editingId:null};
+    render();return;
+  }
+  if(act==='cmp-preview'){commitComposerForm();openOverlay(renderPreviewModal());return}
+  if(act==='cmp-draft'){commitComposerForm();toast('Draft saved','Stored locally for this session');return}
+  if(act==='cancel-edit'){STATE.composer={title:'',body:'',source:'',confidence:'high',validUntil:'',category:'venue',niches:[],tiers:[],city:'Miami',editingId:null};render();return}
+  if(act==='drop-edit'){const p=STATE.intelPosts.find(x=>x.id===t.dataset.id);STATE.composer={title:p.title,body:p.body,source:p.source,confidence:p.confidence,validUntil:p.validUntil,category:p.category,niches:[...p.targetNiches],tiers:[...p.targetTiers],city:p.city,editingId:p.id};render();window.scrollTo(0,0);return}
+  if(act==='drop-dup'){const p=STATE.intelPosts.find(x=>x.id===t.dataset.id);const np={...p,id:'intel'+Date.now(),title:p.title+' (copy)',pushCount:0,readCount:0,usefulCount:0,actedOnCount:0,createdAt:new Date().toISOString()};STATE.intelPosts.unshift(np);toast('Duplicated','New draft created');render();return}
+  if(act==='drop-arch'){const p=STATE.intelPosts.find(x=>x.id===t.dataset.id);p.isArchived=!p.isArchived;toast(p.isArchived?'Archived':'Unarchived','');render();return}
+  if(act==='drop-filter-cat'){STATE.dropFilter.category=t.dataset.v;render();return}
+  if(act==='drop-filter-status'){STATE.dropFilter.status=t.dataset.v;render();return}
+
+  // flags
+  if(act==='flag-tab'){STATE.flagTab=t.dataset.v;render();return}
+  if(act==='expand-flag'){STATE.expandedFlag=STATE.expandedFlag===t.dataset.id?null:t.dataset.id;render();return}
+  if(act==='resolve-flag'){const f=STATE.flags.find(x=>x.id===t.dataset.id);f.resolved=true;toast('Flag resolved','Creator notified · thread archived');render();return}
+  if(act==='reply-flag'){STATE.expandedFlag=t.dataset.id;render();setTimeout(()=>{const i=$('#reply-'+t.dataset.id);if(i)i.focus()},50);return}
+  if(act==='send-reply'){const id=t.dataset.id;const f=STATE.flags.find(x=>x.id===id);const i=$('#reply-'+id);if(!i||!i.value.trim())return;const text=i.value.trim();if(!STATE.messages[f.creatorId])STATE.messages[f.creatorId]=[];STATE.messages[f.creatorId].push({id:'m'+Date.now(),role:'bot',content:'Maya: '+text,time:new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})});f.resolved=true;toast('Reply sent',`Message delivered to ${STATE.creators[f.creatorId].name}`);render();return}
+  if(act==='add-note'){const id=t.dataset.id;const i=$('#note-input');if(!i||!i.value.trim())return;if(!STATE.notes[id])STATE.notes[id]=[];STATE.notes[id].push({op:'Maya',time:new Date().toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}),text:i.value.trim()});toast('Note added','');render();return}
+  if(act==='op-add-booking'){openSheet(renderBookingSheet(t.dataset.id));return}
+  if(act==='op-log-perf'){openSheet(renderLogPerfSheet(t.dataset.id));return}
+  if(act==='edit-creator'){openOverlay(renderEditCreatorModal(t.dataset.id));return}
+  if(act==='open-log-perf'){openSheet(renderLogPerfSheet(STATE.viewingCreatorId||'sofia'));return}
+  if(act==='open-add-creator'){openOverlay(renderAddCreatorModal());return}
+
+  // analytics
+  if(act==='export-csv'){exportCsv();return}
+
+  // bot config
+  if(act==='save-bot-name'){const n=$('#bot-name-input').value.trim();const p=$('#platform-name-input').value.trim();if(n)STATE.settings.botName=n;if(p)STATE.settings.platformName=p;toast('Updated',`Bot is now "${STATE.settings.botName}" — propagated everywhere`);render();return}
+
+  // creator switching
+  if(act==='switch-creator'){STATE.currentCreatorId=t.value;if(!STATE.bookings[t.value])STATE.bookings[t.value]=[];if(!STATE.messages[t.value])STATE.messages[t.value]=[{id:'m1',role:'bot',content:`Hey ${STATE.creators[t.value].name.split(' ')[0]} — I'm ${STATE.settings.botName}. I've got your schedule, your stats, and the city. Ask me anything.`,time:new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})}];render();return}
+
+  // feed
+  if(act==='feed-toggle'){const id=t.dataset.id;STATE.expandedFeed[id]=!STATE.expandedFeed[id];STATE.expandedFeed[id+'_seen']=true;render();return}
+  if(act==='feed-fb'){STATE.feedFb[t.dataset.id]=t.dataset.v;const p=STATE.intelPosts.find(x=>x.id===t.dataset.id);if(p){if(t.dataset.v==='good')p.usefulCount++;else if(t.dataset.v==='act')p.actedOnCount++}toast('Feedback recorded','Helps us tune your feed');render();return}
+  if(act==='add-to-cal'){const p=STATE.intelPosts.find(x=>x.id===t.dataset.id);const cid=STATE.currentCreatorId;if(!STATE.bookings[cid])STATE.bookings[cid]=[];const dt=p.category==='venue'?'2026-04-23T19:00:00':p.category==='brand'?'2026-04-25T12:30:00':p.category==='collab'?'2026-04-28T09:00:00':'2026-04-23T20:00:00';STATE.bookings[cid].push({id:'b'+Date.now(),venue:p.title.slice(0,40),type:p.category==='brand'?'brand':p.category==='collab'?'collab':'event',dateTime:dt,notes:p.body.slice(0,80),status:'pending',createdByBot:true});toast('Added to calendar',p.title.slice(0,50));render();return}
+
+  // chat
+  if(act==='chat-send'){sendChat();return}
+  if(act==='quick-msg'){const i=$('#chat-input');i.value=t.dataset.v;sendChat();return}
+  if(act==='ask-draft-dm'){openSheet(renderDraftDmSheet(null));return}
+
+  // calendar
+  if(act==='cal-prev'){STATE.selCalMonth--;if(STATE.selCalMonth<0){STATE.selCalMonth=11;STATE.selCalYear--}STATE.selCalDay=1;render();return}
+  if(act==='cal-next'){STATE.selCalMonth++;if(STATE.selCalMonth>11){STATE.selCalMonth=0;STATE.selCalYear++}STATE.selCalDay=1;render();return}
+  if(act==='cal-day'){STATE.selCalDay=parseInt(t.dataset.d);renderCalendarGrid();return}
+  if(act==='open-event'){openSheet(renderEventDetailSheet(t.dataset.id));return}
+  if(act==='open-book-sheet'){openSheet(renderBookingSheet(STATE.currentCreatorId));return}
+
+  // network
+  if(act==='net-section'){STATE.networkSection=t.dataset.v;render();return}
+  if(act==='net-search'){STATE.rosterFilter.search=t.value;render();const i=$('#net-search');if(i){i.focus();i.setSelectionRange(i.value.length,i.value.length)};return}
+  if(act==='net-niche'){STATE.rosterFilter.niche=t.dataset.v;render();return}
+  if(act==='net-view'){STATE.viewingNetCreator=t.dataset.id;render();return}
+  if(act==='net-back'){STATE.viewingNetCreator=null;render();return}
+  if(act==='net-connect'){const c=STATE.creators[STATE.currentCreatorId];const id=t.dataset.id;c.connections=c.connections||[];const i=c.connections.indexOf(id);if(i>=0){c.connections.splice(i,1);toast('Disconnected','')}else{c.connections.push(id);toast('Connected',`You can now message ${STATE.creators[id].name.split(' ')[0]}`)}render();return}
+  if(act==='net-message'){const c=STATE.creators[STATE.currentCreatorId];const id=t.dataset.id;const key=[c.id,id].sort().join('-');if(!STATE.dmThreads[key])STATE.dmThreads[key]={participants:[c.id,id],messages:[],unread:0};STATE.viewingNetCreator=null;STATE.networkSection='dms';STATE.openDmThread=key;render();return}
+  if(act==='suggest-collab'){toast('Collab suggested',`${STATE.settings.botName} will reach out to coordinate`);return}
+  if(act==='collab-sub'){STATE.networkSubTab=t.dataset.v;render();return}
+  if(act==='collab-interest'){const p=STATE.collabPosts.find(x=>x.id===t.dataset.id);const cid=STATE.currentCreatorId;const i=p.interested.indexOf(cid);if(i>=0)p.interested.splice(i,1);else{p.interested.push(cid);toast('Interest sent',`${STATE.settings.botName} will set it up`)}render();return}
+  if(act==='open-post-collab'){openOverlay(renderPostCollabModal());return}
+
+  // dms
+  if(act==='open-dm'){const t2=STATE.dmThreads[t.dataset.k];t2.unread=0;t2.messages.forEach(m=>m.read=true);STATE.openDmThread=t.dataset.k;render();return}
+  if(act==='dm-back'){STATE.openDmThread=null;render();return}
+  if(act==='dm-typing'){
+    const slot=$('#dm-typing-slot');if(!slot)return;
+    if(t.value.trim()){
+      clearTimeout(window._dmTypingTimer);
+      const other=STATE.creators[STATE.dmThreads[STATE.openDmThread].participants.find(x=>x!==STATE.currentCreatorId)];
+      slot.innerHTML=`<div class="msg bot" style="font-style:italic;opacity:.7">${esc(other.name.split(' ')[0])} is typing…</div>`;
+      window._dmTypingTimer=setTimeout(()=>{slot.innerHTML=''},2000);
+    }
+    return;
+  }
+  if(act==='dm-send'){const k=t.dataset.k;const i=$('#dm-input');if(!i||!i.value.trim())return;const text=i.value.trim();const time=new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});STATE.dmThreads[k].messages.push({from:STATE.currentCreatorId,content:text,time,read:true});i.value='';render();return}
+  if(act==='dm-draft'){openSheet(renderDraftDmSheet(t.dataset.k));return}
+
+  // creator profile edits
+  if(act==='cr-bio-input'){const i=$('#cr-bio');const cnt=$('#cr-bio-count');if(cnt)cnt.textContent=`${i.value.length}/200`;return}
+  if(act==='cr-save-bio'){const c=STATE.creators[STATE.currentCreatorId];const v=$('#cr-bio').value;c.bio=v;toast('Bio saved','Updated everywhere');render();return}
+  if(act==='cr-save-bot-name'){const v=$('#cr-bot-name').value.trim();if(v){STATE.settings.botName=v;toast('Bot name updated',`Now "${v}" everywhere`);render()};return}
+  if(act==='cr-toggle-notif'){const c=STATE.creators[STATE.currentCreatorId];c.notificationSettings[t.dataset.k]=t.checked;toast('Setting updated','');return}
+  if(act==='cr-edit-profile'){openOverlay(renderEditCreatorModal(STATE.currentCreatorId));return}
+  if(act==='add-voice'){const c=STATE.creators[STATE.currentCreatorId];const i=$('#voice-add');if(!i||!i.value.trim())return;c.voiceProfile=c.voiceProfile||[];c.voiceProfile.push(i.value.trim());toast('Voice example added','');render();return}
+  if(act==='remove-voice'){const c=STATE.creators[STATE.currentCreatorId];c.voiceProfile.splice(parseInt(t.dataset.i),1);render();return}
+  if(act==='open-log-post'){openSheet(renderLogPostSheet());return}
+  if(act==='data-export'){toast('Preparing your data export…','You\'ll receive an email shortly','info');return}
+
+  // overlay/sheet close
+  if(act==='close-overlay'){closeOverlay();return}
+  if(act==='close-sheet'){closeSheet();return}
+}
+
+function commitComposerForm(){
+  const c=STATE.composer;
+  const tit=$('#cmp-title');if(tit)c.title=tit.value;
+  const bod=$('#cmp-body');if(bod)c.body=bod.value;
+  const src=$('#cmp-source');if(src)c.source=src.value;
+  const val=$('#cmp-valid');if(val)c.validUntil=val.value;
+  const city=$('#cmp-city');if(city)c.city=city.value;
+}
+
+// ====== CHAT (Aria) ======
+function ariaReply(q, c){
+  const s=q.toLowerCase();
+  const bn=STATE.settings.botName;
+  if(/book|reserve|table/.test(s)) return `On it. I'll send the request and add a hold to your calendar — you'll get a confirm the moment they reply. Want me to suggest 3 spots based on what's hitting this week?`;
+  if(/remind|reminder/.test(s)) return `Reminder set ✓ I'll ping you 30 min before — text + push.`;
+  if(/calendar|schedule|what's on|whats on|week/.test(s)){const bks=(STATE.bookings[c.id]||[]).slice(0,4);return `This week:\n\n${bks.map(b=>'• '+new Date(b.dateTime).toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'})+' '+timeFromIso(b.dateTime)+' — '+b.venue).join('\n')}\n\nWant me to send it as a digest?`}
+  if(/engagement|stats/.test(s)) return `You're at ${c.engagementRate}% engagement, up from ${c.baselineEngagement}%. That puts you in the top quartile of micro creators in Miami. Posting cadence is ${c.postsPerWeek}/wk vs the ${c.baselinePostsPerWeek} baseline.`;
+  if(/follower|growth/.test(s)){const last=c.performance?c.performance[c.performance.length-1]:{followerDelta:0};return `${fmt(c.followers)} followers right now. +${fmt(last.followerDelta)} this week. At this pace, you'll hit ${fmt(c.followers+5000)} by end of month.`}
+  if(/post|film|content|what should/.test(s)){const drop=STATE.intelPosts.find(p=>p.targetNiches.includes(c.niche));if(drop)return `Top of your feed: ${drop.title}\n\n${drop.body.slice(0,180)}…\n\nWant me to add it to your calendar?`;return `Nothing urgent on the feed. Coast — tomorrow morning is your golden hour.`}
+  if(/deal|aesop|brand|negotiate/.test(s)){const r=marketRate(c);return `Flagging that to your manager — brand deal negotiation is their lane 🎯\n\nContext for you: at ${c.engagementRate}% ER and ${fmt(c.followers)} followers, your market rate for a sponsored Reel is $${fmt(r.reelLow)}–$${fmt(r.reelHigh)}. The Aesop $1,800 is below market — your manager will counter at $2,200.`}
+  if(/rate|worth|value|charge/.test(s)){const r=marketRate(c);return `Your market rates:\n\n• Sponsored Reel: $${fmt(r.reelLow)}–$${fmt(r.reelHigh)}\n• Static post: $${fmt(r.reelLow*.55|0)}–$${fmt(r.reelHigh*.55|0)}\n• Story bundle (3): $${fmt(r.reelLow*.4|0)}\n\nBased on followers + ER + ${c.neighborhood} positioning.`}
+  if(/draft|write|dm/.test(s)) return `I can draft a DM for you. Tell me who and what topic — I'll match your voice ("${(c.voiceProfile||['direct, low-effort'])[0]}") and you can send it manually.`;
+  if(/name|rename/.test(s)) return `You can rename me anytime in Profile → Sub-bot. The change propagates everywhere — I'll just answer to whatever you call me.`;
+  if(/nia|collab/.test(s)) return `Nia's wellness morning series: 4 weeks, 2 shoots from you, cross-post. Audience overlap 68%, expected ER bump +0.6–1.2pp. Want me to lock in shoot 1 for Tuesday morning?`;
+  if(/hi|hello|hey|morning/.test(s)) return `Hey ${c.name.split(' ')[0]} ☀️ I've got eyes on your schedule, your stats, and the city. What do you need?`;
+  return `Got it. I'll handle it — ping you when there's something to confirm.`;
+}
+function sendChat(){
+  const i=$('#chat-input');if(!i||!i.value.trim())return;
+  const c=STATE.creators[STATE.currentCreatorId];
+  const text=i.value.trim();
+  const time=new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+  if(!STATE.messages[c.id])STATE.messages[c.id]=[];
+  STATE.messages[c.id].push({id:'m'+Date.now(),role:'user',content:text,time});
+  i.value='';
+  render();
+  // typing indicator + streaming
+  setTimeout(()=>{
+    const m=$('#chat-msgs');if(!m)return;
+    const typ=document.createElement('div');typ.className='typing';typ.innerHTML='<span></span><span></span><span></span>';m.appendChild(typ);m.scrollTop=m.scrollHeight;
+    setTimeout(()=>{
+      typ.remove();
+      const reply=ariaReply(text,c);
+      const el=document.createElement('div');el.className='msg bot';m.appendChild(el);
+      const words=reply.split(' ');let idx=0;
+      const tick=()=>{if(idx>=words.length){
+        STATE.messages[c.id].push({id:'m'+Date.now(),role:'bot',content:reply,time:new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})});
+        return}
+        el.textContent=words.slice(0,idx+1).join(' ');m.scrollTop=m.scrollHeight;idx++;setTimeout(tick,40);
+      };
+      tick();
+    },1100+Math.random()*400);
+  },80);
+}
+
+// ====== OVERLAYS / SHEETS ======
+function openOverlay(html){const h=$('#overlay-host');h.innerHTML=`<div class="overlay" data-act="close-overlay">${html}</div>`}
+function closeOverlay(){$('#overlay-host').innerHTML=''}
+function openSheet(html){const h=$('#overlay-host');h.innerHTML=`<div class="sheet-overlay" data-act="close-sheet"><div class="sheet" onclick="event.stopPropagation()"><div class="sheet-handle"></div>${html}</div></div>`}
+function closeSheet(){$('#overlay-host').innerHTML=''}
+
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){closeOverlay();closeSheet()}
+});
+
+function renderPreviewModal(){
+  const c=STATE.composer;
+  const cat=(c.category||'venue')[0].toUpperCase()+(c.category||'venue').slice(1)+' drop';
+  const title=c.title||'Syntax rooftop — soft open tonight, not posted anywhere yet';
+  const body=c.body||"West corner has the skyline + water at golden hour. Small crowd, right people. Film a Reel 6–8 PM. Post 7–9 PM.";
+  return `
+    <div class="phone-frame" onclick="event.stopPropagation()">
+      <button class="overlay-close" data-act="close-overlay">×</button>
+      <div class="phone-screen">
+        <div class="phone-status"><span>9:41</span><span>● ● ● ● 100%</span></div>
+        <div style="padding:14px">
+          <div style="font-size:11px;text-transform:uppercase;letter-spacing:.2em;color:var(--txt3);font-weight:600;margin-bottom:4px">Good morning</div>
+          <div style="font-family:'Playfair Display',serif;font-style:italic;font-size:24px;font-weight:500;margin-bottom:14px">Sofia 👋</div>
+          <div class="feed-card unread ${c.category||'venue'}">
+            <div class="feed-cat">${esc(cat)}</div>
+            <div class="feed-title">${esc(title)}</div>
+            <div class="feed-time">Just now · valid until ${c.validUntil?new Date(c.validUntil).toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}):'tonight'}</div>
+            <div style="margin-top:11px;font-size:12.5px;color:var(--txt2);line-height:1.55">${esc(body)}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+function renderBookingSheet(creatorId){
+  return `
+    <h3>Ask ${esc(STATE.settings.botName)} to book</h3>
+    <div class="form-row"><label class="label">Venue / Type</label><input class="input" id="book-venue" placeholder="Komodo · table for 2" /></div>
+    <div class="form-row"><label class="label">Date & Time</label><input class="input" type="datetime-local" id="book-dt" value="2026-04-${String(STATE.selCalDay).padStart(2,'0')}T20:00" /></div>
+    <div class="form-row"><label class="label">Type</label>
+      <select class="select" id="book-type">
+        <option value="restaurant">Restaurant</option><option value="event">Event</option><option value="brand">Brand</option><option value="collab">Collab</option>
+      </select>
+    </div>
+    <div class="form-row"><label class="label">Notes</label><textarea class="textarea" id="book-notes" placeholder="Any context I should pass on…"></textarea></div>
+    <button class="btn primary full" onclick="(()=>{const v=document.getElementById('book-venue').value.trim();if(!v){toast('Venue required','','error');return}const dt=document.getElementById('book-dt').value;const tp=document.getElementById('book-type').value;const nt=document.getElementById('book-notes').value;if(!STATE.bookings['${creatorId}'])STATE.bookings['${creatorId}']=[];STATE.bookings['${creatorId}'].push({id:'b'+Date.now(),venue:v,type:tp,dateTime:dt+':00',notes:nt||'No notes',status:'pending',createdByBot:true});const d=new Date(dt);STATE.selCalYear=d.getFullYear();STATE.selCalMonth=d.getMonth();STATE.selCalDay=d.getDate();closeSheet();toast('${esc(STATE.settings.botName)} is on it','Hold added · awaiting confirm');render();})()">Book It</button>
+    <button class="btn ghost full" style="margin-top:8px" data-act="close-sheet">Cancel</button>
+  `;
+}
+function renderEventDetailSheet(id){
+  const c=STATE.creators[STATE.currentCreatorId];
+  const b=(STATE.bookings[c.id]||[]).find(x=>x.id===id);if(!b)return'';
+  return `
+    <h3>${esc(b.venue)}</h3>
+    <div style="font-size:12.5px;color:var(--txt2);margin-bottom:14px">${new Date(b.dateTime).toLocaleString('en-US',{weekday:'long',month:'long',day:'numeric',hour:'numeric',minute:'2-digit'})}</div>
+    <div class="settings-card" style="margin-bottom:14px"><div class="settings-h">Type</div><span class="agenda-tag ${bookingDot(b.type)}">${esc(b.type)} · ${esc(b.status)}</span></div>
+    <div class="form-row"><label class="label">Venue</label><input class="input" id="ev-venue" value="${esc(b.venue)}" /></div>
+    <div class="form-row"><label class="label">Date & Time</label><input class="input" type="datetime-local" id="ev-dt" value="${b.dateTime.slice(0,16)}" /></div>
+    <div class="form-row"><label class="label">Notes</label><textarea class="textarea" id="ev-notes">${esc(b.notes)}</textarea></div>
+    <div class="form-row"><label class="label">Status</label>
+      <select class="select" id="ev-status">
+        <option value="pending" ${b.status==='pending'?'selected':''}>Pending</option>
+        <option value="confirmed" ${b.status==='confirmed'?'selected':''}>Confirmed</option>
+        <option value="cancelled" ${b.status==='cancelled'?'selected':''}>Cancelled</option>
+      </select>
+    </div>
+    <div class="btn-row">
+      <button class="btn primary" onclick="(()=>{const c=STATE.creators[STATE.currentCreatorId];const b=STATE.bookings[c.id].find(x=>x.id==='${id}');b.venue=document.getElementById('ev-venue').value;b.dateTime=document.getElementById('ev-dt').value+':00';b.notes=document.getElementById('ev-notes').value;b.status=document.getElementById('ev-status').value;closeSheet();toast('Event updated','');render();})()">Save</button>
+      <button class="btn danger" onclick="(()=>{if(!confirm('Delete this event?'))return;const c=STATE.creators[STATE.currentCreatorId];STATE.bookings[c.id]=STATE.bookings[c.id].filter(x=>x.id!=='${id}');closeSheet();toast('Event deleted','');render();})()">Delete</button>
+      <button class="btn ghost" data-act="close-sheet">Cancel</button>
+    </div>
+  `;
+}
+function renderDraftDmSheet(threadKey){
+  return `
+    <h3>${esc(STATE.settings.botName)} drafts a DM</h3>
+    <div class="form-row"><label class="label">To</label><input class="input" id="draft-to" placeholder="Nia V." ${threadKey?`value="${esc(STATE.creators[STATE.dmThreads[threadKey].participants.find(x=>x!==STATE.currentCreatorId)].name)}"`:''} ${threadKey?'disabled':''} /></div>
+    <div class="form-row"><label class="label">Topic</label><input class="input" id="draft-topic" placeholder="Confirm planning call this week" /></div>
+    <button class="btn primary full" onclick="(()=>{const to=document.getElementById('draft-to').value;const tp=document.getElementById('draft-topic').value;if(!tp){toast('Topic required','','error');return}const c=STATE.creators[STATE.currentCreatorId];const draft='Hey '+(to.split(' ')[0]||'')+' — '+tp.toLowerCase()+'? Whenever works for you. — '+c.name.split(' ')[0];if('${threadKey||''}'){const i=document.getElementById('dm-input');if(i)i.value=draft;}else{const c2=STATE.creators[STATE.currentCreatorId];if(!STATE.messages[c2.id])STATE.messages[c2.id]=[];STATE.messages[c2.id].push({id:'m'+Date.now(),role:'bot',content:'Here\\'s a draft:\\n\\n\"'+draft+'\"\\n\\nSend it manually whenever you\\'re ready.',time:new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})});}closeSheet();toast('Draft ready','Edit it before sending');render();})()">Generate Draft</button>
+    <button class="btn ghost full" style="margin-top:8px" data-act="close-sheet">Cancel</button>
+  `;
+}
+function renderEditCreatorModal(id){
+  const c=STATE.creators[id];
+  return `
+    <div class="modal" onclick="event.stopPropagation()">
+      <div class="modal-head"><div class="modal-title">Edit ${esc(c.name)}</div><button class="modal-close" data-act="close-overlay">×</button></div>
+      <div class="form-row"><label class="label">Name</label><input class="input" id="ec-name" value="${esc(c.name)}" /></div>
+      <div class="form-row"><label class="label">Handle</label><input class="input" id="ec-handle" value="${esc(c.handle)}" /></div>
+      <div class="form-grid">
+        <div class="form-row"><label class="label">Niche</label><select class="select" id="ec-niche">${NICHES.map(n=>`<option ${c.niche===n?'selected':''}>${esc(n)}</option>`).join('')}</select></div>
+        <div class="form-row"><label class="label">Tier</label><select class="select" id="ec-tier"><option value="basic" ${c.tier==='basic'?'selected':''}>Basic</option><option value="pro" ${c.tier==='pro'?'selected':''}>Pro</option><option value="vip" ${c.tier==='vip'?'selected':''}>VIP</option></select></div>
+      </div>
+      <div class="form-grid">
+        <div class="form-row"><label class="label">City</label><input class="input" id="ec-city" value="${esc(c.city)}" /></div>
+        <div class="form-row"><label class="label">Neighborhood</label><input class="input" id="ec-hood" value="${esc(c.neighborhood)}" /></div>
+      </div>
+      <div class="form-row"><label class="label">Bio</label><textarea class="textarea" id="ec-bio">${esc(c.bio)}</textarea></div>
+      <div class="form-row"><label class="toggle"><input type="checkbox" id="ec-active" ${c.active?'checked':''} /><span class="switch"></span>Active</label></div>
+      <div class="btn-row">
+        <button class="btn primary" onclick="(()=>{const c=STATE.creators['${id}'];c.name=document.getElementById('ec-name').value;c.handle=document.getElementById('ec-handle').value;c.niche=document.getElementById('ec-niche').value;c.tier=document.getElementById('ec-tier').value;c.city=document.getElementById('ec-city').value;c.neighborhood=document.getElementById('ec-hood').value;c.bio=document.getElementById('ec-bio').value;c.active=document.getElementById('ec-active').checked;closeOverlay();toast('Profile saved','Updated everywhere');render();})()">Save</button>
+        <button class="btn ghost" data-act="close-overlay">Cancel</button>
+      </div>
+    </div>
+  `;
+}
+function renderAddCreatorModal(){
+  return `
+    <div class="modal" onclick="event.stopPropagation()">
+      <div class="modal-head"><div class="modal-title">Add Creator</div><button class="modal-close" data-act="close-overlay">×</button></div>
+      <div class="form-grid">
+        <div class="form-row"><label class="label">Name</label><input class="input" id="ac-name" placeholder="Lola M." /></div>
+        <div class="form-row"><label class="label">Handle</label><input class="input" id="ac-handle" placeholder="@lola" /></div>
+      </div>
+      <div class="form-grid">
+        <div class="form-row"><label class="label">Niche</label><select class="select" id="ac-niche">${NICHES.map(n=>`<option>${esc(n)}</option>`).join('')}</select></div>
+        <div class="form-row"><label class="label">Tier</label><select class="select" id="ac-tier"><option value="basic">Basic</option><option value="pro" selected>Pro</option><option value="vip">VIP</option></select></div>
+      </div>
+      <div class="form-grid">
+        <div class="form-row"><label class="label">Followers</label><input class="input" id="ac-followers" type="number" value="25000" /></div>
+        <div class="form-row"><label class="label">Engagement %</label><input class="input" id="ac-er" type="number" step="0.1" value="3.2" /></div>
+      </div>
+      <div class="btn-row">
+        <button class="btn primary" onclick="(()=>{const id='c'+Date.now();const n=document.getElementById('ac-name').value;if(!n){toast('Name required','','error');return}const initials=n.split(' ').map(x=>x[0]).join('').slice(0,2).toUpperCase();STATE.creators[id]={id,name:n,handle:document.getElementById('ac-handle').value||'@'+n.toLowerCase().split(' ')[0],niche:document.getElementById('ac-niche').value,city:'Miami',neighborhood:'Brickell',followers:parseInt(document.getElementById('ac-followers').value),engagementRate:parseFloat(document.getElementById('ac-er').value),tier:document.getElementById('ac-tier').value,postsPerWeek:3,active:true,bio:'New addition to the roster.',avatarGradient:'linear-gradient(135deg,#FFB84E,#4EFFE0)',avatarInitials:initials,baselineFollowers:parseInt(document.getElementById('ac-followers').value),baselineEngagement:parseFloat(document.getElementById('ac-er').value),baselinePostsPerWeek:2,brandDealsActive:0,brandDealValue:0,voiceProfile:[],connections:[],notificationSettings:{dailyIntel:true,postingReminders:true,bookingReminders:true,smsAlerts:false,collabMatches:true,weeklyDigest:true},performance:[]};closeOverlay();toast('Creator added',n+' is now in your roster');render();})()">Add</button>
+        <button class="btn ghost" data-act="close-overlay">Cancel</button>
+      </div>
+    </div>
+  `;
+}
+function renderLogPerfSheet(creatorId){
+  return `
+    <h3>Log weekly performance</h3>
+    <div style="font-size:11.5px;color:var(--txt3);margin-bottom:13px">${esc(STATE.creators[creatorId].name)} · adds to performance log + updates charts</div>
+    <div class="form-grid">
+      <div class="form-row"><label class="label">Posts</label><input class="input" type="number" id="lp-posts" value="5" /></div>
+      <div class="form-row"><label class="label">Engagement %</label><input class="input" type="number" step="0.1" id="lp-er" value="4.5" /></div>
+    </div>
+    <div class="form-grid">
+      <div class="form-row"><label class="label">Δ Followers</label><input class="input" type="number" id="lp-fd" value="900" /></div>
+      <div class="form-row"><label class="label">Brand value $</label><input class="input" type="number" id="lp-bv" value="3800" /></div>
+    </div>
+    <div class="form-row"><label class="label">Notes</label><textarea class="textarea" id="lp-notes" placeholder="What drove the change…"></textarea></div>
+    <button class="btn primary full" onclick="(()=>{const c=STATE.creators['${creatorId}'];const wk=(c.performance||[]).length+1;c.performance=c.performance||[];c.performance.push({week:wk,posts:parseInt(document.getElementById('lp-posts').value),engagement:parseFloat(document.getElementById('lp-er').value),followerDelta:parseInt(document.getElementById('lp-fd').value),brandDeals:c.brandDealsActive,brandValue:parseInt(document.getElementById('lp-bv').value)});c.engagementRate=parseFloat(document.getElementById('lp-er').value);c.postsPerWeek=parseInt(document.getElementById('lp-posts').value);c.followers+=parseInt(document.getElementById('lp-fd').value);closeSheet();toast('Performance logged','Charts updated');render();})()">Save Week</button>
+    <button class="btn ghost full" style="margin-top:8px" data-act="close-sheet">Cancel</button>
+  `;
+}
+function renderLogPostSheet(){
+  const c=STATE.creators[STATE.currentCreatorId];
+  return `
+    <h3>Log a post</h3>
+    <div class="form-row"><label class="label">URL</label><input class="input" id="lpost-url" placeholder="instagram.com/p/…" /></div>
+    <div class="form-grid">
+      <div class="form-row"><label class="label">Type</label><select class="select" id="lpost-type"><option>Reel</option><option>Carousel</option><option>Static</option><option>Story</option></select></div>
+      <div class="form-row"><label class="label">Linked Hot Drop</label><select class="select" id="lpost-intel"><option value="">— None —</option>${STATE.intelPosts.map(p=>`<option value="${p.id}">${esc(p.title.slice(0,40))}</option>`).join('')}</select></div>
+    </div>
+    <div class="form-row"><label class="label">Caption excerpt</label><input class="input" id="lpost-cap" placeholder="One line that captures it" /></div>
+    <div class="form-grid">
+      <div class="form-row"><label class="label">Likes</label><input class="input" type="number" id="lpost-likes" value="2400" /></div>
+      <div class="form-row"><label class="label">Comments</label><input class="input" type="number" id="lpost-comments" value="120" /></div>
+    </div>
+    <button class="btn primary full" onclick="(()=>{const url=document.getElementById('lpost-url').value;if(!url){toast('URL required','','error');return}if(!STATE.receipts['${c.id}'])STATE.receipts['${c.id}']=[];STATE.receipts['${c.id}'].unshift({url,type:document.getElementById('lpost-type').value,excerpt:document.getElementById('lpost-cap').value||'(no caption)',likes:parseInt(document.getElementById('lpost-likes').value),comments:parseInt(document.getElementById('lpost-comments').value),intelId:document.getElementById('lpost-intel').value,date:new Date().toLocaleDateString('en-US',{month:'short',day:'numeric'})});closeSheet();toast('Post logged','Receipts updated');render();})()">Log Post</button>
+    <button class="btn ghost full" style="margin-top:8px" data-act="close-sheet">Cancel</button>
+  `;
+}
+function renderPostCollabModal(){
+  return `
+    <div class="modal" onclick="event.stopPropagation()">
+      <div class="modal-head"><div class="modal-title">Post a collab</div><button class="modal-close" data-act="close-overlay">×</button></div>
+      <div class="form-row"><label class="label">Title</label><input class="input" id="pc-title" placeholder="Looking for a co-post partner" /></div>
+      <div class="form-row"><label class="label">Description</label><textarea class="textarea" id="pc-desc"></textarea></div>
+      <div class="form-grid">
+        <div class="form-row"><label class="label">Type</label><select class="select" id="pc-type"><option value="co_post">Co-Post</option><option value="brand_deal">Brand Deal</option><option value="event">Event</option></select></div>
+        <div class="form-row"><label class="label">Compensation</label><input class="input" id="pc-comp" placeholder="Rev share / $X / mutual" /></div>
+      </div>
+      <div class="form-row"><label class="label">Deadline</label><input class="input" type="date" id="pc-deadline" /></div>
+      <div class="btn-row">
+        <button class="btn primary" onclick="(()=>{const t=document.getElementById('pc-title').value;if(!t){toast('Title required','','error');return}STATE.collabPosts.unshift({id:'c'+Date.now(),postedBy:STATE.currentCreatorId,title:t,description:document.getElementById('pc-desc').value||'(no description)',type:document.getElementById('pc-type').value,compensation:document.getElementById('pc-comp').value||'TBD',targetNiches:[STATE.creators[STATE.currentCreatorId].niche],deadline:document.getElementById('pc-deadline').value||null,isActive:true,interested:[]});closeOverlay();toast('Collab posted','Visible to the network');render();})()">Post</button>
+        <button class="btn ghost" data-act="close-overlay">Cancel</button>
+      </div>
+    </div>
+  `;
+}
+
+// ====== CSV EXPORT ======
+function exportCsv(){
+  const rows=[['week','avg_posts','avg_engagement']];
+  STATE.pilotStats.weeklyPosts.forEach((p,i)=>rows.push([i+1,p,STATE.pilotStats.weeklyER[i]]));
+  rows.push([]);rows.push(['creator','followers','er','tier','posts_per_week','active']);
+  Object.values(STATE.creators).forEach(c=>rows.push([c.name,c.followers,c.engagementRate,c.tier,c.postsPerWeek,c.active]));
+  const csv=rows.map(r=>r.join(',')).join('\n');
+  const blob=new Blob([csv],{type:'text/csv'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;a.download='babyg_pilot_w6.csv';a.click();
+  URL.revokeObjectURL(url);
+  toast('CSV exported','babyg_pilot_w6.csv downloaded');
+}
+
+// ====== TYPED INPUTS — keep state on input ======
+document.addEventListener('input',e=>{
+  const t=e.target;
+  if(t.id==='cmp-title')STATE.composer.title=t.value;
+  else if(t.id==='cmp-body')STATE.composer.body=t.value;
+  else if(t.id==='cmp-source')STATE.composer.source=t.value;
+  else if(t.id==='cmp-valid')STATE.composer.validUntil=t.value;
+  else if(t.id==='cmp-city')STATE.composer.city=t.value;
+  else if(t.id==='roster-search'){STATE.rosterFilter.search=t.value;render();const i=$('#roster-search');if(i){i.focus();i.setSelectionRange(i.value.length,i.value.length)}}
+  else if(t.id==='roster-tier'){STATE.rosterFilter.tier=t.value;render()}
+  else if(t.id==='roster-niche'){STATE.rosterFilter.niche=t.value;render()}
+  else if(t.id==='net-search'){STATE.rosterFilter.search=t.value;render();const i=$('#net-search');if(i){i.focus();i.setSelectionRange(i.value.length,i.value.length)}}
+  else if(t.dataset && t.dataset.act==='roster-active'){STATE.rosterFilter.activeOnly=t.checked;render()}
+  else if(t.id==='cr-bio'){const cnt=$('#cr-bio-count');if(cnt)cnt.textContent=`${t.value.length}/200`}
+  else if(t.dataset && t.dataset.act==='cr-toggle-notif'){const c=STATE.creators[STATE.currentCreatorId];c.notificationSettings[t.dataset.k]=t.checked}
+  else if(t.dataset && t.dataset.act==='dm-typing'){
+    const slot=$('#dm-typing-slot');if(!slot)return;
+    if(t.value.trim()){
+      clearTimeout(window._dmTypingTimer);
+      const other=STATE.creators[STATE.dmThreads[STATE.openDmThread].participants.find(x=>x!==STATE.currentCreatorId)];
+      slot.innerHTML=`<div class="msg bot" style="font-style:italic;opacity:.7">${esc(other.name.split(' ')[0])} is typing…</div>`;
+      window._dmTypingTimer=setTimeout(()=>{slot.innerHTML=''},2000);
+    }
+  }
+});
+document.addEventListener('change',e=>{
+  const t=e.target;
+  if(t.dataset && t.dataset.act==='switch-creator'){STATE.currentCreatorId=t.value;render()}
+});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Enter'){
+    const t=e.target;
+    if(t.id==='chat-input'){e.preventDefault();sendChat()}
+    else if(t.id==='dm-input'){
+      e.preventDefault();
+      const k=STATE.openDmThread;if(!k)return;
+      const text=t.value.trim();if(!text)return;
+      const time=new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+      STATE.dmThreads[k].messages.push({from:STATE.currentCreatorId,content:text,time,read:true});
+      t.value='';render();
+    }
+    else if(t.id==='voice-add'){e.preventDefault();const c=STATE.creators[STATE.currentCreatorId];if(!t.value.trim())return;c.voiceProfile=c.voiceProfile||[];c.voiceProfile.push(t.value.trim());render()}
+  }
+});
+
+// initial render
+render();
+</script>
+</body>
+</html>
